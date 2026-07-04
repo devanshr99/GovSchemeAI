@@ -107,8 +107,8 @@ class BackupRestoreManager:
                 # 4. Environment Configurations (Sanitizing secrets)
                 if "configs" in targets:
                     env_path = Path(".env")
+                    sanitized_lines = []
                     if env_path.exists():
-                        sanitized_lines = []
                         with open(env_path, "r", encoding="utf-8") as f:
                             for line in f:
                                 if "=" in line:
@@ -120,11 +120,20 @@ class BackupRestoreManager:
                                         sanitized_lines.append(line)
                                 else:
                                     sanitized_lines.append(line)
-                        config_temp = self.temp_dir / "sanitized.env"
-                        with open(config_temp, "w", encoding="utf-8") as f:
-                            f.writelines(sanitized_lines)
-                        zip_file.write(config_temp, arcname="configs/sanitized.env")
-                        os.remove(config_temp)
+                    else:
+                        # Fallback: Generate sanitized configuration from active settings (e.g. in CI environments)
+                        for key, val in self.settings.model_dump().items():
+                            key_upper = key.upper()
+                            if any(secret_word in key.lower() for secret_word in ["key", "secret", "password", "token"]):
+                                sanitized_lines.append(f"{key_upper}=[REDACTED]\n")
+                            else:
+                                sanitized_lines.append(f"{key_upper}={val}\n")
+
+                    config_temp = self.temp_dir / "sanitized.env"
+                    with open(config_temp, "w", encoding="utf-8") as f:
+                        f.writelines(sanitized_lines)
+                    zip_file.write(config_temp, arcname="configs/sanitized.env")
+                    os.remove(config_temp)
 
                 # 5. Logs (Memory Logs Buffer)
                 if "logs" in targets:
