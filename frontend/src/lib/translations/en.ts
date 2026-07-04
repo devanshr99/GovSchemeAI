@@ -1,0 +1,117 @@
+export const en = {
+  // Navigation & Layout
+  title: "GovSchemeAI",
+  subtitle: "Government Schemes Discovery Platform",
+  findSchemes: "Find Schemes",
+  browseSchemes: "Browse Schemes",
+  chatAssistant: "AI Assistant",
+  about: "About",
+  adminPanel: "Admin Panel",
+  logout: "Logout",
+  navMenuLabel: "Main navigation menu",
+  langPickerLabel: "Change language",
+  activeLangLabel: "Active language is English",
+  comingSoon: "Coming Soon",
+
+  // Landing / Hero Section
+  heroTitle: "Discover Government Schemes You Qualify For",
+  heroSubtitle: "Enter your profile info and let our AI eligibility engine match you with benefits, scholarships, farming subsidies, pension plans, and more.",
+  startChecking: "Find Schemes You Can Apply For",
+  schemesChecked: "schemes scanned",
+  eligibleMatches: "eligible schemes found",
+  activeSchemes: "Active Schemes",
+  categories: "Categories",
+
+  // Profile Form Labels & Attributes
+  formHeading: "Your Profile Details",
+  formSubheading: "All fields are kept secure locally.",
+  labelAge: "Age (in years)",
+  labelGender: "Gender",
+  genderMale: "Male",
+  genderFemale: "Female",
+  genderOther: "Other",
+  labelState: "State / UT",
+  labelDistrict: "District",
+  labelOccupation: "Occupation",
+  labelAnnualIncome: "Annual Family Income (₹)",
+  labelCategory: "Social Category",
+  categoryGeneral: "General",
+  categoryObc: "OBC",
+  categorySc: "SC",
+  categorySt: "ST",
+  labelDisability: "Person with Disability (PwD)",
+  labelBpl: "Below Poverty Line (BPL)",
+  labelFarmer: "Are you a Farmer?",
+  labelLand: "Land Holding (in hectares)",
+  labelStudent: "Are you a Student?",
+  labelWoman: "Applying specifically as a Woman?",
+  labelSenior: "Senior Citizen?",
+  buttonCheck: "Check Eligibility",
+  buttonChecking: "Matching Schemes...",
+  resetForm: "Reset Profile",
+
+  // Occupations List
+  occupationFarmer: "Farmer",
+  occupationStudent: "Student",
+  occupationHomemaker: "Homemaker",
+  occupationUnemployed: "Unemployed",
+  occupationSalaried: "Salaried",
+  occupationBusiness: "Business / Self-Employed",
+  occupationLaborer: "Daily Wage Laborer",
+
+  // Form Validation & Errors
+  valAgeMin: "Age cannot be negative",
+  valAgeMax: "Age cannot exceed 120 years",
+  valIncomeMin: "Annual income cannot be negative",
+  valLandMin: "Land holding cannot be negative",
+  backendOfflineError: "Cannot connect to the backend server. Please make sure it is running on port 8000.",
+  generalFormError: "Failed to check eligibility. Please try again.",
+
+  // Results & Schemes Card UI
+  matchedResults: "Your Matching Schemes",
+  matchScore: "Match Confidence",
+  benefits: "Benefits",
+  documents: "Required Documents",
+  applicationProcess: "Application Process",
+  applyNow: "Official Apply Link",
+  helpline: "Helpline",
+  deadline: "Deadline",
+  explainWhy: "Explain with AI",
+  close: "Close",
+  aiSummaryTitle: "AI Eligibility Analysis",
+  noDeadline: "Open / No Deadline",
+  loadingSchemes: "Loading schemes data...",
+  noSchemesFound: "No schemes match your filters.",
+  emptyStatesTitle: "No Schemes Found",
+  emptyStatesDesc: "Try adjusting your filters or search keywords.",
+  loadMore: "Load More",
+
+  // Chat Interface
+  chatPromptPlaceholder: "Ask anything about government schemes...",
+  chatWelcome: "Hello! I am GovSchemeAI, your virtual guide. Ask me any questions about Indian government schemes, benefits, eligibility, or how to apply.",
+  chatSources: "Sources",
+  chatSending: "Sending message...",
+  chatError: "Failed to send message. Please retry.",
+  searchPlaceholder: "Search schemes by name, keyword or ministry...",
+  filterLevel: "Scheme Level",
+  filterCategory: "Scheme Category",
+  allLevels: "All Levels",
+  central: "Central Government",
+  state: "State Government",
+  allCategories: "All Categories",
+
+  // Offline / Error States UI
+  offlineTitle: "You are Offline",
+  offlineDesc: "Please check your internet connection. Some features may be unavailable.",
+  retryBtn: "Retry Now",
+  successMessage: "Data saved successfully!",
+  errorTitle: "Unexpected Error",
+  errorDesc: "Something went wrong. Please refresh the page.",
+
+  // Accessibility Announcements
+  loadingIndicator: "Loading content, please wait...",
+  profileResetAnnounce: "Profile data cleared successfully",
+  langChangedAnnounce: "Language changed successfully"
+};
+
+export type TranslationType = typeof en;

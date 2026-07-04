@@ -1,0 +1,117 @@
+import { TranslationType } from './en';
+
+export const hi: TranslationType = {
+  // Navigation & Layout
+  title: "GovSchemeAI",
+  subtitle: "सरकारी योजना खोज मंच",
+  findSchemes: "पात्रता जाँचें",
+  browseSchemes: "योजनाएं देखें",
+  chatAssistant: "AI सहायक",
+  about: "हमारे बारे में",
+  adminPanel: "व्यवस्थापक पैनल",
+  logout: "लॉगआउट",
+  navMenuLabel: "मुख्य नेविगेशन मेनू",
+  langPickerLabel: "भाषा बदलें",
+  activeLangLabel: "सक्रिय भाषा हिन्दी है",
+  comingSoon: "जल्द आ रहा है",
+
+  // Landing / Hero Section
+  heroTitle: "उन सरकारी योजनाओं को खोजें जिनके लिए आप पात्र हैं",
+  heroSubtitle: "अपनी प्रोफाइल दर्ज करें और हमारा AI इंजन आपको कृषि सब्सिडी, छात्रवृत्ति, पेंशन और अन्य योजनाओं से मिलाएगा।",
+  startChecking: "अपनी पात्रता जांचें",
+  schemesChecked: "योजनाएं स्कैन की गईं",
+  eligibleMatches: "योग्य योजनाएं मिलीं",
+  activeSchemes: "सक्रिय योजनाएं",
+  categories: "श्रेणियाँ",
+
+  // Profile Form Labels & Attributes
+  formHeading: "आपकी व्यक्तिगत जानकारी",
+  formSubheading: "आपकी जानकारी सुरक्षित रखी जाती है।",
+  labelAge: "आयु (वर्षों में)",
+  labelGender: "लिंग",
+  genderMale: "पुरुष",
+  genderFemale: "महिला",
+  genderOther: "अन्य",
+  labelState: "राज्य / केंद्र शासित प्रदेश",
+  labelDistrict: "जिला",
+  labelOccupation: "व्यवसाय",
+  labelAnnualIncome: "वार्षिक पारिवारिक आय (₹)",
+  labelCategory: "सामाजिक श्रेणी",
+  categoryGeneral: "सामान्य (General)",
+  categoryObc: "अन्य पिछड़ा वर्ग (OBC)",
+  categorySc: "अनुसूचित जाति (SC)",
+  categorySt: "अनुसूचित जनजाति (ST)",
+  labelDisability: "दिव्यांगता (PwD) स्थिति",
+  labelBpl: "गरीबी रेखा से नीचे (BPL)",
+  labelFarmer: "क्या आप किसान हैं?",
+  labelLand: "भूमि जोत (हेक्टेयर में)",
+  labelStudent: "क्या आप छात्र हैं?",
+  labelWoman: "विशेष रूप से महिला के रूप में आवेदन?",
+  labelSenior: "वरिष्ठ नागरिक?",
+  buttonCheck: "पात्रता की जाँच करें",
+  buttonChecking: "जाँच की जा रही है...",
+  resetForm: "प्रोफाइल रीसेट करें",
+
+  // Occupations List
+  occupationFarmer: "किसान",
+  occupationStudent: "छात्र",
+  occupationHomemaker: "गृहणी",
+  occupationUnemployed: "बेरोजगार",
+  occupationSalaried: "नौकरीपेशा",
+  occupationBusiness: "व्यवसाय / स्व-व्यवसायी",
+  occupationLaborer: "दैनिक मजदूर",
+
+  // Form Validation & Errors
+  valAgeMin: "आयु नकारात्मक नहीं हो सकती",
+  valAgeMax: "आयु 120 वर्ष से अधिक नहीं हो सकती",
+  valIncomeMin: "वार्षिक आय नकारात्मक नहीं हो सकती",
+  valLandMin: "भूमि जोत नकारात्मक नहीं हो सकती",
+  backendOfflineError: "बैकएंड सर्वर से कनेक्ट नहीं हो पा रहा है। कृपया सुनिश्चित करें कि यह पोर्ट 8000 पर चल रहा है।",
+  generalFormError: "पात्रता जाँचने में विफल। कृपया पुन: प्रयास करें।",
+
+  // Results & Schemes Card UI
+  matchedResults: "आपके लिए योजनाएं",
+  matchScore: "मैच स्कोर",
+  benefits: "लाभ",
+  documents: "आवश्यक दस्तावेज",
+  applicationProcess: "आवेदन प्रक्रिया",
+  applyNow: "आधिकारिक आवेदन लिंक",
+  helpline: "हेल्पलाइन",
+  deadline: "अंतिम तिथि",
+  explainWhy: "AI से समझें",
+  close: "बंद करें",
+  aiSummaryTitle: "AI पात्रता विश्लेषण",
+  noDeadline: "खुला है / कोई अंतिम तिथि नहीं",
+  loadingSchemes: "योजनाओं का डेटा लोड हो रहा है...",
+  noSchemesFound: "फ़िल्टर के अनुसार कोई योजना नहीं मिली।",
+  emptyStatesTitle: "कोई योजना नहीं मिली",
+  emptyStatesDesc: "फ़िल्टर या खोज शब्दों को समायोजित करने का प्रयास करें।",
+  loadMore: "अधिक लोड करें",
+
+  // Chat Interface
+  chatPromptPlaceholder: "सरकारी योजनाओं के बारे में कुछ भी पूछें...",
+  chatWelcome: "नमस्ते! मैं GovSchemeAI हूँ। मुझसे भारतीय सरकारी योजनाओं, लाभों, पात्रता या आवेदन करने के तरीके के बारे में कोई भी प्रश्न पूछें।",
+  chatSources: "स्रोत",
+  chatSending: "संदेश भेजा जा रहा है...",
+  chatError: "संदेश भेजने में विफल। कृपया पुन: प्रयास करें।",
+  searchPlaceholder: "नाम, कीवर्ड या मंत्रालय द्वारा खोजें...",
+  filterLevel: "योजना स्तर",
+  filterCategory: "योजना श्रेणी",
+  allLevels: "सभी स्तर",
+  central: "केंद्र सरकार",
+  state: "राज्य सरकार",
+  allCategories: "सभी श्रेणियां",
+
+  // Offline / Error States UI
+  offlineTitle: "आप ऑफ़लाइन हैं",
+  offlineDesc: "कृपया अपना इंटरनेट कनेक्शन जांचें। कुछ सुविधाएं अनुपलब्ध हो सकती हैं।",
+  retryBtn: "पुनः प्रयास करें",
+  successMessage: "डेटा सफलतापूर्वक सहेज लिया गया!",
+  errorTitle: "अपेक्षित त्रुटि",
+  errorDesc: "कुछ गलत हो गया। कृपया पृष्ठ को रीफ़्रेश करें।",
+
+  // Accessibility Announcements
+  loadingIndicator: "सामग्री लोड हो रही है, कृपया प्रतीक्षा करें...",
+  profileResetAnnounce: "प्रोफाइल डेटा सफलतापूर्वक साफ कर दिया गया है",
+  langChangedAnnounce: "भाषा सफलतापूर्वक बदल दी गई है"
+};

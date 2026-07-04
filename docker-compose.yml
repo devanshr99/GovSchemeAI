@@ -1,0 +1,205 @@
+version: '3.8'
+
+services:
+  # 1. Production PostgreSQL Database
+  database:
+    image: postgres:15-alpine
+    container_name: govscheme-database
+    restart: always
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-govscheme}
+      POSTGRES_USER: ${POSTGRES_USER:-govscheme}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-govschemesecret}
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    networks:
+      - govscheme-backend
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # 2. Redis Data Broker / Cache
+  redis:
+    image: redis:7-alpine
+    container_name: govscheme-redis
+    restart: always
+    command: redis-server --save 60 1 --loglevel warning
+    volumes:
+      - redis_data:/data
+    networks:
+      - govscheme-backend
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # 3. Production FastAPI Backend API
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: govscheme-backend
+    restart: always
+    environment:
+      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-govscheme}:${POSTGRES_PASSWORD:-govschemesecret}@database:5432/${POSTGRES_DB:-govscheme}
+      REDIS_URL: redis://redis:6379/0
+      DEBUG: "False"
+      HOST: "0.0.0.0"
+      PORT: "8000"
+      GEMINI_API_KEY: ${GEMINI_API_KEY}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY}
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+      OPENROUTER_API_KEY: ${OPENROUTER_API_KEY}
+    volumes:
+      - backend_data:/app/data
+    networks:
+      - govscheme-backend
+    depends_on:
+      database:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  # 4. Production Next.js Frontend
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: govscheme-frontend
+    restart: always
+    environment:
+      NODE_ENV: production
+      PORT: "3000"
+      BACKEND_URL: http://backend:8000
+    networks:
+      - govscheme-frontend
+      - govscheme-backend
+    depends_on:
+      - backend
+
+  # 5. Dedicated Queue Worker (Scaled separately from API server)
+  worker:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: govscheme-worker
+    restart: always
+    command: ["python", "-m", "app.services.worker_manager"]
+    environment:
+      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-govscheme}:${POSTGRES_PASSWORD:-govschemesecret}@database:5432/${POSTGRES_DB:-govscheme}
+      REDIS_URL: redis://redis:6379/0
+      DEBUG: "False"
+    volumes:
+      - backend_data:/app/data
+    networks:
+      - govscheme-backend
+    depends_on:
+      database:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  # 6. Dedicated Scheduler Engine
+  scheduler:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: govscheme-scheduler
+    restart: always
+    command: ["python", "-m", "app.scheduler"]
+    environment:
+      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-govscheme}:${POSTGRES_PASSWORD:-govschemesecret}@database:5432/${POSTGRES_DB:-govscheme}
+      REDIS_URL: redis://redis:6379/0
+      DEBUG: "False"
+    volumes:
+      - backend_data:/app/data
+    networks:
+      - govscheme-backend
+    depends_on:
+      database:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  # 7. Reverse Proxy (Nginx)
+  reverse-proxy:
+    image: nginx:1.25-alpine
+    container_name: govscheme-reverse-proxy
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/ssl:/etc/nginx/ssl:ro
+      - certbot_etc:/etc/letsencrypt
+      - certbot_var:/var/lib/letsencrypt
+      - webroot_path:/var/www/certbot
+    networks:
+      - govscheme-frontend
+      - govscheme-backend
+    depends_on:
+      - frontend
+      - backend
+
+  # 8. Monitoring (Prometheus)
+  prometheus:
+    image: prom/prometheus:v2.45.0
+    container_name: govscheme-prometheus
+    restart: always
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--storage.tsdb.retention.time=15d'
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+    networks:
+      - govscheme-backend
+    ports:
+      - "9090:9090"
+
+  # 9. Visualization Dashboards (Grafana)
+  grafana:
+    image: grafana/grafana:10.0.0
+    container_name: govscheme-grafana
+    restart: always
+    environment:
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:-admin}
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./grafana/provisioning/datasources:/etc/grafana/provisioning/datasources:ro
+      - ./grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards:ro
+    networks:
+      - govscheme-backend
+    ports:
+      - "3001:3000"
+    depends_on:
+      - prometheus
+
+volumes:
+  pg_data:
+    driver: local
+  redis_data:
+    driver: local
+  backend_data:
+    driver: local
+  prometheus_data:
+    driver: local
+  grafana_data:
+    driver: local
+  certbot_etc:
+    driver: local
+  certbot_var:
+    driver: local
+  webroot_path:
+    driver: local
+
+networks:
+  govscheme-frontend:
+    driver: bridge
+  govscheme-backend:
+    driver: bridge
