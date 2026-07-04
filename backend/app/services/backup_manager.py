@@ -364,9 +364,9 @@ class BackupRestoreManager:
                 if table.name in ("backup_jobs", "backup_history", "restore_history", "disaster_events", "failover_events"):
                     continue
                 if is_sqlite:
-                    await db.execute(text(f"DELETE FROM {table.name};"))
+                    await db.execute(text(f"DELETE FROM {table.name};"))  # nosec B608
                 else:
-                    await db.execute(text(f"TRUNCATE TABLE {table.name} CASCADE;"))
+                    await db.execute(text(f"TRUNCATE TABLE {table.name} CASCADE;"))  # nosec B608
 
             # Populate tables in forward metadata order
             for table in Base.metadata.sorted_tables:

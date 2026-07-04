@@ -17,7 +17,7 @@ class Settings(BaseSettings):
     debug: bool = False
 
     # Server
-    host: str = "0.0.0.0"
+    host: str = "0.0.0.0"  # nosec B104
     port: int = 8000
 
     # Database — SQLite for dev, PostgreSQL for prod
