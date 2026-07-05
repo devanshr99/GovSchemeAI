@@ -80,8 +80,8 @@ export default function AboutDeveloper() {
               <div className="absolute inset-0 bg-gradient-to-tr from-blue-500/10 to-orange-500/10 opacity-30 group-hover:opacity-50 transition-opacity duration-300" />
               <div className="relative w-full h-full rounded-xl overflow-hidden bg-slate-900/50">
                 <Image
-                  src="/developer_illustration.png"
-                  alt="Devansh Rastogi - AI Developer Illustration"
+                  src="/developer_photo.jpg"
+                  alt="Devansh Rastogi - Developer Photo"
                   fill
                   sizes="(max-w-768px) 100vw, 400px"
                   className="object-cover group-hover:scale-105 transition-transform duration-500"
