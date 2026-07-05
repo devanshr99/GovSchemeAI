@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useApp } from '../../context/AppContext';
-import { Globe, Search, MessageSquare, ShieldAlert, Award, Menu, X, Settings } from 'lucide-react';
+import { Globe, Search, MessageSquare, ShieldAlert, Award, Menu, X, Settings, User } from 'lucide-react';
 import { LanguagePicker } from './LanguagePicker';
 
 export const Navbar: React.FC = () => {
@@ -33,6 +33,7 @@ export const Navbar: React.FC = () => {
     { href: '/', label: t('findSchemes'), icon: ShieldAlert },
     { href: '/schemes', label: t('browseSchemes'), icon: Search },
     { href: '/chat', label: t('chatAssistant'), icon: MessageSquare },
+    { href: '/about-developer', label: 'About Developer', icon: User },
   ];
 
   return (

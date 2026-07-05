@@ -5,9 +5,16 @@ import { Footer } from '../components/layout/Footer';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'GovSchemeAI — Government Schemes Discovery Platform',
-  description: 'Help Indian citizens discover all government schemes they are eligible for using AI matching and structured profiles.',
+  title: 'GovSchemeAI | AI Powered Government Scheme Finder',
+  description: 'GovSchemeAI helps Indian citizens discover government schemes, check eligibility, and receive AI-powered recommendations instantly.',
   keywords: ['government schemes', 'India', 'scholarships', 'subsidies', 'pension', 'PM-KISAN', 'eligibility matching'],
+  openGraph: {
+    title: 'GovSchemeAI | AI Powered Government Scheme Finder',
+    description: 'GovSchemeAI helps Indian citizens discover government schemes, check eligibility, and receive AI-powered recommendations instantly.',
+    type: 'website',
+    locale: 'en_IN',
+    siteName: 'GovSchemeAI',
+  },
 };
 
 export default function RootLayout({
