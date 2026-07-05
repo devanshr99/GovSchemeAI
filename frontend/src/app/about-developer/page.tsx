@@ -76,15 +76,15 @@ export default function AboutDeveloper() {
 
           {/* Right Column: Premium Tech Illustration */}
           <div className="lg:col-span-5 flex justify-center">
-            <div className="relative w-full max-w-[400px] aspect-square rounded-2xl overflow-hidden glass-panel border border-white/[0.08] p-3 shadow-2xl shadow-blue-500/10 group">
+            <div className="relative w-full max-w-[360px] aspect-[3/4] rounded-2xl overflow-hidden glass-panel border border-white/[0.08] p-3 shadow-2xl shadow-blue-500/10 group">
               <div className="absolute inset-0 bg-gradient-to-tr from-blue-500/10 to-orange-500/10 opacity-30 group-hover:opacity-50 transition-opacity duration-300" />
               <div className="relative w-full h-full rounded-xl overflow-hidden bg-slate-900/50">
                 <Image
                   src="/developer_photo.jpg"
                   alt="Devansh Rastogi - Developer Photo"
                   fill
-                  sizes="(max-w-768px) 100vw, 400px"
-                  className="object-cover group-hover:scale-105 transition-transform duration-500"
+                  sizes="(max-w-768px) 100vw, 360px"
+                  className="object-cover object-top group-hover:scale-105 transition-transform duration-500"
                   priority
                 />
               </div>
