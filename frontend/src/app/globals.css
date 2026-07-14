@@ -165,3 +165,63 @@ textarea:focus-visible,
   outline-offset: 2px !important;
   box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.2) !important;
 }
+
+/* Typewriter Cursor animation */
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+.typewriter-cursor::after {
+  content: '▋';
+  display: inline-block;
+  color: var(--primary);
+  margin-left: 2px;
+  animation: blink 1s step-end infinite;
+}
+
+/* Custom Table Styles inside markdown */
+.markdown-table-wrapper {
+  overflow-x: auto;
+  margin: 1rem 0;
+  border-radius: 0.75rem;
+  border: 1px solid var(--card-border);
+}
+
+.markdown-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 0.875rem;
+}
+
+.markdown-table th {
+  background: rgba(255, 255, 255, 0.05);
+  color: white;
+  font-weight: 700;
+  padding: 0.75rem 1rem;
+  border-bottom: 2px solid var(--card-border);
+}
+
+.markdown-table td {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--card-border);
+  color: #cbd5e1;
+}
+
+.markdown-table tr:last-child td {
+  border-bottom: none;
+}
+
+.markdown-table tr:hover td {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+/* Circular Progress Animation */
+@keyframes progress {
+  from { stroke-dashoffset: 283; }
+}
+
+.circular-progress-circle {
+  transition: stroke-dashoffset 0.8s ease-in-out;
+}

@@ -28,6 +28,9 @@ export interface SchemeDetail extends SchemeCard {
   deadline?: string;
   launched_date?: string;
   eligibility_rules_summary: string[];
+  ai_summary?: string;
+  related_schemes?: SchemeCard[];
+  similar_schemes?: SchemeCard[];
 }
 
 export interface SchemeListResponse {

@@ -100,8 +100,79 @@ export const api = {
         message: params.message,
         session_id: params.sessionId,
         language: params.language,
+        context: api.getProfileFromStorage(),
       }),
     });
+  },
+
+  sendChatMessageStream: async (params: {
+    message: string;
+    sessionId?: string;
+    language: 'en' | 'hi';
+    onChunk: (text: string) => void;
+    onDone: (data: { session_id: string }) => void;
+    onError: (err: any) => void;
+  }): Promise<void> => {
+    try {
+      const response = await fetch('/api/chat/stream', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          message: params.message,
+          session_id: params.sessionId,
+          language: params.language,
+          context: api.getProfileFromStorage(),
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const reader = response.body?.getReader();
+      if (!reader) {
+        throw new Error('ReadableStream not supported by browser.');
+      }
+
+      const decoder = new TextDecoder();
+      let buffer = '';
+
+      while (true) {
+        const { value, done } = await reader.read();
+        if (done) break;
+
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split('\n');
+        buffer = lines.pop() || '';
+
+        for (const line of lines) {
+          const cleanLine = line.trim();
+          if (!cleanLine) continue;
+          if (cleanLine.startsWith('data: ')) {
+            const dataStr = cleanLine.substring(6);
+            try {
+              const data = JSON.parse(dataStr);
+              if (data.error) {
+                params.onError(new Error(data.error));
+              } else {
+                if (data.text) {
+                  params.onChunk(data.text);
+                }
+                if (data.session_id) {
+                  params.onDone({ session_id: data.session_id });
+                }
+              }
+            } catch (e) {
+              console.warn('Failed to parse chat stream SSE payload', e);
+            }
+          }
+        }
+      }
+    } catch (err) {
+      params.onError(err);
+    }
   },
 
   // Profile Storage helpers

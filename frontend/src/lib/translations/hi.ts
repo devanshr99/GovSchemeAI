@@ -14,6 +14,7 @@ export const hi: TranslationType = {
   langPickerLabel: "भाषा बदलें",
   activeLangLabel: "सक्रिय भाषा हिन्दी है",
   comingSoon: "जल्द आ रहा है",
+  back: "पीछे जाएं",
 
   // Landing / Hero Section
   heroTitle: "उन सरकारी योजनाओं को खोजें जिनके लिए आप पात्र हैं",

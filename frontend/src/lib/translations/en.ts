@@ -12,6 +12,7 @@ export const en = {
   langPickerLabel: "Change language",
   activeLangLabel: "Active language is English",
   comingSoon: "Coming Soon",
+  back: "Back",
 
   // Landing / Hero Section
   heroTitle: "Discover Government Schemes You Qualify For",

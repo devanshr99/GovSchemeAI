@@ -71,6 +71,7 @@ class EligibleSchemeResult(BaseModel):
     rules_matched: int = 0
     rules_total: int = 0
     ai_explanation: Optional[str] = None
+    rules_evaluation: list[str] = []
 
 
 class EligibilityResponse(BaseModel):

@@ -25,6 +25,12 @@ class AIProvider(ABC):
         pass
 
     @abstractmethod
+    async def generate_stream(
+        self, prompt: str, system_prompt: str = "", max_tokens: int = 1024
+    ):
+        pass
+
+    @abstractmethod
     async def check_availability(self) -> bool:
         pass
 
@@ -70,6 +76,13 @@ class GeminiProvider(AIProvider):
                 return parts[0].get("text", "")
         return ""
 
+    async def generate_stream(
+        self, prompt: str, system_prompt: str = "", max_tokens: int = 1024
+    ):
+        text = await self.generate(prompt, system_prompt, max_tokens)
+        if text:
+            yield text
+
     async def check_availability(self) -> bool:
         return bool(self.api_key)
 
@@ -110,6 +123,13 @@ class ClaudeProvider(AIProvider):
         if content:
             return content[0].get("text", "")
         return ""
+
+    async def generate_stream(
+        self, prompt: str, system_prompt: str = "", max_tokens: int = 1024
+    ):
+        text = await self.generate(prompt, system_prompt, max_tokens)
+        if text:
+            yield text
 
     async def check_availability(self) -> bool:
         return bool(self.api_key)
@@ -156,6 +176,50 @@ class OpenAIProvider(AIProvider):
             return choices[0].get("message", {}).get("content", "")
         return ""
 
+    async def generate_stream(
+        self, prompt: str, system_prompt: str = "", max_tokens: int = 1024
+    ):
+        if not self.api_key:
+            raise RuntimeError("OpenAI API key not configured")
+        messages = []
+        if system_prompt:
+            messages.append({"role": "system", "content": system_prompt})
+        messages.append({"role": "user", "content": prompt})
+
+        url = "https://api.openai.com/v1/chat/completions"
+        headers = {
+            "Authorization": f"Bearer {self.api_key}",
+            "Content-Type": "application/json",
+        }
+        payload = {
+            "model": self.model,
+            "messages": messages,
+            "max_tokens": max_tokens,
+            "temperature": 0.3,
+            "stream": True,
+        }
+
+        async with self.client.stream("POST", url, headers=headers, json=payload, timeout=30.0) as response:
+            response.raise_for_status()
+            async for line in response.aiter_lines():
+                line = line.strip()
+                if not line:
+                    continue
+                if line.startswith("data: "):
+                    data_str = line[6:]
+                    if data_str == "[DONE]":
+                        break
+                    try:
+                        data = json.loads(data_str)
+                        choices = data.get("choices", [])
+                        if choices:
+                            delta = choices[0].get("delta", {})
+                            content = delta.get("content", "")
+                            if content:
+                                yield content
+                    except Exception:
+                        pass
+
     async def check_availability(self) -> bool:
         return bool(self.api_key)
 
@@ -171,6 +235,13 @@ class FallbackProvider(AIProvider):
             "Please check the scheme details and eligibility criteria listed above. "
             "For assistance, contact the helpline number provided."
         )
+
+    async def generate_stream(
+        self, prompt: str, system_prompt: str = "", max_tokens: int = 1024
+    ):
+        text = await self.generate(prompt, system_prompt, max_tokens)
+        if text:
+            yield text
 
     async def check_availability(self) -> bool:
         return True
@@ -218,6 +289,53 @@ class OpenRouterProvider(AIProvider):
         if choices:
             return choices[0].get("message", {}).get("content", "")
         return ""
+
+    async def generate_stream(
+        self, prompt: str, system_prompt: str = "", max_tokens: int = 1024
+    ):
+        if not self.api_key:
+            raise RuntimeError("OpenRouter API key not configured")
+
+        messages = []
+        if system_prompt:
+            messages.append({"role": "system", "content": system_prompt})
+        messages.append({"role": "user", "content": prompt})
+
+        url = "https://openrouter.ai/api/v1/chat/completions"
+        headers = {
+            "Authorization": f"Bearer {self.api_key}",
+            "Content-Type": "application/json",
+            "HTTP-Referer": "http://localhost:3000",
+            "X-Title": "GovSchemeAI - Government Schemes",
+        }
+        payload = {
+            "model": self.model,
+            "messages": messages,
+            "max_tokens": max_tokens,
+            "temperature": 0.4,
+            "stream": True,
+        }
+
+        async with self.client.stream("POST", url, headers=headers, json=payload, timeout=45.0) as response:
+            response.raise_for_status()
+            async for line in response.aiter_lines():
+                line = line.strip()
+                if not line:
+                    continue
+                if line.startswith("data: "):
+                    data_str = line[6:]
+                    if data_str == "[DONE]":
+                        break
+                    try:
+                        data = json.loads(data_str)
+                        choices = data.get("choices", [])
+                        if choices:
+                            delta = choices[0].get("delta", {})
+                            content = delta.get("content", "")
+                            if content:
+                                yield content
+                    except Exception:
+                        pass
 
     async def check_availability(self) -> bool:
         return bool(self.api_key)
@@ -354,6 +472,88 @@ Suggest users verify details on official government websites."""
 
         prompt = "\n\n".join(parts)
         return await self.generate(prompt, system_prompt, max_tokens=500)
+
+    async def generate_stream(
+        self,
+        prompt: str,
+        system_prompt: str = "",
+        max_tokens: int = 1024,
+    ):
+        """Generate text stream using configured AI provider with fallback chain."""
+        provider = self._get_provider()
+        try:
+            if await provider.check_availability():
+                async for chunk in provider.generate_stream(prompt, system_prompt, max_tokens):
+                    yield chunk
+                return
+        except Exception as e:
+            logger.warning(f"Primary provider ({self.primary}) streaming failed: {e}")
+
+        # Try remaining providers
+        for name, prov in self.providers.items():
+            if name == self.primary or name == "fallback":
+                continue
+            try:
+                if await prov.check_availability():
+                    logger.info(f"Streaming falling back to {name}")
+                    async for chunk in prov.generate_stream(prompt, system_prompt, max_tokens):
+                        yield chunk
+                    return
+            except Exception as e:
+                logger.warning(f"Fallback provider ({name}) streaming failed: {e}")
+
+        # Last resort
+        fallback_text = await self.providers["fallback"].generate(prompt, system_prompt, max_tokens)
+        yield fallback_text
+
+    async def chat_response_stream(
+        self,
+        user_message: str,
+        context: str = "",
+        chat_history: list[dict] = None,
+        language: str = "en",
+    ):
+        """Generate a conversational streaming response about government schemes."""
+        lang_instruction = (
+            "Respond in Hindi (Devanagari script)." if language == "hi"
+            else "Respond in simple English."
+        )
+
+        system_prompt = f"""You are GovSchemeAI, a friendly and highly intelligent AI assistant that helps Indian citizens
+discover and understand government schemes they're eligible for.
+{lang_instruction}
+Be accurate. If you're not sure about a scheme detail, say so.
+Never make up scheme names, amounts, or eligibility criteria.
+Suggest users verify details on official government websites.
+
+Response Format Guidelines:
+1. Use markdown tables to compare schemes or present structured information (e.g. comparing benefits, age limits, required documents).
+2. Use bullet formatting and bold text for lists of documents, steps to apply, or key points.
+3. Be friendly, empathetic, and clear.
+4. Answer questions like:
+   - Which schemes am I eligible for? (Use the provided User Profile & Eligible Schemes context)
+   - Why am I eligible or why am I not eligible? (Compare profile against rules)
+   - Compare schemes
+   - Required documents
+   - Application process
+   - Official websites, deadlines, benefits
+5. If eligibility is low or not met, explain why clearly (e.g. age not in range, income exceeds limit).
+6. If info is unavailable, state it honestly instead of hallucinating."""
+
+        # Build context
+        parts = []
+        if context:
+            parts.append(f"Reference information:\n{context}")
+        if chat_history:
+            history_text = "\n".join(
+                [f"{m['role']}: {m['content']}" for m in chat_history[-6:]]
+            )
+            parts.append(f"Previous conversation:\n{history_text}")
+        parts.append(f"User: {user_message}")
+
+        prompt = "\n\n".join(parts)
+        async for chunk in self.generate_stream(prompt, system_prompt, max_tokens=1000):
+            yield chunk
 
 
 # Singleton

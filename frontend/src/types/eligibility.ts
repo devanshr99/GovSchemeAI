@@ -29,6 +29,7 @@ export interface EligibleSchemeResult extends SchemeCard {
   application_url?: string;
   helpline?: string;
   deadline?: string;
+  rules_evaluation?: string[];
 }
 
 export interface EligibilityResponse {

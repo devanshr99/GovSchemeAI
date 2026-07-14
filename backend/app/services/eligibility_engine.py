@@ -376,7 +376,8 @@ class EligibilityEngine:
                         category_icon=scheme.category.icon if scheme.category else None,
                         match_score=match_score,
                         rules_matched=rules_matched,
-                        rules_total=rules_total
+                        rules_total=rules_total,
+                        rules_evaluation=eval_res.get("explanations", [])
                     )
                 )
 

@@ -49,6 +49,11 @@ class SchemeDetail(SchemeCard):
     confidence_score: Optional[float] = None
     updated_at: Optional[datetime] = None
 
+    # UI fields
+    ai_summary: Optional[str] = None
+    related_schemes: list[SchemeCard] = []
+    similar_schemes: list[SchemeCard] = []
+
 
 class SchemeListResponse(BaseModel):
     """Paginated scheme list."""
