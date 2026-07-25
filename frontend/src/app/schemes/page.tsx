@@ -6,7 +6,7 @@ import { SchemeCard } from '../../components/schemes/SchemeCard';
 import { api } from '../../lib/api';
 import Link from 'next/link';
 import { SchemeCard as SchemeCardType, Category } from '../../types/scheme';
-import { Search, Filter, BookOpen, RefreshCw, X, History, TrendingUp, Sparkles, Clock, ArrowUpDown } from 'lucide-react';
+import { Search, BookOpen, RefreshCw, X, History, TrendingUp, Clock } from 'lucide-react';
 
 export default function SchemesBrowse() {
   const { language, t } = useApp();
@@ -36,7 +36,6 @@ export default function SchemesBrowse() {
 
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // Load basic configurations, search history, recently viewed
   useEffect(() => {
     Promise.all([api.getCategories(), api.getStates()])
       .then(([cats, states]) => {
@@ -53,7 +52,6 @@ export default function SchemesBrowse() {
       setRecentlyViewed(recent);
     }
 
-    // Handle clicks outside to close suggestions dropdown
     const handleOutsideClick = (e: MouseEvent) => {
       if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
         setShowSuggestions(false);
@@ -73,7 +71,7 @@ export default function SchemesBrowse() {
     return () => clearTimeout(handler);
   }, [search]);
 
-  // Autocomplete suggestions prefix fetch
+  // Autocomplete suggestions
   useEffect(() => {
     if (search.trim().length >= 2) {
       fetch(`/api/search/autocomplete?prefix=${encodeURIComponent(search.trim())}`)
@@ -91,7 +89,7 @@ export default function SchemesBrowse() {
     }
   }, [search]);
 
-  // Load schemes when filters change
+  // Fetch schemes
   useEffect(() => {
     setLoading(true);
     api.getSchemes({
@@ -107,7 +105,6 @@ export default function SchemesBrowse() {
           setSchemes(res.schemes);
         } else {
           setSchemes(prev => {
-            // deduplicate
             const existingIds = new Set(prev.map(s => s.id));
             const newSchemes = res.schemes.filter(s => !existingIds.has(s.id));
             return [...prev, ...newSchemes];
@@ -115,7 +112,6 @@ export default function SchemesBrowse() {
         }
         setTotal(res.total);
 
-        // Save successful search query to history
         if (debouncedSearch.trim() && page === 1 && res.total > 0) {
           saveSearchToHistory(debouncedSearch.trim());
         }
@@ -148,7 +144,6 @@ export default function SchemesBrowse() {
     setPage(prev => prev + 1);
   };
 
-  // Perform Client-side sorting on loaded schemes
   const getSortedSchemes = () => {
     const sorted = [...schemes];
     if (sortBy === 'name-asc') {
@@ -177,22 +172,22 @@ export default function SchemesBrowse() {
     <div className="mx-auto max-w-5xl w-full py-12 px-4 sm:px-6 lg:px-8 space-y-8 relative z-10">
       {/* Title */}
       <div className="space-y-1">
-        <h1 className="text-3xl font-extrabold text-[#111827] flex items-center gap-2">
-          <BookOpen className="h-7 w-7 text-[#0F766E]" />
+        <h1 className="text-3xl font-extrabold text-[#101828] flex items-center gap-2.5">
+          <BookOpen className="h-7 w-7 text-[#2563EB]" />
           {t('browseSchemes')}
         </h1>
-        <p className="text-sm text-[#6B7280]">
+        <p className="text-sm text-[#667085]">
           Find verified government welfare programs. Apply directly or check eligibility.
         </p>
       </div>
 
       {/* Filter and Search Panel */}
       <div className="space-y-4" ref={containerRef}>
-        <div className="glass-panel rounded-xl p-4 sm:p-5 grid grid-cols-1 md:grid-cols-4 gap-4 items-center relative">
+        <div className="glass-panel rounded-2xl p-4 sm:p-5 grid grid-cols-1 md:grid-cols-4 gap-4 items-center relative">
           
-          {/* Search Input and Suggestions */}
+          {/* Search Input */}
           <div className="relative md:col-span-2">
-            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-[#9CA3AF]" />
+            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-[#98A2B3]" />
             <input
               type="text"
               placeholder={t('searchPlaceholder')}
@@ -202,7 +197,7 @@ export default function SchemesBrowse() {
                 setIsFocused(true);
                 if (suggestions.length > 0) setShowSuggestions(true);
               }}
-              className="w-full pl-10 pr-10 py-2.5 rounded-lg text-sm"
+              className="w-full pl-10 pr-10 py-2.5 rounded-xl text-sm"
             />
             {search && (
               <button
@@ -210,30 +205,29 @@ export default function SchemesBrowse() {
                   setSearch('');
                   setSuggestions([]);
                 }}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-[#9CA3AF] hover:text-[#111827] p-1 cursor-pointer"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-[#98A2B3] hover:text-[#101828] p-1 cursor-pointer"
               >
-                <X className="h-3.5 w-3.5" />
+                <X className="h-4 w-4" />
               </button>
             )}
 
             {/* Suggestions & History Dropdown */}
             {((showSuggestions && suggestions.length > 0) || (isFocused && searchHistory.length > 0 && !search)) && (
-              <div className="absolute top-[105%] left-0 right-0 bg-white rounded-xl border border-[#E5E7EB] shadow-lg p-3 z-30 space-y-3">
-                {/* Search History */}
+              <div className="absolute top-[105%] left-0 right-0 bg-white rounded-2xl border border-[#E4E7EC] shadow-xl p-3.5 z-30 space-y-3">
                 {!search && searchHistory.length > 0 && (
                   <div className="space-y-2">
-                    <div className="flex justify-between items-center text-[10px] uppercase font-semibold tracking-wider text-[#9CA3AF] px-1">
+                    <div className="flex justify-between items-center text-[10px] uppercase font-semibold tracking-wider text-[#98A2B3] px-1">
                       <span className="flex items-center gap-1">
                         <History className="h-3.5 w-3.5" /> Recent Searches
                       </span>
-                      <button onClick={clearHistory} className="hover:text-[#DC2626] cursor-pointer">Clear All</button>
+                      <button onClick={clearHistory} className="hover:text-[#F04438] cursor-pointer">Clear All</button>
                     </div>
                     <div className="flex flex-wrap gap-1.5 p-1">
                       {searchHistory.map((q, idx) => (
                         <button
                           key={idx}
                           onClick={() => handleSuggestionClick(q)}
-                          className="text-xs bg-[#F3F4F6] hover:bg-[#E5E7EB] text-[#374151] px-3 py-1.5 rounded-lg border border-[#E5E7EB] cursor-pointer transition-colors"
+                          className="text-xs bg-[#F2F4F7] hover:bg-[#EAECF0] text-[#344054] px-3 py-1.5 rounded-lg border border-[#E4E7EC] cursor-pointer transition-colors"
                         >
                           {q}
                         </button>
@@ -242,19 +236,18 @@ export default function SchemesBrowse() {
                   </div>
                 )}
 
-                {/* Suggestions List */}
                 {search && suggestions.length > 0 && (
                   <div className="space-y-1">
-                    <span className="text-[10px] uppercase font-semibold tracking-wider text-[#9CA3AF] px-1 block mb-1">
+                    <span className="text-[10px] uppercase font-semibold tracking-wider text-[#98A2B3] px-1 block mb-1">
                       Matching Suggestions
                     </span>
                     {suggestions.map((suggestion, sIdx) => (
                       <button
                         key={sIdx}
                         onClick={() => handleSuggestionClick(suggestion)}
-                        className="w-full text-left px-3 py-2 text-xs rounded-lg hover:bg-[#F3F4F6] text-[#374151] hover:text-[#111827] flex items-center gap-2 cursor-pointer transition-colors"
+                        className="w-full text-left px-3 py-2 text-xs rounded-lg hover:bg-[#F2F4F7] text-[#344054] hover:text-[#101828] flex items-center gap-2 cursor-pointer transition-colors"
                       >
-                        <TrendingUp className="h-3.5 w-3.5 text-[#0F766E]" />
+                        <TrendingUp className="h-3.5 w-3.5 text-[#2563EB]" />
                         <span className="line-clamp-1">{suggestion}</span>
                       </button>
                     ))}
@@ -272,7 +265,7 @@ export default function SchemesBrowse() {
                 setLevel(e.target.value);
                 setPage(1);
               }}
-              className="w-full px-3 py-2.5 rounded-lg text-sm appearance-none cursor-pointer"
+              className="w-full px-3 py-2.5 rounded-xl text-sm appearance-none cursor-pointer"
             >
               <option value="">{t('filterLevel')}</option>
               <option value="central">{t('central')}</option>
@@ -285,7 +278,7 @@ export default function SchemesBrowse() {
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value)}
-              className="w-full px-3 py-2.5 rounded-lg text-sm appearance-none cursor-pointer"
+              className="w-full px-3 py-2.5 rounded-xl text-sm appearance-none cursor-pointer"
             >
               <option value="name-asc">Alphabetical (A - Z)</option>
               <option value="name-desc">Alphabetical (Z - A)</option>
@@ -297,16 +290,16 @@ export default function SchemesBrowse() {
 
         {/* Category filter chips */}
         {categories.length > 0 && (
-          <div className="flex flex-wrap gap-2 items-center bg-[#F9FAFB] p-3 rounded-xl border border-[#E5E7EB]">
+          <div className="flex flex-wrap gap-2 items-center bg-[#F8FAFC] p-3.5 rounded-2xl border border-[#E4E7EC]">
             <button
               onClick={() => {
                 setCategory('');
                 setPage(1);
               }}
-              className={`text-xs px-3.5 py-1.5 rounded-lg border transition-all cursor-pointer font-semibold ${
+              className={`text-xs px-3.5 py-1.5 rounded-xl border transition-all cursor-pointer font-semibold ${
                 category === ''
-                  ? 'bg-[#0F766E] border-[#0F766E] text-white'
-                  : 'bg-white border-[#E5E7EB] text-[#6B7280] hover:text-[#111827] hover:border-[#D1D5DB]'
+                  ? 'bg-[#2563EB] border-[#2563EB] text-white'
+                  : 'bg-white border-[#E4E7EC] text-[#667085] hover:text-[#101828] hover:border-[#D0D5DD]'
               }`}
             >
               All Categories
@@ -318,10 +311,10 @@ export default function SchemesBrowse() {
                   setCategory(cat.slug);
                   setPage(1);
                 }}
-                className={`text-xs px-3.5 py-1.5 rounded-lg border transition-all cursor-pointer font-semibold flex items-center gap-1.5 ${
+                className={`text-xs px-3.5 py-1.5 rounded-xl border transition-all cursor-pointer font-semibold flex items-center gap-1.5 ${
                   category === cat.slug
-                    ? 'bg-[#0F766E] border-[#0F766E] text-white'
-                    : 'bg-white border-[#E5E7EB] text-[#6B7280] hover:text-[#111827] hover:border-[#D1D5DB]'
+                    ? 'bg-[#2563EB] border-[#2563EB] text-white'
+                    : 'bg-white border-[#E4E7EC] text-[#667085] hover:text-[#101828] hover:border-[#D0D5DD]'
                 }`}
               >
                 <span>{cat.icon || '📁'}</span>
@@ -332,7 +325,7 @@ export default function SchemesBrowse() {
         )}
       </div>
 
-      {/* Schemes Grid */}
+      {/* Schemes List */}
       <div className="space-y-5">
         {getSortedSchemes().map((scheme) => (
           <SchemeCard
@@ -347,24 +340,22 @@ export default function SchemesBrowse() {
           />
         ))}
 
-        {/* Loading skeleton */}
         {loading && page === 1 && (
           <div className="space-y-4">
             {[1, 2, 3].map(n => (
-              <div key={n} className="glass-panel h-28 rounded-xl skeleton-shimmer opacity-60" />
+              <div key={n} className="glass-panel h-28 rounded-2xl skeleton-shimmer opacity-60" />
             ))}
           </div>
         )}
 
-        {/* No Results Page */}
         {!loading && schemes.length === 0 && (
           <div className="glass-panel rounded-2xl p-12 text-center space-y-6 max-w-xl mx-auto">
-            <div className="h-16 w-16 bg-[#F3F4F6] border border-[#E5E7EB] rounded-full flex items-center justify-center mx-auto text-[#9CA3AF]">
+            <div className="h-16 w-16 bg-[#F2F4F7] border border-[#E4E7EC] rounded-full flex items-center justify-center mx-auto text-[#98A2B3]">
               <Search className="h-8 w-8" />
             </div>
             <div className="space-y-2">
-              <h2 className="text-xl font-bold text-[#111827]">No Schemes Found</h2>
-              <p className="text-[#6B7280] text-sm">
+              <h2 className="text-xl font-bold text-[#101828]">No Schemes Found</h2>
+              <p className="text-[#667085] text-sm">
                 We couldn&apos;t find any schemes matching your filters or search query. Try searching for these popular items instead:
               </p>
             </div>
@@ -373,9 +364,9 @@ export default function SchemesBrowse() {
                 <button
                   key={idx}
                   onClick={() => setSearch(q)}
-                  className="text-xs px-3.5 py-2 rounded-lg bg-[#F0FDFA] border border-[#0F766E]/15 text-[#0F766E] hover:bg-[#CCFBF1] font-semibold transition-all cursor-pointer flex items-center gap-1"
+                  className="text-xs px-3.5 py-2 rounded-xl bg-[#EFF6FF] border border-[#2563EB]/15 text-[#2563EB] hover:bg-[#DBEAFE] font-semibold transition-all cursor-pointer flex items-center gap-1"
                 >
-                  <TrendingUp className="h-3 w-3" />
+                  <TrendingUp className="h-3.5 w-3.5" />
                   {q}
                 </button>
               ))}
@@ -383,12 +374,11 @@ export default function SchemesBrowse() {
           </div>
         )}
 
-        {/* Load More Button */}
         {!loading && schemes.length < total && (
           <div className="flex justify-center pt-4">
             <button
               onClick={loadMore}
-              className="px-6 py-2.5 bg-white hover:bg-[#F9FAFB] text-[#374151] border border-[#E5E7EB] hover:border-[#D1D5DB] rounded-lg text-sm font-semibold flex items-center gap-2 transition-all cursor-pointer"
+              className="px-6 py-2.5 bg-white hover:bg-[#F8FAFC] text-[#344054] border border-[#E4E7EC] hover:border-[#D0D5DD] rounded-xl text-sm font-semibold flex items-center gap-2 transition-all cursor-pointer shadow-sm"
             >
               <RefreshCw className="h-4 w-4" />
               {t('loadMore')}
@@ -399,9 +389,9 @@ export default function SchemesBrowse() {
 
       {/* Recently Viewed schemes row */}
       {!loading && recentlyViewed.length > 0 && (
-        <div className="space-y-4 pt-10 border-t border-[#E5E7EB]">
-          <h3 className="text-base font-bold text-[#111827] flex items-center gap-2">
-            <Clock className="h-4 w-4 text-[#0F766E]" />
+        <div className="space-y-4 pt-10 border-t border-[#E4E7EC]">
+          <h3 className="text-base font-bold text-[#101828] flex items-center gap-2">
+            <Clock className="h-4.5 w-4.5 text-[#2563EB]" />
             Recently Viewed Schemes
           </h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
@@ -409,12 +399,12 @@ export default function SchemesBrowse() {
               <Link
                 href={`/schemes/${recent.slug}`}
                 key={recent.id}
-                className="block glass-panel p-4 rounded-xl hover:border-[#0F766E]/20 hover:bg-[#FAFAFA] transition-all group"
+                className="block glass-panel p-4 rounded-xl hover:border-[#2563EB]/30 hover:bg-[#FAFAFA] transition-all group"
               >
-                <span className="text-[9px] uppercase tracking-wider font-semibold text-[#0F766E] block mb-1">
+                <span className="text-[10px] uppercase tracking-wider font-semibold text-[#2563EB] block mb-1">
                   {recent.category_name || 'General'}
                 </span>
-                <h4 className="font-semibold text-xs text-[#111827] group-hover:text-[#0F766E] transition-colors line-clamp-1">
+                <h4 className="font-semibold text-xs text-[#101828] group-hover:text-[#2563EB] transition-colors line-clamp-1">
                   {language === 'hi' && recent.name_hi ? recent.name_hi : recent.name}
                 </h4>
               </Link>

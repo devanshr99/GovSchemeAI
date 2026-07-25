@@ -4,36 +4,29 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useApp } from '../../context/AppContext';
-import { Globe, Search, MessageSquare, ShieldAlert, Award, Menu, X, Settings, User } from 'lucide-react';
+import { Search, MessageSquare, ShieldCheck, Menu, X, Settings, User } from 'lucide-react';
 import { LanguagePicker } from './LanguagePicker';
 
-/** Inline SVG Logo — Shield + Document checkmark (minimal, flat, professional) */
+/** Startup Logo SVG — Flat minimal geometry (Shield + Document + Checkmark) */
 const LogoIcon = () => (
-  <svg width="36" height="36" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-    {/* Shield shape */}
+  <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" className="shrink-0" aria-hidden="true">
+    <rect width="32" height="32" rx="8" fill="#2563EB" />
     <path
-      d="M18 3L5 9v8c0 8.5 5.5 16.4 13 18 7.5-1.6 13-9.5 13-18V9L18 3z"
-      fill="#0F766E"
-      fillOpacity="0.08"
-      stroke="#0F766E"
+      d="M16 6L8 10V16C8 21.5 11.5 26.5 16 27.5C20.5 26.5 24 21.5 24 16V10L16 6Z"
+      fill="#FFFFFF"
+      fillOpacity="0.15"
+      stroke="#FFFFFF"
       strokeWidth="1.5"
       strokeLinejoin="round"
     />
-    {/* Document inside */}
-    <rect x="12" y="10" width="12" height="15" rx="2" fill="#FFFFFF" stroke="#0F766E" strokeWidth="1.2" />
-    {/* Document lines */}
-    <line x1="14.5" y1="14" x2="21.5" y2="14" stroke="#D1D5DB" strokeWidth="1" strokeLinecap="round" />
-    <line x1="14.5" y1="17" x2="21.5" y2="17" stroke="#D1D5DB" strokeWidth="1" strokeLinecap="round" />
-    <line x1="14.5" y1="20" x2="18.5" y2="20" stroke="#D1D5DB" strokeWidth="1" strokeLinecap="round" />
-    {/* Checkmark circle */}
-    <circle cx="22" cy="22" r="5.5" fill="#0F766E" stroke="#FFFFFF" strokeWidth="1.5" />
-    <path d="M19.5 22L21 23.5L24.5 20" stroke="#FFFFFF" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+    <rect x="11" y="10" width="10" height="12" rx="2" fill="#FFFFFF" />
+    <path d="M13.5 16L15.5 18L18.5 14" stroke="#2563EB" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
   </svg>
 );
 
 export const Navbar: React.FC = () => {
   const pathname = usePathname();
-  const { language, setLanguage, t } = useApp();
+  const { language, t } = useApp();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [backendOnline, setBackendOnline] = useState<boolean | null>(null);
 
@@ -48,34 +41,32 @@ export const Navbar: React.FC = () => {
       }
     };
     checkHealth();
-    // Re-check every 60 seconds
     const interval = setInterval(checkHealth, 60_000);
     return () => clearInterval(interval);
   }, []);
 
   const navItems = [
-    { href: '/', label: t('findSchemes'), icon: ShieldAlert },
+    { href: '/', label: t('findSchemes'), icon: ShieldCheck },
     { href: '/schemes', label: t('browseSchemes'), icon: Search },
     { href: '/chat', label: t('chatAssistant'), icon: MessageSquare },
     { href: '/about-developer', label: 'About Developer', icon: User },
   ];
 
   return (
-    <nav className="sticky top-0 z-50 w-full border-b border-[#E5E7EB] bg-white/95 backdrop-blur-sm">
+    <nav className="sticky top-0 z-50 w-full border-b border-[#E4E7EC] bg-white/98 backdrop-blur-md">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 items-center justify-between">
           {/* Logo */}
           <div className="flex items-center">
             <Link href="/" className="flex items-center gap-2.5 group">
               <LogoIcon />
-              <span className="text-xl font-semibold tracking-tight">
-                <span className="text-[#111827]">GovScheme</span>
-                <span className="text-[#0F766E] font-bold">AI</span>
+              <span className="text-lg font-bold tracking-tight text-[#101828]">
+                GovScheme<span className="text-[#2563EB] font-extrabold">AI</span>
               </span>
             </Link>
           </div>
 
-          {/* Desktop Nav Links */}
+          {/* Desktop Navigation Links */}
           <div className="hidden md:flex items-center gap-1">
             {navItems.map((item) => {
               const Icon = item.icon;
@@ -84,74 +75,74 @@ export const Navbar: React.FC = () => {
                 <Link
                   key={item.href}
                   href={item.href}
-                  className={`flex items-center gap-2 text-sm font-medium px-3 py-2 rounded-lg transition-all duration-150 ${
+                  className={`flex items-center gap-2 text-sm font-medium px-3.5 py-2 rounded-lg transition-all duration-150 ${
                     isActive
-                      ? 'bg-[#F0FDFA] text-[#0F766E] font-semibold'
-                      : 'text-[#6B7280] hover:text-[#111827] hover:bg-[#F9FAFB]'
+                      ? 'bg-[#F2F4F7] text-[#101828] font-semibold'
+                      : 'text-[#667085] hover:text-[#101828] hover:bg-[#F8FAFC]'
                   }`}
                 >
-                  <Icon className="h-4 w-4" />
+                  <Icon className="h-4 w-4 stroke-[2]" />
                   {item.label}
                 </Link>
               );
             })}
           </div>
 
-          {/* Actions */}
-          <div className="flex items-center gap-2.5">
-            {/* Backend Health Indicator */}
+          {/* Action controls */}
+          <div className="flex items-center gap-3">
+            {/* Backend Health Status Pill */}
             <div
-              className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[10px] font-semibold uppercase tracking-wider"
-              title={backendOnline === null ? 'Checking backend...' : backendOnline ? 'Backend online' : 'Backend offline — start the server on port 8000'}
+              className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-medium bg-[#F8FAFC] border border-[#E4E7EC]"
+              title={backendOnline === null ? 'Checking backend connection...' : backendOnline ? 'FastAPI backend connected' : 'Backend offline'}
             >
               <div
                 className={`h-2 w-2 rounded-full ${
                   backendOnline === null
-                    ? 'bg-gray-300 animate-pulse'
+                    ? 'bg-[#98A2B3] animate-pulse'
                     : backendOnline
-                    ? 'bg-[#16A34A]'
-                    : 'bg-[#DC2626]'
+                    ? 'bg-[#12B76A]'
+                    : 'bg-[#F04438]'
                 }`}
               />
-              <span className={`${backendOnline ? 'text-[#16A34A]' : backendOnline === false ? 'text-[#DC2626]' : 'text-[#9CA3AF]'}`}>
-                {backendOnline === null ? 'Checking' : backendOnline ? 'Online' : 'Offline'}
+              <span className="text-[#667085]">
+                {backendOnline === null ? 'Checking' : backendOnline ? 'API Active' : 'API Offline'}
               </span>
             </div>
 
-            {/* Admin link */}
+            {/* Admin Dashboard */}
             <Link
               href="/admin"
-              className={`hidden sm:flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border text-xs font-medium transition-all ${
+              className={`hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-semibold transition-all ${
                 pathname === '/admin'
-                  ? 'bg-[#F0FDFA] border-[#0F766E]/20 text-[#0F766E]'
-                  : 'border-[#E5E7EB] hover:border-[#D1D5DB] text-[#6B7280] hover:text-[#111827] bg-white hover:bg-[#F9FAFB]'
+                  ? 'bg-[#EFF6FF] border-[#2563EB]/20 text-[#2563EB]'
+                  : 'border-[#E4E7EC] hover:border-[#D0D5DD] text-[#344054] hover:text-[#101828] bg-white'
               }`}
             >
-              <Settings className="h-3.5 w-3.5" />
+              <Settings className="h-3.5 w-3.5 stroke-[2]" />
               Admin
             </Link>
 
-            {/* Language Picker Dropdown */}
+            {/* Language Selector */}
             <LanguagePicker />
 
-            {/* Mobile Menu Toggle */}
+            {/* Mobile Menu Button */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="md:hidden flex items-center justify-center h-9 w-9 rounded-lg border border-[#E5E7EB] hover:border-[#D1D5DB] bg-white hover:bg-[#F9FAFB] transition-all cursor-pointer"
+              className="md:hidden flex items-center justify-center h-9 w-9 rounded-lg border border-[#E4E7EC] bg-white text-[#667085] hover:text-[#101828] transition-all cursor-pointer"
               aria-label="Toggle menu"
             >
               {mobileMenuOpen ? (
-                <X className="h-4 w-4 text-[#6B7280]" />
+                <X className="h-5 w-5 stroke-[2]" />
               ) : (
-                <Menu className="h-4 w-4 text-[#6B7280]" />
+                <Menu className="h-5 w-5 stroke-[2]" />
               )}
             </button>
           </div>
         </div>
 
-        {/* Mobile Navigation Menu */}
+        {/* Mobile Navigation Drawer */}
         {mobileMenuOpen && (
-          <div className="md:hidden border-t border-[#E5E7EB] py-3 animate-slide-down">
+          <div className="md:hidden border-t border-[#E4E7EC] py-3 animate-slide-down">
             <div className="space-y-1">
               {navItems.map((item) => {
                 const Icon = item.icon;
@@ -161,33 +152,26 @@ export const Navbar: React.FC = () => {
                     key={item.href}
                     href={item.href}
                     onClick={() => setMobileMenuOpen(false)}
-                    className={`flex items-center gap-3 text-sm font-medium px-4 py-3 rounded-xl transition-all duration-150 ${
+                    className={`flex items-center gap-3 text-sm font-medium px-4 py-3 rounded-lg transition-all ${
                       isActive
-                        ? 'bg-[#F0FDFA] text-[#0F766E] font-semibold'
-                        : 'text-[#6B7280] hover:text-[#111827] hover:bg-[#F9FAFB]'
+                        ? 'bg-[#EFF6FF] text-[#2563EB] font-semibold'
+                        : 'text-[#667085] hover:text-[#101828] hover:bg-[#F8FAFC]'
                     }`}
                   >
-                    <Icon className="h-4 w-4" />
+                    <Icon className="h-4 w-4 stroke-[2]" />
                     {item.label}
                   </Link>
                 );
               })}
 
-              {/* Mobile Admin Link */}
               <Link
                 href="/admin"
                 onClick={() => setMobileMenuOpen(false)}
-                className="flex items-center gap-3 text-sm font-medium px-4 py-3 rounded-xl text-[#6B7280] hover:text-[#111827] hover:bg-[#F9FAFB] transition-all"
+                className="flex items-center gap-3 text-sm font-medium px-4 py-3 rounded-lg text-[#667085] hover:text-[#101828] hover:bg-[#F8FAFC] transition-all"
               >
-                <Settings className="h-4 w-4" />
+                <Settings className="h-4 w-4 stroke-[2]" />
                 Admin Panel
               </Link>
-
-              {/* Mobile Backend Status */}
-              <div className="flex items-center gap-2 px-4 py-2 text-xs text-[#9CA3AF]">
-                <div className={`h-2 w-2 rounded-full ${backendOnline ? 'bg-[#16A34A]' : backendOnline === false ? 'bg-[#DC2626]' : 'bg-gray-300'}`} />
-                Backend: {backendOnline === null ? 'Checking...' : backendOnline ? 'Online ✓' : 'Offline — start server on :8000'}
-              </div>
             </div>
           </div>
         )}
@@ -195,4 +179,5 @@ export const Navbar: React.FC = () => {
     </nav>
   );
 };
+
 export default Navbar;

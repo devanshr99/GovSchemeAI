@@ -4,10 +4,10 @@ import React, { useState, useEffect } from 'react';
 import { EligibleSchemeResult } from '../../types/eligibility';
 import { useApp } from '../../context/AppContext';
 import { api } from '../../lib/api';
-import { formatIndianCurrency, formatIndianDate } from '../../lib/formatter';
+import { formatIndianCurrency } from '../../lib/formatter';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { ShieldCheck, Calendar, Phone, Globe, Sparkles, Award, Bookmark, BookmarkCheck, ArrowRight } from 'lucide-react';
+import { Globe, Sparkles, Bookmark, BookmarkCheck, ArrowRight } from 'lucide-react';
 
 interface SchemeCardProps {
   scheme: EligibleSchemeResult;
@@ -75,27 +75,27 @@ export const SchemeCard: React.FC<SchemeCardProps> = ({ scheme, isMatchedView = 
   return (
     <div 
       onClick={handleCardClick}
-      className="block glass-panel rounded-xl p-5 sm:p-6 transition-all duration-200 relative overflow-hidden hover:border-[#0F766E]/20 hover:shadow-md hover:-translate-y-0.5 group cursor-pointer"
+      className="block glass-panel rounded-2xl p-6 transition-all duration-200 relative overflow-hidden hover:border-[#2563EB]/30 hover:shadow-md hover:-translate-y-0.5 group cursor-pointer"
     >
       <div className="flex flex-col gap-4">
         {/* Header */}
         <div className="flex items-start justify-between gap-4">
-          <div className="space-y-1.5 flex-1">
+          <div className="space-y-2 flex-1">
             <div className="flex flex-wrap items-center gap-2">
-              <span className="text-[10px] uppercase font-semibold tracking-wider px-2 py-0.5 rounded-md bg-[#F0FDFA] text-[#0F766E] border border-[#0F766E]/10">
+              <span className="text-[11px] uppercase font-semibold tracking-wider px-2.5 py-0.5 rounded-full bg-[#EFF6FF] text-[#2563EB] border border-[#2563EB]/15">
                 {scheme.category_name || 'General'}
               </span>
-              <span className="text-[10px] uppercase font-semibold tracking-wider px-2 py-0.5 rounded-md bg-[#EFF6FF] text-[#2563EB] border border-[#2563EB]/10">
+              <span className="text-[11px] uppercase font-semibold tracking-wider px-2.5 py-0.5 rounded-full bg-[#F0FDFA] text-[#0F766E] border border-[#0F766E]/15">
                 {scheme.level || 'Central'}
               </span>
             </div>
-            <h3 className="text-base sm:text-lg font-semibold text-[#111827] leading-snug group-hover:text-[#0F766E] transition-colors">
+            <h3 className="text-lg sm:text-[20px] font-semibold text-[#101828] leading-snug group-hover:text-[#2563EB] transition-colors">
               <Link href={`/schemes/${scheme.slug}`} onClick={handleInnerLinkClick}>
                 {displayName}
               </Link>
             </h3>
             {scheme.ministry && (
-              <p className="text-xs text-[#6B7280]">{scheme.ministry}</p>
+              <p className="text-xs text-[#667085]">{scheme.ministry}</p>
             )}
           </div>
 
@@ -104,10 +104,10 @@ export const SchemeCard: React.FC<SchemeCardProps> = ({ scheme, isMatchedView = 
             <button
               onClick={toggleBookmark}
               aria-label="Bookmark scheme"
-              className="p-1.5 rounded-lg bg-[#F9FAFB] border border-[#E5E7EB] hover:border-[#D1D5DB] text-[#9CA3AF] hover:text-[#111827] transition-all cursor-pointer"
+              className="p-2 rounded-xl bg-[#F8FAFC] border border-[#E4E7EC] hover:border-[#D0D5DD] text-[#667085] hover:text-[#101828] transition-all cursor-pointer"
             >
               {isBookmarked ? (
-                <BookmarkCheck className="h-4 w-4 text-[#0F766E]" />
+                <BookmarkCheck className="h-4 w-4 text-[#2563EB]" />
               ) : (
                 <Bookmark className="h-4 w-4" />
               )}
@@ -116,11 +116,11 @@ export const SchemeCard: React.FC<SchemeCardProps> = ({ scheme, isMatchedView = 
             {/* Match Score Badge */}
             {isMatchedView && (
               <div className="text-right">
-                <div className="inline-flex flex-col items-center p-2 rounded-lg bg-[#F0FDFA] border border-[#0F766E]/10">
+                <div className="inline-flex flex-col items-center px-3 py-1.5 rounded-xl bg-[#F0FDFA] border border-[#0F766E]/15">
                   <span className="text-base font-bold text-[#0F766E]">
                     {Math.round(scheme.match_score * 100)}%
                   </span>
-                  <span className="text-[8px] uppercase tracking-wider text-[#6B7280] font-semibold">
+                  <span className="text-[9px] uppercase tracking-wider text-[#667085] font-semibold">
                     Match
                   </span>
                 </div>
@@ -131,9 +131,9 @@ export const SchemeCard: React.FC<SchemeCardProps> = ({ scheme, isMatchedView = 
 
         {/* Benefits Highlight */}
         {scheme.benefits_amount && (
-          <div className="flex items-center gap-2 bg-[#FFFBEB] border border-[#F59E0B]/15 p-3 rounded-lg">
-            <span className="text-xs font-medium text-[#6B7280]">{t('benefits')}:</span>
-            <span className="text-xs sm:text-sm font-semibold text-[#B45309]">
+          <div className="flex items-center gap-2.5 bg-[#FFFBEB] border border-[#F59E0B]/20 px-4 py-3 rounded-xl">
+            <span className="text-xs font-medium text-[#667085]">{t('benefits')}:</span>
+            <span className="text-sm font-semibold text-[#B45309]">
               {/^\d+$/.test(scheme.benefits_amount.trim()) 
                 ? formatIndianCurrency(scheme.benefits_amount.trim()) 
                 : scheme.benefits_amount}
@@ -141,24 +141,24 @@ export const SchemeCard: React.FC<SchemeCardProps> = ({ scheme, isMatchedView = 
           </div>
         )}
 
-        {/* Inline AI Explanation if available */}
+        {/* Inline AI Explanation */}
         {isMatchedView && aiExplanation && (
-          <div className="p-3.5 rounded-lg bg-[#F0FDFA] border border-[#0F766E]/10 text-xs text-[#374151] leading-relaxed italic animate-fade-in">
-            <span className="font-semibold text-[#0F766E] block mb-1">AI Match Analysis:</span>
+          <div className="p-4 rounded-xl bg-[#EFF6FF] border border-[#2563EB]/15 text-xs text-[#344054] leading-relaxed italic animate-fade-in">
+            <span className="font-semibold text-[#2563EB] block mb-1">AI Qualification Analysis:</span>
             &ldquo;{aiExplanation}&rdquo;
           </div>
         )}
 
-        {/* Rules Checklist for Eligibility View */}
+        {/* Rules Checklist */}
         {isMatchedView && scheme.rules_evaluation && scheme.rules_evaluation.length > 0 && (
-          <div className="space-y-1.5 border-t border-[#E5E7EB] pt-3">
-            <span className="text-[10px] uppercase tracking-wider font-semibold text-[#6B7280] block">Match Checklist:</span>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
+          <div className="space-y-1.5 border-t border-[#E4E7EC] pt-3.5">
+            <span className="text-[10px] uppercase tracking-wider font-semibold text-[#667085] block">Match Checklist:</span>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               {scheme.rules_evaluation.slice(0, 4).map((rule, rIdx) => {
                 const passed = rule.startsWith('✓');
                 return (
-                  <div key={rIdx} className="flex items-center gap-1.5 text-xs text-[#374151]">
-                    <span className={passed ? "text-[#16A34A]" : "text-[#DC2626]"}>
+                  <div key={rIdx} className="flex items-center gap-2 text-xs text-[#344054]">
+                    <span className={passed ? "text-[#12B76A] font-bold" : "text-[#F04438] font-bold"}>
                       {passed ? "✓" : "✗"}
                     </span>
                     <span className="truncate">{rule.replace(/[✓✗]\s*/, '')}</span>
@@ -170,10 +170,10 @@ export const SchemeCard: React.FC<SchemeCardProps> = ({ scheme, isMatchedView = 
         )}
 
         {/* Action Row */}
-        <div className="flex items-center justify-between border-t border-[#E5E7EB] pt-3 mt-1 shrink-0">
-          <span className="text-xs text-[#0F766E] font-semibold group-hover:underline flex items-center gap-1">
+        <div className="flex items-center justify-between border-t border-[#E4E7EC] pt-4 mt-1 shrink-0">
+          <span className="text-xs text-[#2563EB] font-semibold group-hover:underline flex items-center gap-1">
             <span>Details & Eligibility</span>
-            <ArrowRight className="h-3 w-3 group-hover:translate-x-0.5 transition-transform" />
+            <ArrowRight className="h-3.5 w-3.5 group-hover:translate-x-0.5 transition-transform" />
           </span>
 
           <div className="flex gap-2">
@@ -181,7 +181,7 @@ export const SchemeCard: React.FC<SchemeCardProps> = ({ scheme, isMatchedView = 
               <button
                 onClick={handleExplain}
                 disabled={aiLoading}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold border border-[#F59E0B]/20 bg-[#FFFBEB] text-[#B45309] hover:bg-[#FEF3C7] transition-all cursor-pointer"
+                className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold border border-[#F59E0B]/20 bg-[#FFFBEB] text-[#B45309] hover:bg-[#FEF3C7] transition-all cursor-pointer"
               >
                 <Sparkles className="h-3.5 w-3.5" />
                 {aiLoading ? 'Analyzing...' : t('explainWhy')}
@@ -194,7 +194,7 @@ export const SchemeCard: React.FC<SchemeCardProps> = ({ scheme, isMatchedView = 
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={handleInnerLinkClick}
-                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-[#0F766E] hover:bg-[#0D5F59] text-white rounded-lg text-xs font-semibold transition-all cursor-pointer shadow-sm"
+                className="inline-flex items-center gap-1.5 px-4 py-2 bg-[#2563EB] hover:bg-[#1D4ED8] text-white rounded-xl text-xs font-semibold transition-all cursor-pointer shadow-sm"
               >
                 <Globe className="h-3.5 w-3.5" />
                 {t('applyNow')}
@@ -206,4 +206,5 @@ export const SchemeCard: React.FC<SchemeCardProps> = ({ scheme, isMatchedView = 
     </div>
   );
 };
+
 export default SchemeCard;
