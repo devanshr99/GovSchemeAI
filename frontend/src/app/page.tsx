@@ -74,55 +74,49 @@ export default function Home() {
 
   return (
     <div className="relative min-h-screen flex flex-col justify-start py-12 px-4 sm:px-6 lg:px-8 space-y-20 overflow-hidden">
-      {/* Background Decorative Rings */}
-      <div className="absolute top-10 left-1/2 -translate-x-1/2 w-full max-w-7xl h-[400px] pointer-events-none overflow-hidden opacity-30 z-0">
-        <div className="absolute top-0 left-1/4 w-[300px] h-[300px] rounded-full bg-blue-500/20 blur-[100px]" />
-        <div className="absolute bottom-0 right-1/4 w-[250px] h-[250px] rounded-full bg-orange-500/20 blur-[80px]" />
-      </div>
-
       {/* Hero & Form Section */}
       <div className="mx-auto max-w-7xl w-full flex flex-col lg:flex-row gap-12 items-center justify-between relative z-10">
         {/* Left Column: Hero & Statistics */}
         <div className="flex-1 space-y-8 text-center lg:text-left animate-fade-in">
           <div className="space-y-4">
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-blue-500/25 bg-blue-500/10 text-xs font-semibold text-blue-400">
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-[#0F766E]/15 bg-[#F0FDFA] text-xs font-semibold text-[#0F766E]">
               <ShieldCheck className="h-3.5 w-3.5" />
               <span>Direct Matching • Verified Government Rules</span>
             </div>
 
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight leading-tight">
-              <span className="block text-slate-100">Welfare Discoveries</span>
-              <span className="block bg-gradient-to-r from-orange-400 via-blue-400 to-emerald-400 bg-clip-text text-transparent">
+              <span className="block text-[#111827]">Welfare Discoveries</span>
+              <span className="block text-[#0F766E]">
                 Made Simple for India
               </span>
             </h1>
 
-            <p className="text-base sm:text-lg text-slate-400 max-w-2xl mx-auto lg:mx-0 leading-relaxed">
+            <p className="text-base sm:text-lg text-[#6B7280] max-w-2xl mx-auto lg:mx-0 leading-relaxed">
               Find and apply for central and state schemes you qualify for. Overcome information fragmentation and complex rules matrices in seconds.
             </p>
           </div>
 
           {/* Stats Grid */}
           <div className="grid grid-cols-2 gap-4 max-w-md mx-auto lg:mx-0">
-            <div className="glass-panel p-4 rounded-xl flex items-center gap-3 border-white/[0.06]">
-              <div className="h-10 w-10 rounded-lg bg-blue-500/10 flex items-center justify-center border border-blue-500/20">
-                <BookOpen className="h-5 w-5 text-blue-400" />
+            <div className="glass-panel p-4 rounded-xl flex items-center gap-3">
+              <div className="h-10 w-10 rounded-lg bg-[#F0FDFA] flex items-center justify-center border border-[#0F766E]/10">
+                <BookOpen className="h-5 w-5 text-[#0F766E]" />
               </div>
               <div>
-                <div className="text-lg font-bold text-slate-100">
+                <div className="text-lg font-bold text-[#111827]">
                   {totalSchemes !== null ? `${totalSchemes}+` : '130+'}
                 </div>
-                <div className="text-[10px] text-slate-400 uppercase tracking-wider font-semibold">Active Schemes</div>
+                <div className="text-[10px] text-[#6B7280] uppercase tracking-wider font-semibold">Active Schemes</div>
               </div>
             </div>
 
-            <div className="glass-panel p-4 rounded-xl flex items-center gap-3 border-white/[0.06]">
-              <div className="h-10 w-10 rounded-lg bg-orange-500/10 flex items-center justify-center border border-orange-500/20">
-                <SlidersHorizontal className="h-5 w-5 text-orange-400" />
+            <div className="glass-panel p-4 rounded-xl flex items-center gap-3">
+              <div className="h-10 w-10 rounded-lg bg-[#FFFBEB] flex items-center justify-center border border-[#F59E0B]/10">
+                <SlidersHorizontal className="h-5 w-5 text-[#F59E0B]" />
               </div>
               <div>
-                <div className="text-lg font-bold text-slate-100">9</div>
-                <div className="text-[10px] text-slate-400 uppercase tracking-wider font-semibold">Categories</div>
+                <div className="text-lg font-bold text-[#111827]">9</div>
+                <div className="text-[10px] text-[#6B7280] uppercase tracking-wider font-semibold">Categories</div>
               </div>
             </div>
           </div>
@@ -137,29 +131,29 @@ export default function Home() {
       {/* Categories Discovery */}
       <div className="mx-auto max-w-7xl w-full space-y-8 relative z-10">
         <div className="text-center space-y-3">
-          <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-100">
-            Browse by Scheme <span className="bg-gradient-to-r from-blue-400 to-indigo-400 bg-clip-text text-transparent">Categories</span>
+          <h2 className="text-2xl sm:text-3xl font-extrabold text-[#111827]">
+            Browse by Scheme <span className="text-[#0F766E]">Categories</span>
           </h2>
-          <p className="text-xs sm:text-sm text-slate-400 max-w-xl mx-auto">
+          <p className="text-sm text-[#6B7280] max-w-xl mx-auto">
             Discover opportunities tailored specifically by target sector. Click any card to filter programs.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
           {categories.map((cat, idx) => (
             <Link
               href={`/schemes?category=${cat.slug}`}
               key={idx}
-              className="glass-panel glass-panel-hover p-6 rounded-2xl flex flex-col items-start gap-4 border border-white/[0.06] transition-all group cursor-pointer"
+              className="glass-panel glass-panel-hover p-6 rounded-xl flex flex-col items-start gap-4 transition-all group cursor-pointer"
             >
-              <div className="text-3xl bg-slate-800 p-2.5 rounded-xl border border-white/[0.05] group-hover:scale-110 transition-transform">
+              <div className="text-3xl bg-[#F8FAFC] p-2.5 rounded-xl border border-[#E5E7EB] group-hover:scale-105 transition-transform">
                 {cat.icon}
               </div>
               <div>
-                <h3 className="font-extrabold text-slate-100 mb-1 group-hover:text-blue-400 transition-colors text-base">
+                <h3 className="font-semibold text-[#111827] mb-1 group-hover:text-[#0F766E] transition-colors text-base">
                   {cat.name}
                 </h3>
-                <p className="text-xs text-slate-400 leading-relaxed">{cat.desc}</p>
+                <p className="text-xs text-[#6B7280] leading-relaxed">{cat.desc}</p>
               </div>
             </Link>
           ))}
@@ -169,30 +163,30 @@ export default function Home() {
       {/* Testimonials */}
       <div className="mx-auto max-w-7xl w-full space-y-8 relative z-10">
         <div className="text-center space-y-3">
-          <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-100">
-            Trusted by <span className="bg-gradient-to-r from-orange-400 to-red-400 bg-clip-text text-transparent">Citizens</span>
+          <h2 className="text-2xl sm:text-3xl font-extrabold text-[#111827]">
+            Trusted by <span className="text-[#0F766E]">Citizens</span>
           </h2>
-          <p className="text-xs sm:text-sm text-slate-400 max-w-xl mx-auto">
+          <p className="text-sm text-[#6B7280] max-w-xl mx-auto">
             Hear from rural and urban beneficiaries who successfully navigated scheme qualification with GovSchemeAI.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
           {testimonials.map((t, idx) => (
-            <div key={idx} className="glass-panel p-6 rounded-2xl border border-white/[0.06] flex flex-col justify-between space-y-4">
+            <div key={idx} className="glass-panel p-6 rounded-xl flex flex-col justify-between space-y-4 border-l-4 border-l-[#0F766E]">
               <div className="space-y-3">
                 <div className="flex gap-1">
                   {[1, 2, 3, 4, 5].map((s) => (
-                    <Star key={s} className="h-4 w-4 fill-orange-400 text-orange-400" />
+                    <Star key={s} className="h-4 w-4 fill-[#F59E0B] text-[#F59E0B]" />
                   ))}
                 </div>
-                <p className="text-xs sm:text-sm text-slate-300 leading-relaxed italic">
-                  "{t.quote}"
+                <p className="text-sm text-[#374151] leading-relaxed italic">
+                  &ldquo;{t.quote}&rdquo;
                 </p>
               </div>
-              <div className="border-t border-white/[0.05] pt-3">
-                <h4 className="font-bold text-xs text-slate-100">{t.name}</h4>
-                <p className="text-[10px] text-slate-500 font-medium">{t.role}</p>
+              <div className="border-t border-[#E5E7EB] pt-3">
+                <h4 className="font-semibold text-sm text-[#111827]">{t.name}</h4>
+                <p className="text-xs text-[#6B7280] font-medium">{t.role}</p>
               </div>
             </div>
           ))}
@@ -202,36 +196,36 @@ export default function Home() {
       {/* FAQ Section */}
       <div className="mx-auto max-w-3xl w-full space-y-8 relative z-10">
         <div className="text-center space-y-3">
-          <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-100 flex items-center justify-center gap-2">
-            <HelpCircle className="h-7 w-7 text-indigo-400" />
+          <h2 className="text-2xl sm:text-3xl font-extrabold text-[#111827] flex items-center justify-center gap-2">
+            <HelpCircle className="h-7 w-7 text-[#0F766E]" />
             Frequently Asked Questions
           </h2>
-          <p className="text-xs sm:text-sm text-slate-400">
+          <p className="text-sm text-[#6B7280]">
             Everything you need to know about criteria validations and safety configurations.
           </p>
         </div>
 
-        <div className="space-y-4">
+        <div className="space-y-3">
           {faqs.map((faq, idx) => {
             const isOpen = openFaq === idx;
             return (
               <div
                 key={idx}
-                className="glass-panel rounded-2xl overflow-hidden border border-white/[0.06] transition-all"
+                className="glass-panel rounded-xl overflow-hidden transition-all"
               >
                 <button
                   onClick={() => toggleFaq(idx)}
-                  className="w-full px-6 py-4 text-left flex justify-between items-center hover:bg-white/[0.01] transition-all cursor-pointer"
+                  className="w-full px-6 py-4 text-left flex justify-between items-center hover:bg-[#F9FAFB] transition-all cursor-pointer"
                 >
-                  <span className="font-bold text-sm text-slate-100">{faq.q}</span>
+                  <span className="font-semibold text-sm text-[#111827]">{faq.q}</span>
                   {isOpen ? (
-                    <ChevronUp className="h-4 w-4 text-slate-400 shrink-0" />
+                    <ChevronUp className="h-4 w-4 text-[#6B7280] shrink-0" />
                   ) : (
-                    <ChevronDown className="h-4 w-4 text-slate-400 shrink-0" />
+                    <ChevronDown className="h-4 w-4 text-[#6B7280] shrink-0" />
                   )}
                 </button>
                 {isOpen && (
-                  <div className="px-6 pb-5 pt-1 text-xs sm:text-sm text-slate-400 leading-relaxed border-t border-white/[0.02] bg-white/[0.005] animate-fade-in">
+                  <div className="px-6 pb-5 pt-1 text-sm text-[#6B7280] leading-relaxed border-t border-[#F3F4F6] bg-[#FAFAFA] animate-fade-in">
                     {faq.a}
                   </div>
                 )}
@@ -243,12 +237,11 @@ export default function Home() {
 
       {/* Call to Action CTA */}
       <div className="mx-auto max-w-5xl w-full relative z-10 pt-4">
-        <div className="glass-panel bg-gradient-to-br from-blue-900/20 via-slate-900 to-indigo-900/20 rounded-3xl p-8 sm:p-12 border border-white/[0.08] text-center space-y-6 relative overflow-hidden">
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_120%,rgba(59,130,246,0.1),transparent_50%)]" />
+        <div className="bg-[#0F766E] rounded-2xl p-8 sm:p-12 text-center space-y-6 relative overflow-hidden">
           <div className="space-y-2 relative z-10">
-            <h2 className="text-2xl sm:text-3xl font-black text-slate-100">Check Your Scheme Match Today</h2>
-            <p className="text-xs sm:text-sm text-slate-400 max-w-md mx-auto leading-relaxed">
-              Don't miss out on financial support or subsidies. Use our eligibility checker to run a scan or browse schemes by ministry.
+            <h2 className="text-2xl sm:text-3xl font-extrabold text-white">Check Your Scheme Match Today</h2>
+            <p className="text-sm text-white/80 max-w-md mx-auto leading-relaxed">
+              Don&apos;t miss out on financial support or subsidies. Use our eligibility checker to run a scan or browse schemes by ministry.
             </p>
           </div>
           <div className="flex justify-center relative z-10">
@@ -256,10 +249,10 @@ export default function Home() {
               onClick={() => {
                 window.scrollTo({ top: 0, behavior: 'smooth' });
               }}
-              className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold shadow-lg shadow-blue-500/20 hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer text-xs"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-white hover:bg-[#F9FAFB] text-[#0F766E] rounded-xl font-bold shadow-sm hover:shadow transition-all cursor-pointer text-sm"
             >
               Start Free Scan
-              <Sparkles className="h-4 w-4 text-orange-200" />
+              <Search className="h-4 w-4" />
             </button>
           </div>
         </div>

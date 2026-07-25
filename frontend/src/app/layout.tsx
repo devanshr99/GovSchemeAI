@@ -29,7 +29,7 @@ export default function RootLayout({
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+Devanagari:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
       </head>
-      <body className="min-h-full flex flex-col antialiased bg-[#0f172a] text-slate-100 selection:bg-blue-600/30 selection:text-blue-200">
+      <body className="min-h-full flex flex-col antialiased bg-[#F8FAFC] text-[#111827] selection:bg-teal-100 selection:text-teal-900">
         <AppProvider>
           <Navbar />
           <main className="flex-1 flex flex-col justify-start">

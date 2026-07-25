@@ -6,24 +6,24 @@ import { Mail } from 'lucide-react';
 
 export const Footer: React.FC = () => {
   return (
-    <footer className="border-t border-white/[0.06] bg-[#0f172a]/80 backdrop-blur-md py-6 mt-auto">
+    <footer className="border-t border-[#E5E7EB] bg-[#F1F5F9] py-6 mt-auto">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
-        <div className="text-sm text-slate-400 font-medium">
+        <div className="text-sm text-[#6B7280] font-medium">
           Made with ❤️ by{' '}
           <Link
             href="/about-developer"
-            className="text-slate-200 hover:text-blue-400 font-semibold transition-colors duration-200 underline decoration-blue-500/30 decoration-2 underline-offset-4 hover:decoration-blue-400"
+            className="text-[#111827] hover:text-[#0F766E] font-semibold transition-colors duration-200 underline decoration-[#0F766E]/20 decoration-2 underline-offset-4 hover:decoration-[#0F766E]"
           >
             Devansh Rastogi
           </Link>
         </div>
 
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-3">
           <a
             href="https://github.com/devanshr99"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-slate-400 hover:text-slate-200 transition-colors duration-200 p-1.5 rounded-lg hover:bg-white/[0.04]"
+            className="text-[#9CA3AF] hover:text-[#111827] transition-colors duration-200 p-2 rounded-lg hover:bg-[#E5E7EB]/50"
             aria-label="GitHub"
           >
             <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -35,7 +35,7 @@ export const Footer: React.FC = () => {
             href="https://www.linkedin.com/in/devansh-rastogi-a86a83323/"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-slate-400 hover:text-[#0a66c2] transition-colors duration-200 p-1.5 rounded-lg hover:bg-white/[0.04]"
+            className="text-[#9CA3AF] hover:text-[#0a66c2] transition-colors duration-200 p-2 rounded-lg hover:bg-[#E5E7EB]/50"
             aria-label="LinkedIn"
           >
             <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -46,7 +46,7 @@ export const Footer: React.FC = () => {
           </a>
           <a
             href="mailto:devanshrastogi993@gmail.com"
-            className="text-slate-400 hover:text-orange-400 transition-colors duration-200 p-1.5 rounded-lg hover:bg-white/[0.04]"
+            className="text-[#9CA3AF] hover:text-[#F59E0B] transition-colors duration-200 p-2 rounded-lg hover:bg-[#E5E7EB]/50"
             aria-label="Email"
           >
             <Mail className="h-4 w-4" />

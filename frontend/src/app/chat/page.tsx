@@ -17,13 +17,13 @@ function renderInline(text: string) {
   const parts = text.split(/(\*\*.*?\*\*|\*.*?\*|`.*?`)/g);
   return parts.map((part, i) => {
     if (part.startsWith('**') && part.endsWith('**')) {
-      return <strong key={i} className="font-extrabold text-slate-100">{part.slice(2, -2)}</strong>;
+      return <strong key={i} className="font-bold text-[#111827]">{part.slice(2, -2)}</strong>;
     }
     if (part.startsWith('*') && part.endsWith('*')) {
-      return <em key={i} className="italic text-slate-300">{part.slice(1, -1)}</em>;
+      return <em key={i} className="italic text-[#374151]">{part.slice(1, -1)}</em>;
     }
     if (part.startsWith('`') && part.endsWith('`')) {
-      return <code key={i} className="px-1.5 py-0.5 rounded bg-slate-900 border border-white/[0.06] text-orange-300 font-mono text-xs">{part.slice(1, -1)}</code>;
+      return <code key={i} className="px-1.5 py-0.5 rounded bg-[#F3F4F6] border border-[#E5E7EB] text-[#0F766E] font-mono text-xs">{part.slice(1, -1)}</code>;
     }
     return <span key={i}>{part}</span>;
   });
@@ -42,7 +42,7 @@ function renderMarkdown(text: string) {
   const flushParagraph = (key: string) => {
     if (currentParagraphLines.length > 0) {
       renderedElements.push(
-        <p key={key} className="text-sm leading-relaxed mb-3 last:mb-0 text-slate-200">
+        <p key={key} className="text-sm leading-relaxed mb-3 last:mb-0 text-[#374151]">
           {currentParagraphLines.map((line, lIdx) => (
             <React.Fragment key={lIdx}>
               {renderInline(line)}
@@ -121,7 +121,7 @@ function renderMarkdown(text: string) {
         const content = trimmed.replace(/^[-•*]\s*/, '');
         renderedElements.push(
           <ul key={`ul-${i}`} className="list-disc list-inside space-y-1 my-1.5">
-            <li className="text-sm leading-relaxed pl-2 text-slate-300">
+            <li className="text-sm leading-relaxed pl-2 text-[#374151]">
               {renderInline(content)}
             </li>
           </ul>
@@ -276,14 +276,14 @@ export default function ChatAssistant() {
   return (
     <div className="mx-auto max-w-3xl w-full py-8 px-4 sm:px-6 lg:px-8 flex-1 flex flex-col" style={{ height: 'calc(100vh - 120px)' }}>
       {/* Header */}
-      <div className="flex items-center justify-between border-b border-white/[0.08] pb-4 mb-4 shrink-0">
+      <div className="flex items-center justify-between border-b border-[#E5E7EB] pb-4 mb-4 shrink-0">
         <div className="flex items-center gap-3">
-          <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-blue-500/20 to-orange-500/20 border border-white/[0.08] flex items-center justify-center">
-            <Bot className="h-5 w-5 text-blue-400" />
+          <div className="h-10 w-10 rounded-xl bg-[#F0FDFA] border border-[#0F766E]/10 flex items-center justify-center">
+            <MessageSquare className="h-5 w-5 text-[#0F766E]" />
           </div>
           <div>
-            <h1 className="text-xl font-bold text-slate-100">{t('chatAssistant')}</h1>
-            <p className="text-[10px] text-slate-400 font-semibold uppercase tracking-wider">
+            <h1 className="text-xl font-bold text-[#111827]">{t('chatAssistant')}</h1>
+            <p className="text-[10px] text-[#9CA3AF] font-semibold uppercase tracking-wider">
               {sessionId ? `Session: ${sessionId.slice(0, 8)}...` : 'New Conversation'}
             </p>
           </div>
@@ -291,7 +291,7 @@ export default function ChatAssistant() {
 
         <div className="flex items-center gap-2">
           {connectionError && (
-            <div className="flex items-center gap-1.5 text-xs text-red-400 bg-red-500/10 border border-red-500/20 px-2.5 py-1 rounded-lg">
+            <div className="flex items-center gap-1.5 text-xs text-[#DC2626] bg-[#FEF2F2] border border-[#FECACA] px-2.5 py-1 rounded-lg">
               <WifiOff className="h-3.5 w-3.5" />
               Backend offline
             </div>
@@ -299,7 +299,7 @@ export default function ChatAssistant() {
 
           <button
             onClick={resetChat}
-            className="p-2 rounded-lg hover:bg-white/[0.03] text-xs text-slate-400 hover:text-white transition-all cursor-pointer flex items-center gap-1.5 border border-white/[0.08]"
+            className="p-2 rounded-lg hover:bg-[#F3F4F6] text-xs text-[#6B7280] hover:text-[#111827] transition-all cursor-pointer flex items-center gap-1.5 border border-[#E5E7EB]"
           >
             <RefreshCw className="h-3.5 w-3.5" />
             <span>Reset</span>
@@ -318,13 +318,13 @@ export default function ChatAssistant() {
             <div
               className={`h-8 w-8 rounded-full flex items-center justify-center shrink-0 mt-1 ${
                 msg.role === 'user'
-                  ? 'bg-blue-600 border border-blue-500'
-                  : 'bg-gradient-to-br from-orange-500/20 to-blue-500/20 border border-white/[0.08]'
+                  ? 'bg-[#0F766E] border border-[#0D5F59]'
+                  : 'bg-[#F0FDFA] border border-[#0F766E]/10'
               }`}
             >
               {msg.role === 'user'
                 ? <UserIcon className="h-4 w-4 text-white" />
-                : <Sparkles className="h-4 w-4 text-orange-400" />
+                : <MessageSquare className="h-4 w-4 text-[#0F766E]" />
               }
             </div>
 
@@ -333,8 +333,8 @@ export default function ChatAssistant() {
               <div
                 className={`p-4 rounded-2xl border leading-relaxed ${
                   msg.role === 'user'
-                    ? 'bg-blue-600 border-blue-500/50 text-white rounded-tr-none'
-                    : 'glass-panel text-slate-100 rounded-tl-none'
+                    ? 'bg-[#0F766E] border-[#0D5F59] text-white rounded-tr-none'
+                    : 'bg-[#F9FAFB] border-[#E5E7EB] text-[#111827] rounded-tl-none'
                 } ${msg.isStreaming ? 'typewriter-cursor' : ''}`}
               >
                 {msg.role === 'assistant'
@@ -352,13 +352,13 @@ export default function ChatAssistant() {
       {/* Suggested Questions */}
       {!loading && (
         <div className="mb-4 shrink-0 animate-fade-in">
-          <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-2">Suggested Actions:</p>
+          <p className="text-[10px] text-[#9CA3AF] font-semibold uppercase tracking-wider mb-2">Suggested Actions:</p>
           <div className="flex flex-wrap gap-2">
             {getSuggestedQuestions().map((q, idx) => (
               <button
                 key={idx}
                 onClick={() => handleSendMessage(q)}
-                className="text-xs px-3.5 py-2.5 rounded-xl bg-white/[0.02] border border-white/[0.05] hover:border-blue-500/30 text-slate-300 hover:text-blue-400 hover:bg-blue-500/5 flex items-center gap-1.5 transition-all text-left cursor-pointer"
+                className="text-xs px-3.5 py-2.5 rounded-lg bg-white border border-[#E5E7EB] hover:border-[#0F766E]/30 text-[#374151] hover:text-[#0F766E] hover:bg-[#F0FDFA] flex items-center gap-1.5 transition-all text-left cursor-pointer"
               >
                 <span>{q}</span>
                 <ArrowRight className="h-3 w-3 opacity-60 shrink-0" />
@@ -379,16 +379,16 @@ export default function ChatAssistant() {
           onKeyDown={handleKeyDown}
           disabled={loading}
           maxLength={500}
-          className="w-full pl-4 pr-14 py-4 rounded-2xl text-sm disabled:opacity-60"
+          className="w-full pl-4 pr-14 py-4 rounded-xl text-sm border border-[#E5E7EB] disabled:opacity-60"
         />
         <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
           {input.length > 400 && (
-            <span className="text-[10px] text-slate-500 font-mono">{500 - input.length}</span>
+            <span className="text-[10px] text-[#9CA3AF] font-mono">{500 - input.length}</span>
           )}
           <button
             onClick={() => handleSendMessage(input)}
             disabled={loading || !input.trim()}
-            className="p-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white transition-all disabled:opacity-40 disabled:hover:bg-blue-600 cursor-pointer"
+            className="p-2.5 rounded-lg bg-[#0F766E] hover:bg-[#0D5F59] text-white transition-all disabled:opacity-40 disabled:hover:bg-[#0F766E] cursor-pointer"
           >
             <Send className="h-4 w-4" />
           </button>
