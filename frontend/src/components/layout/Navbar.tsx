@@ -4,8 +4,9 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useApp } from '../../context/AppContext';
-import { Globe, Search, MessageSquare, ShieldAlert, Award, Menu, X, Settings, User } from 'lucide-react';
+import { Globe, Search, MessageSquare, ShieldAlert, Menu, X, Settings, User } from 'lucide-react';
 import { LanguagePicker } from './LanguagePicker';
+import Logo from '../common/Logo';
 
 export const Navbar: React.FC = () => {
   const pathname = usePathname();
@@ -18,7 +19,8 @@ export const Navbar: React.FC = () => {
     const checkHealth = async () => {
       try {
         const res = await fetch('/api/health', { method: 'GET' });
-        setBackendOnline(res.ok);
+        if (res.ok) setBackendOnline(true);
+        else setBackendOnline(false);
       } catch {
         setBackendOnline(false);
       }
@@ -42,16 +44,8 @@ export const Navbar: React.FC = () => {
         <div className="flex h-16 items-center justify-between">
           {/* Logo */}
           <div className="flex items-center">
-            <Link href="/" className="flex items-center gap-2 group">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-tr from-orange-500 to-blue-600 p-0.5 shadow-lg shadow-blue-500/20 group-hover:scale-105 transition-transform duration-300">
-                <div className="flex h-full w-full items-center justify-center rounded-[10px] bg-[#0f172a]">
-                  <Award className="h-5 w-5 text-orange-400 group-hover:rotate-12 transition-transform duration-300" />
-                </div>
-              </div>
-              <span className="text-xl font-bold tracking-tight">
-                <span className="text-orange-400">GovScheme</span>
-                <span className="text-blue-400 font-extrabold">AI</span>
-              </span>
+            <Link href="/" className="flex items-center gap-2 group hover:opacity-95 transition-opacity">
+              <Logo variant="full" size="md" />
             </Link>
           </div>
 

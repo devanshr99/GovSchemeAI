@@ -8,12 +8,26 @@ export const metadata: Metadata = {
   title: 'GovSchemeAI | AI Powered Government Scheme Finder',
   description: 'GovSchemeAI helps Indian citizens discover government schemes, check eligibility, and receive AI-powered recommendations instantly.',
   keywords: ['government schemes', 'India', 'scholarships', 'subsidies', 'pension', 'PM-KISAN', 'eligibility matching'],
+  icons: {
+    icon: '/logo-icon.svg',
+    shortcut: '/logo-icon.svg',
+    apple: '/logo-icon.svg',
+  },
+  manifest: '/manifest.json',
   openGraph: {
     title: 'GovSchemeAI | AI Powered Government Scheme Finder',
     description: 'GovSchemeAI helps Indian citizens discover government schemes, check eligibility, and receive AI-powered recommendations instantly.',
     type: 'website',
     locale: 'en_IN',
     siteName: 'GovSchemeAI',
+    images: [
+      {
+        url: '/logo.svg',
+        width: 220,
+        height: 40,
+        alt: 'GovSchemeAI Logo',
+      },
+    ],
   },
 };
 

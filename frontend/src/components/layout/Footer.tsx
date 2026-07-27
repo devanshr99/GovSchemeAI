@@ -3,19 +3,26 @@
 import React from 'react';
 import Link from 'next/link';
 import { Mail } from 'lucide-react';
+import Logo from '../common/Logo';
 
 export const Footer: React.FC = () => {
   return (
     <footer className="border-t border-white/[0.06] bg-[#0f172a]/80 backdrop-blur-md py-6 mt-auto">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
-        <div className="text-sm text-slate-400 font-medium">
-          Made with ❤️ by{' '}
-          <Link
-            href="/about-developer"
-            className="text-slate-200 hover:text-blue-400 font-semibold transition-colors duration-200 underline decoration-blue-500/30 decoration-2 underline-offset-4 hover:decoration-blue-400"
-          >
-            Devansh Rastogi
+        <div className="flex items-center gap-4">
+          <Link href="/" className="hover:opacity-90 transition-opacity">
+            <Logo variant="full" size="sm" />
           </Link>
+          <span className="text-xs text-slate-500 hidden md:inline">|</span>
+          <div className="text-xs text-slate-400 font-medium">
+            Made with ❤️ by{' '}
+            <Link
+              href="/about-developer"
+              className="text-slate-200 hover:text-blue-400 font-semibold transition-colors duration-200 underline decoration-blue-500/30 decoration-2 underline-offset-4 hover:decoration-blue-400"
+            >
+              Devansh Rastogi
+            </Link>
+          </div>
         </div>
 
         <div className="flex items-center gap-4">

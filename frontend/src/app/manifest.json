@@ -1,0 +1,17 @@
+{
+  "name": "GovSchemeAI - AI Powered Government Scheme Finder",
+  "short_name": "GovSchemeAI",
+  "description": "Discover Indian Government welfare schemes, subsidies, pensions, and scholarships with instant AI eligibility checks.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0f172a",
+  "theme_color": "#1A56DB",
+  "icons": [
+    {
+      "src": "/logo-icon.svg",
+      "sizes": "64x64 128x128 192x192 512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
