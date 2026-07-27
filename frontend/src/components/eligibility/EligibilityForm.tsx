@@ -5,7 +5,7 @@ import { useApp } from '../../context/AppContext';
 import { api } from '../../lib/api';
 import { EligibilityRequest } from '../../types/eligibility';
 import { useRouter } from 'next/navigation';
-import { User, DollarSign, Calendar, MapPin, Sparkles, UserCheck, AlertTriangle, ArrowRight } from 'lucide-react';
+import { User, DollarSign, Calendar, MapPin, Sparkles, UserCheck, AlertTriangle } from 'lucide-react';
 
 export const EligibilityForm: React.FC = () => {
   const { checkEligibility, language, t } = useApp();
@@ -36,12 +36,14 @@ export const EligibilityForm: React.FC = () => {
   const [formError, setFormError] = useState<string | null>(null);
 
   useEffect(() => {
+    // Fetch states on mount
     api.getStates()
       .then(res => setStatesList(res))
       .catch(err => console.error('Failed to load states', err));
   }, []);
 
   useEffect(() => {
+    // Fetch districts when state changes
     if (state) {
       api.getDistricts(state)
         .then(res => {
@@ -65,6 +67,7 @@ export const EligibilityForm: React.FC = () => {
     setFormLoading(true);
     setFormError(null);
 
+    // Validate inputs
     if (age < 0) {
       setFormError(t('valAgeMin'));
       setFormLoading(false);
@@ -132,37 +135,37 @@ export const EligibilityForm: React.FC = () => {
         <div 
           role="alert"
           aria-live="assertive"
-          className="flex items-start gap-3 p-4 rounded-xl bg-[#FEF2F2] border border-[#FEE2E2] text-sm text-[#F04438] animate-fade-in"
+          className="flex items-start gap-3 p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-sm text-red-300 animate-fade-in"
         >
-          <AlertTriangle className="h-5 w-5 text-[#F04438] shrink-0 mt-0.5" aria-hidden="true" />
+          <AlertTriangle className="h-5 w-5 text-red-400 shrink-0 mt-0.5" aria-hidden="true" />
           <div className="flex-1">
-            <p className="font-semibold text-[#B42318]">Validation Error</p>
-            <p className="text-xs text-[#B42318] mt-0.5">{formError}</p>
+            <p className="font-semibold text-red-300">Error</p>
+            <p className="text-xs text-red-400 mt-0.5">{formError}</p>
           </div>
           <button
             type="button"
             onClick={() => setFormError(null)}
             aria-label="Dismiss error"
-            className="ml-auto text-[#B42318] hover:text-[#912018] transition-colors text-xs font-bold cursor-pointer shrink-0 p-1 rounded"
+            className="ml-auto text-red-400 hover:text-red-200 transition-colors text-xs font-bold cursor-pointer shrink-0 focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:outline-none p-1 rounded"
           >
             ✕
           </button>
         </div>
       )}
 
-      <div className="border-b border-[#E4E7EC] pb-4">
-        <h2 id="form-heading-title" className="text-xl font-bold text-[#101828] flex items-center gap-2">
-          <UserCheck className="h-5 w-5 text-[#2563EB]" aria-hidden="true" />
+      <div className="border-b border-white/[0.08] pb-4">
+        <h2 id="form-heading-title" className="text-xl font-bold text-slate-100 flex items-center gap-2">
+          <UserCheck className="h-5 w-5 text-blue-400" aria-hidden="true" />
           {t('formHeading')}
         </h2>
-        <p className="text-xs text-[#667085] mt-1">{t('formSubheading')}</p>
+        <p className="text-xs text-slate-400 mt-1">{t('formSubheading')}</p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Age */}
-        <div className="space-y-1.5">
-          <label htmlFor="age-input" className="text-xs font-semibold text-[#344054] flex items-center gap-1.5 uppercase tracking-wide">
-            <Calendar className="h-3.5 w-3.5 text-[#2563EB]" aria-hidden="true" />
+        <div className="space-y-2">
+          <label htmlFor="age-input" className="text-sm font-semibold text-slate-300 flex items-center gap-1.5">
+            <Calendar className="h-4 w-4 text-blue-400" aria-hidden="true" />
             {t('labelAge')}
           </label>
           <input
@@ -176,15 +179,15 @@ export const EligibilityForm: React.FC = () => {
               setAge(val);
               setIsSenior(val >= 60);
             }}
-            className="w-full rounded-xl px-3.5 py-2.5 text-sm bg-white border border-[#E4E7EC] text-[#101828] focus:ring-2 focus:ring-[#2563EB]/20 focus:border-[#2563EB]"
+            className="w-full rounded-xl px-4 py-2.5 text-sm bg-slate-900/50 border border-white/10 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
             required
           />
         </div>
 
         {/* Gender */}
-        <div className="space-y-1.5">
-          <label htmlFor="gender-select" className="text-xs font-semibold text-[#344054] flex items-center gap-1.5 uppercase tracking-wide">
-            <User className="h-3.5 w-3.5 text-[#2563EB]" aria-hidden="true" />
+        <div className="space-y-2">
+          <label htmlFor="gender-select" className="text-sm font-semibold text-slate-300 flex items-center gap-1.5">
+            <User className="h-4 w-4 text-blue-400" aria-hidden="true" />
             {t('labelGender')}
           </label>
           <select
@@ -195,7 +198,7 @@ export const EligibilityForm: React.FC = () => {
               setGender(val);
               setIsWoman(val === 'female');
             }}
-            className="w-full rounded-xl px-3.5 py-2.5 text-sm bg-white border border-[#E4E7EC] text-[#101828] focus:ring-2 focus:ring-[#2563EB]/20 focus:border-[#2563EB]"
+            className="w-full rounded-xl px-4 py-2.5 text-sm bg-slate-900/50 border border-white/10 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             <option value="male">{t('genderMale')}</option>
             <option value="female">{t('genderFemale')}</option>
@@ -204,16 +207,16 @@ export const EligibilityForm: React.FC = () => {
         </div>
 
         {/* State */}
-        <div className="space-y-1.5">
-          <label htmlFor="state-select" className="text-xs font-semibold text-[#344054] flex items-center gap-1.5 uppercase tracking-wide">
-            <MapPin className="h-3.5 w-3.5 text-[#2563EB]" aria-hidden="true" />
+        <div className="space-y-2">
+          <label htmlFor="state-select" className="text-sm font-semibold text-slate-300 flex items-center gap-1.5">
+            <MapPin className="h-4 w-4 text-blue-400" aria-hidden="true" />
             {t('labelState')}
           </label>
           <select
             id="state-select"
             value={state}
             onChange={(e) => setState(e.target.value)}
-            className="w-full rounded-xl px-3.5 py-2.5 text-sm bg-white border border-[#E4E7EC] text-[#101828] focus:ring-2 focus:ring-[#2563EB]/20 focus:border-[#2563EB]"
+            className="w-full rounded-xl px-4 py-2.5 text-sm bg-slate-900/50 border border-white/10 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             {statesList.map((s) => (
               <option key={s.code} value={s.code}>
@@ -224,16 +227,16 @@ export const EligibilityForm: React.FC = () => {
         </div>
 
         {/* District */}
-        <div className="space-y-1.5">
-          <label htmlFor="district-select" className="text-xs font-semibold text-[#344054] flex items-center gap-1.5 uppercase tracking-wide">
-            <MapPin className="h-3.5 w-3.5 text-[#2563EB]" aria-hidden="true" />
+        <div className="space-y-2">
+          <label htmlFor="district-select" className="text-sm font-semibold text-slate-300 flex items-center gap-1.5">
+            <MapPin className="h-4 w-4 text-blue-400" aria-hidden="true" />
             {t('labelDistrict')}
           </label>
           <select
             id="district-select"
             value={district}
             onChange={(e) => setDistrict(e.target.value)}
-            className="w-full rounded-xl px-3.5 py-2.5 text-sm bg-white border border-[#E4E7EC] text-[#101828] focus:ring-2 focus:ring-[#2563EB]/20 focus:border-[#2563EB] disabled:bg-[#F8FAFC] disabled:text-[#98A2B3]"
+            className="w-full rounded-xl px-4 py-2.5 text-sm bg-slate-900/50 border border-white/10 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
             disabled={districtsList.length === 0}
           >
             {districtsList.map((d) => (
@@ -248,9 +251,9 @@ export const EligibilityForm: React.FC = () => {
         </div>
 
         {/* Annual Income */}
-        <div className="space-y-1.5">
-          <label htmlFor="income-input" className="text-xs font-semibold text-[#344054] flex items-center gap-1.5 uppercase tracking-wide">
-            <DollarSign className="h-3.5 w-3.5 text-[#2563EB]" aria-hidden="true" />
+        <div className="space-y-2">
+          <label htmlFor="income-input" className="text-sm font-semibold text-slate-300 flex items-center gap-1.5">
+            <DollarSign className="h-4 w-4 text-blue-400" aria-hidden="true" />
             {t('labelAnnualIncome')}
           </label>
           <input
@@ -260,22 +263,22 @@ export const EligibilityForm: React.FC = () => {
             step="1000"
             value={annualIncome}
             onChange={(e) => setAnnualIncome(parseFloat(e.target.value) || 0)}
-            className="w-full rounded-xl px-3.5 py-2.5 text-sm bg-white border border-[#E4E7EC] text-[#101828] focus:ring-2 focus:ring-[#2563EB]/20 focus:border-[#2563EB]"
+            className="w-full rounded-xl px-4 py-2.5 text-sm bg-slate-900/50 border border-white/10 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
             required
           />
         </div>
 
         {/* Category */}
-        <div className="space-y-1.5">
-          <label htmlFor="category-select" className="text-xs font-semibold text-[#344054] flex items-center gap-1.5 uppercase tracking-wide">
-            <User className="h-3.5 w-3.5 text-[#2563EB]" aria-hidden="true" />
+        <div className="space-y-2">
+          <label htmlFor="category-select" className="text-sm font-semibold text-slate-300 flex items-center gap-1.5">
+            <User className="h-4 w-4 text-blue-400" aria-hidden="true" />
             {t('labelCategory')}
           </label>
           <select
             id="category-select"
             value={category}
             onChange={(e) => setCategory(e.target.value as any)}
-            className="w-full rounded-xl px-3.5 py-2.5 text-sm bg-white border border-[#E4E7EC] text-[#101828] focus:ring-2 focus:ring-[#2563EB]/20 focus:border-[#2563EB]"
+            className="w-full rounded-xl px-4 py-2.5 text-sm bg-slate-900/50 border border-white/10 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             <option value="general">{t('categoryGeneral')}</option>
             <option value="obc">{t('categoryObc')}</option>
@@ -285,9 +288,9 @@ export const EligibilityForm: React.FC = () => {
         </div>
 
         {/* Occupation */}
-        <div className="space-y-1.5">
-          <label htmlFor="occupation-select" className="text-xs font-semibold text-[#344054] flex items-center gap-1.5 uppercase tracking-wide">
-            <User className="h-3.5 w-3.5 text-[#2563EB]" aria-hidden="true" />
+        <div className="space-y-2">
+          <label htmlFor="occupation-select" className="text-sm font-semibold text-slate-300 flex items-center gap-1.5">
+            <User className="h-4 w-4 text-blue-400" aria-hidden="true" />
             {t('labelOccupation')}
           </label>
           <select
@@ -299,7 +302,7 @@ export const EligibilityForm: React.FC = () => {
               setIsFarmer(val === 'farmer');
               setIsStudent(val === 'student');
             }}
-            className="w-full rounded-xl px-3.5 py-2.5 text-sm bg-white border border-[#E4E7EC] text-[#101828] focus:ring-2 focus:ring-[#2563EB]/20 focus:border-[#2563EB]"
+            className="w-full rounded-xl px-4 py-2.5 text-sm bg-slate-900/50 border border-white/10 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             <option value="farmer">{t('occupationFarmer')}</option>
             <option value="student">{t('occupationStudent')}</option>
@@ -313,9 +316,9 @@ export const EligibilityForm: React.FC = () => {
 
         {/* Land holding (if farmer) */}
         {isFarmer && (
-          <div className="space-y-1.5 animate-fade-in">
-            <label htmlFor="land-input" className="text-xs font-semibold text-[#344054] flex items-center gap-1.5 uppercase tracking-wide">
-              <Sparkles className="h-3.5 w-3.5 text-[#2563EB]" aria-hidden="true" />
+          <div className="space-y-2 animate-fade-in">
+            <label htmlFor="land-input" className="text-sm font-semibold text-slate-300 flex items-center gap-1.5">
+              <Sparkles className="h-4 w-4 text-blue-400" aria-hidden="true" />
               {t('labelLand')}
             </label>
             <input
@@ -325,47 +328,50 @@ export const EligibilityForm: React.FC = () => {
               step="0.1"
               value={landHolding}
               onChange={(e) => setLandHolding(parseFloat(e.target.value) || 0)}
-              className="w-full rounded-xl px-3.5 py-2.5 text-sm bg-white border border-[#E4E7EC] text-[#101828] focus:ring-2 focus:ring-[#2563EB]/20 focus:border-[#2563EB]"
+              className="w-full rounded-xl px-4 py-2.5 text-sm bg-slate-900/50 border border-white/10 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
         )}
       </div>
 
       {/* Switches Grid */}
-      <fieldset className="border-t border-[#E4E7EC] pt-6 space-y-4">
-        <legend className="text-xs text-[#667085] uppercase tracking-wider font-semibold mb-2">Additional Qualifications</legend>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+      <fieldset className="border-t border-white/[0.08] pt-6 space-y-4">
+        <legend className="text-xs text-slate-400 uppercase tracking-wider font-semibold mb-2">Additional Qualifications</legend>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {/* Disability */}
           <label 
             htmlFor="disability-checkbox" 
-            className="flex items-center gap-3 p-3 rounded-xl bg-[#F8FAFC] border border-[#E4E7EC] hover:border-[#D0D5DD] cursor-pointer select-none transition-all"
+            className="flex items-center gap-3 p-3 rounded-xl bg-white/[0.02] border border-white/[0.05] hover:border-white/10 cursor-pointer select-none focus-within:ring-2 focus-within:ring-blue-500 focus-within:outline-none"
           >
             <input
               id="disability-checkbox"
               type="checkbox"
               checked={disability}
               onChange={(e) => setDisability(e.target.checked)}
-              className="h-4 w-4 rounded accent-[#2563EB] cursor-pointer focus:outline-none"
+              className="h-4 w-4 rounded accent-blue-500 cursor-pointer focus:outline-none"
             />
-            <span className="text-sm font-medium text-[#344054]">{t('labelDisability')}</span>
+            <span className="text-sm font-medium text-slate-300">{t('labelDisability')}</span>
           </label>
 
+          {/* BPL */}
           <label 
             htmlFor="bpl-checkbox"
-            className="flex items-center gap-3 p-3 rounded-xl bg-[#F8FAFC] border border-[#E4E7EC] hover:border-[#D0D5DD] cursor-pointer select-none transition-all"
+            className="flex items-center gap-3 p-3 rounded-xl bg-white/[0.02] border border-white/[0.05] hover:border-white/10 cursor-pointer select-none focus-within:ring-2 focus-within:ring-blue-500 focus-within:outline-none"
           >
             <input
               id="bpl-checkbox"
               type="checkbox"
               checked={isBpl}
               onChange={(e) => setIsBpl(e.target.checked)}
-              className="h-4 w-4 rounded accent-[#2563EB] cursor-pointer focus:outline-none"
+              className="h-4 w-4 rounded accent-blue-500 cursor-pointer focus:outline-none"
             />
-            <span className="text-sm font-medium text-[#344054]">{t('labelBpl')}</span>
+            <span className="text-sm font-medium text-slate-300">{t('labelBpl')}</span>
           </label>
 
+          {/* Student status */}
           <label 
             htmlFor="student-checkbox"
-            className="flex items-center gap-3 p-3 rounded-xl bg-[#F8FAFC] border border-[#E4E7EC] hover:border-[#D0D5DD] cursor-pointer select-none transition-all"
+            className="flex items-center gap-3 p-3 rounded-xl bg-white/[0.02] border border-white/[0.05] hover:border-white/10 cursor-pointer select-none focus-within:ring-2 focus-within:ring-blue-500 focus-within:outline-none"
           >
             <input
               id="student-checkbox"
@@ -375,14 +381,15 @@ export const EligibilityForm: React.FC = () => {
                 setIsStudent(e.target.checked);
                 if (e.target.checked) setOccupation('student');
               }}
-              className="h-4 w-4 rounded accent-[#2563EB] cursor-pointer focus:outline-none"
+              className="h-4 w-4 rounded accent-blue-500 cursor-pointer focus:outline-none"
             />
-            <span className="text-sm font-medium text-[#344054]">{t('labelStudent')}</span>
+            <span className="text-sm font-medium text-slate-300">{t('labelStudent')}</span>
           </label>
 
+          {/* Farmer status */}
           <label 
             htmlFor="farmer-checkbox"
-            className="flex items-center gap-3 p-3 rounded-xl bg-[#F8FAFC] border border-[#E4E7EC] hover:border-[#D0D5DD] cursor-pointer select-none transition-all"
+            className="flex items-center gap-3 p-3 rounded-xl bg-white/[0.02] border border-white/[0.05] hover:border-white/10 cursor-pointer select-none focus-within:ring-2 focus-within:ring-blue-500 focus-within:outline-none"
           >
             <input
               id="farmer-checkbox"
@@ -392,37 +399,39 @@ export const EligibilityForm: React.FC = () => {
                 setIsFarmer(e.target.checked);
                 if (e.target.checked) setOccupation('farmer');
               }}
-              className="h-4 w-4 rounded accent-[#2563EB] cursor-pointer focus:outline-none"
+              className="h-4 w-4 rounded accent-blue-500 cursor-pointer focus:outline-none"
             />
-            <span className="text-sm font-medium text-[#344054]">{t('labelFarmer')}</span>
+            <span className="text-sm font-medium text-slate-300">{t('labelFarmer')}</span>
           </label>
 
+          {/* Woman status */}
           <label 
             htmlFor="woman-checkbox"
-            className="flex items-center gap-3 p-3 rounded-xl bg-[#F8FAFC] border border-[#E4E7EC] hover:border-[#D0D5DD] cursor-pointer select-none transition-all"
+            className="flex items-center gap-3 p-3 rounded-xl bg-white/[0.02] border border-white/[0.05] hover:border-white/10 cursor-pointer select-none focus-within:ring-2 focus-within:ring-blue-500 focus-within:outline-none"
           >
             <input
               id="woman-checkbox"
               type="checkbox"
               checked={isWoman}
               onChange={(e) => setIsWoman(e.target.checked)}
-              className="h-4 w-4 rounded accent-[#2563EB] cursor-pointer focus:outline-none"
+              className="h-4 w-4 rounded accent-blue-500 cursor-pointer focus:outline-none"
             />
-            <span className="text-sm font-medium text-[#344054]">{t('labelWoman')}</span>
+            <span className="text-sm font-medium text-slate-300">{t('labelWoman')}</span>
           </label>
 
+          {/* Senior Citizen */}
           <label 
             htmlFor="senior-checkbox"
-            className="flex items-center gap-3 p-3 rounded-xl bg-[#F8FAFC] border border-[#E4E7EC] hover:border-[#D0D5DD] cursor-pointer select-none transition-all"
+            className="flex items-center gap-3 p-3 rounded-xl bg-white/[0.02] border border-white/[0.05] hover:border-white/10 cursor-pointer select-none focus-within:ring-2 focus-within:ring-blue-500 focus-within:outline-none"
           >
             <input
               id="senior-checkbox"
               type="checkbox"
               checked={isSenior}
               onChange={(e) => setIsSenior(e.target.checked)}
-              className="h-4 w-4 rounded accent-[#2563EB] cursor-pointer focus:outline-none"
+              className="h-4 w-4 rounded accent-blue-500 cursor-pointer focus:outline-none"
             />
-            <span className="text-sm font-medium text-[#344054]">{t('labelSenior')}</span>
+            <span className="text-sm font-medium text-slate-300">{t('labelSenior')}</span>
           </label>
         </div>
       </fieldset>
@@ -431,14 +440,13 @@ export const EligibilityForm: React.FC = () => {
         <button
           type="submit"
           disabled={formLoading}
-          className="w-full sm:w-auto px-8 py-3 bg-[#2563EB] hover:bg-[#1D4ED8] text-white rounded-xl font-semibold text-sm shadow-sm hover:shadow transition-all cursor-pointer flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed"
+          className="w-full sm:w-auto px-8 py-3 bg-gradient-to-r from-orange-500 to-blue-600 hover:from-orange-600 hover:to-blue-700 text-white rounded-xl font-bold shadow-lg shadow-blue-500/20 hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer flex items-center justify-center gap-2 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none"
         >
+          <Sparkles className="h-4 w-4 text-orange-200 animate-spin" style={{ animationDuration: '3s' }} aria-hidden="true" />
           {formLoading ? t('buttonChecking') : t('buttonCheck')}
-          <ArrowRight className="h-4 w-4 stroke-[2]" aria-hidden="true" />
         </button>
       </div>
     </form>
   );
 };
-
 export default EligibilityForm;
