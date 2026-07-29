@@ -4,14 +4,25 @@ export interface SchemeCard {
   name_hi?: string;
   slug: string;
   ministry?: string;
+  department?: string;
   level?: string;
   state_code?: string;
   benefits_amount?: string;
   scheme_type: string[];
   tags: string[];
   category_name?: string;
+  category_slug?: string;
   category_icon?: string;
+  hub_category?: 'student' | 'startup' | 'farmer' | 'women' | 'youth' | string;
   is_active: boolean;
+  
+  // Advanced eligibility metrics
+  match_score?: number;
+  match_percentage?: number;
+  confidence_score?: number;
+  reasons_eligible?: string[];
+  reasons_ineligible?: string[];
+  alternative_schemes?: SchemeCard[];
 }
 
 export interface SchemeDetail extends SchemeCard {
@@ -31,6 +42,9 @@ export interface SchemeDetail extends SchemeCard {
   ai_summary?: string;
   related_schemes?: SchemeCard[];
   similar_schemes?: SchemeCard[];
+  industry?: string;
+  funding_stage?: string;
+  renewal_terms?: string;
 }
 
 export interface SchemeListResponse {
@@ -48,3 +62,4 @@ export interface Category {
   icon?: string;
   color?: string;
 }
+

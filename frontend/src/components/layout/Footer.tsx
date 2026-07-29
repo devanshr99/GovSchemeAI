@@ -10,91 +10,127 @@ export const Footer: React.FC = () => {
     <footer className="border-t border-white/[0.08] bg-[#071126] text-slate-400 mt-auto pt-10 pb-6">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-8">
         {/* Main Footer Links */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8 pb-8 border-b border-white/[0.06]">
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-8 pb-8 border-b border-white/[0.06]">
           {/* Col 1: Brand & Disclaimer */}
           <div className="space-y-3 md:col-span-1">
             <Link href="/" className="inline-block hover:opacity-90 transition-opacity">
               <Logo variant="full" size="md" />
             </Link>
             <p className="text-xs text-slate-400 leading-relaxed">
-              GovSchemeAI is an independent citizen welfare portal designed to evaluate scheme eligibility against official department criteria.
+              GovSchemeAI is a comprehensive Digital Government Services Platform evaluating citizen eligibility against verified department gazettes.
             </p>
             <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-blue-900/30 border border-blue-500/20 text-[10px] font-semibold text-blue-300">
               <ShieldCheck className="h-3.5 w-3.5 text-blue-400" />
-              <span>Verified Government Guidelines</span>
+              <span>500+ Active Schemes</span>
             </div>
           </div>
 
-          {/* Col 2: Navigation */}
+          {/* Col 2: Sector Hubs */}
           <div className="space-y-3">
-            <h4 className="text-xs font-bold uppercase tracking-wider text-slate-200">Portal Services</h4>
+            <h4 className="text-xs font-bold uppercase tracking-wider text-slate-200">Sector Hubs</h4>
             <ul className="space-y-2 text-xs">
               <li>
-                <Link href="/" className="hover:text-blue-400 transition-colors">
-                  Eligibility Checker
+                <Link href="/hubs/student" className="hover:text-blue-400 transition-colors">
+                  Student & Scholarship Hub
                 </Link>
               </li>
               <li>
-                <Link href="/schemes" className="hover:text-blue-400 transition-colors">
-                  Browse All Schemes
+                <Link href="/hubs/startup" className="hover:text-amber-400 transition-colors">
+                  Startup & Entrepreneur Hub
                 </Link>
               </li>
               <li>
-                <Link href="/chat" className="hover:text-blue-400 transition-colors">
-                  Digital Scheme Advisor
+                <Link href="/hubs/farmer" className="hover:text-emerald-400 transition-colors">
+                  Kisan & Agriculture Hub
                 </Link>
               </li>
               <li>
-                <Link href="/admin" className="hover:text-blue-400 transition-colors">
-                  Admin Control Panel
+                <Link href="/hubs/women" className="hover:text-pink-400 transition-colors">
+                  Women Empowerment Hub
+                </Link>
+              </li>
+              <li>
+                <Link href="/hubs/youth" className="hover:text-cyan-400 transition-colors">
+                  Youth & Skill India Hub
                 </Link>
               </li>
             </ul>
           </div>
 
-          {/* Col 3: Scheme Categories */}
+          {/* Col 3: Portal Tools */}
           <div className="space-y-3">
-            <h4 className="text-xs font-bold uppercase tracking-wider text-slate-200">Featured Sectors</h4>
+            <h4 className="text-xs font-bold uppercase tracking-wider text-slate-200">Citizen Services</h4>
             <ul className="space-y-2 text-xs">
               <li>
-                <Link href="/schemes?category=agriculture" className="hover:text-blue-400 transition-colors">
-                  Agriculture & Farmer Welfare
+                <Link href="/dashboard" className="hover:text-blue-400 transition-colors">
+                  Citizen Dashboard
                 </Link>
               </li>
+              <li>
+                <Link href="/compare" className="hover:text-blue-400 transition-colors">
+                  Scheme Comparison Matrix
+                </Link>
+              </li>
+              <li>
+                <Link href="/documents" className="hover:text-blue-400 transition-colors">
+                  Document Verification Center
+                </Link>
+              </li>
+              <li>
+                <Link href="/news" className="hover:text-blue-400 transition-colors">
+                  Government News & PIB Feed
+                </Link>
+              </li>
+              <li>
+                <Link href="/analytics" className="hover:text-blue-400 transition-colors">
+                  Portal Analytics & Metrics
+                </Link>
+              </li>
+            </ul>
+          </div>
+
+          {/* Col 4: Featured Categories */}
+          <div className="space-y-3">
+            <h4 className="text-xs font-bold uppercase tracking-wider text-slate-200">Categories</h4>
+            <ul className="space-y-2 text-xs">
               <li>
                 <Link href="/schemes?category=education" className="hover:text-blue-400 transition-colors">
-                  Education & Scholarships
+                  Education & Fellowships
                 </Link>
               </li>
               <li>
-                <Link href="/schemes?category=health" className="hover:text-blue-400 transition-colors">
-                  Healthcare & Medical Aid
+                <Link href="/schemes?category=agriculture" className="hover:text-blue-400 transition-colors">
+                  Crop Credit & Farming Aid
                 </Link>
               </li>
               <li>
                 <Link href="/schemes?category=business" className="hover:text-blue-400 transition-colors">
-                  MSME & Business Subsidies
+                  MSME & Seed Fund
+                </Link>
+              </li>
+              <li>
+                <Link href="/schemes?category=health" className="hover:text-blue-400 transition-colors">
+                  Health & Ayushman Bharat
                 </Link>
               </li>
             </ul>
           </div>
 
-          {/* Col 4: Official Resources & Contact */}
+          {/* Col 5: Developer & Contact */}
           <div className="space-y-3">
-            <h4 className="text-xs font-bold uppercase tracking-wider text-slate-200">Developer & Contact</h4>
+            <h4 className="text-xs font-bold uppercase tracking-wider text-slate-200">Engineering & Lead</h4>
             <p className="text-xs text-slate-400">
-              Designed & Engineered with precision for citizen access.
+              Designed & Built by:
             </p>
             <div className="text-xs text-slate-300 font-medium">
-              Lead Architect:{' '}
               <Link
                 href="/about-developer"
-                className="text-blue-400 hover:underline font-semibold"
+                className="text-blue-400 hover:underline font-bold text-sm"
               >
                 Devansh Rastogi
               </Link>
             </div>
-            <div className="flex items-center gap-3 pt-1">
+            <div className="flex items-center gap-2 pt-1">
               <a
                 href="https://github.com/devanshr99"
                 target="_blank"
@@ -134,10 +170,10 @@ export const Footer: React.FC = () => {
         {/* Bottom Strip */}
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-[11px] text-slate-500 font-medium">
           <div>
-            © {new Date().getFullYear()} GovSchemeAI. All Rights Reserved. Built for Digital Governance & Welfare.
+            © {new Date().getFullYear()} GovSchemeAI. All Rights Reserved. Digital India Government Portal Platform.
           </div>
           <div className="flex items-center gap-1">
-            <span>Crafted with excellence by</span>
+            <span>Lead Engineer:</span>
             <Link href="/about-developer" className="text-slate-300 hover:text-blue-400 font-semibold underline decoration-blue-500/30">
               Devansh Rastogi
             </Link>
@@ -148,4 +184,5 @@ export const Footer: React.FC = () => {
   );
 };
 export default Footer;
+
 
