@@ -85,12 +85,13 @@ export const Logo: React.FC<LogoProps> = ({
     <div className={`inline-flex items-center gap-2.5 ${className}`}>
       {Symbol}
       <span className={`${textSizes[size]} font-bold tracking-tight font-sans flex items-baseline`}>
-        <span className="text-slate-100 font-extrabold">GovScheme</span>
-        <span className="text-slate-400 font-semibold text-[0.85em] ml-0.5 uppercase tracking-wider">AI</span>
+        <span className="text-slate-900 font-extrabold">GovScheme</span>
+        <span className="text-blue-600 font-bold text-[0.85em] ml-0.5 uppercase tracking-wider">AI</span>
       </span>
     </div>
   );
 };
 
 export default Logo;
+
 

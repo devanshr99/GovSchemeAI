@@ -1,350 +1,381 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useApp } from '../context/AppContext';
 import { EligibilityForm } from '../components/eligibility/EligibilityForm';
-import {
-  ShieldCheck, Award, Users, BookOpen, Search, SlidersHorizontal,
-  HelpCircle, ChevronDown, ChevronUp, Star, ArrowRight, CheckCircle2,
-  Building2, Landmark, FileText, Compass, Sparkles
-} from 'lucide-react';
-import { api } from '../lib/api';
+import { SchemeCard } from '../components/schemes/SchemeCard';
+import { COMPREHENSIVE_SCHEMES } from '../data/comprehensiveSchemes';
 import Link from 'next/link';
+import {
+  ShieldCheck, Search, GraduationCap, Rocket, Tractor, HeartHandshake,
+  Briefcase, Landmark, ArrowRight, CheckCircle2, FileCheck, Layers, MapPin,
+  Building2, ExternalLink, HelpCircle, ChevronDown, ChevronUp, Bell, Sparkles, BookOpen
+} from 'lucide-react';
 
-export default function Home() {
-  const { t } = useApp();
-  const [totalSchemes, setTotalSchemes] = useState<number | null>(null);
-  const [openFaq, setOpenFaq] = useState<number | null>(null);
-
-  useEffect(() => {
-    api.getSchemes({ pageSize: 1, activeOnly: true })
-      .then(res => setTotalSchemes(res.total))
-      .catch(err => console.error('Failed to fetch scheme stats:', err));
-  }, []);
-
-  const faqs = [
-    {
-      q: "How does GovSchemeAI evaluate scheme eligibility?",
-      a: "Our evaluation engine tests citizen profiles against official guidelines published by Central and State ministries. Age limits, income ceilings, land size, social category, and occupation are checked directly against department criteria."
-    },
-    {
-      q: "Is citizen profile information kept private?",
-      a: "Yes. All demographic parameters are evaluated locally in your session. We do not sell, store, or transmit your private identity details to third-party servers."
-    },
-    {
-      q: "What is the Digital Scheme Advisor?",
-      a: "The Digital Scheme Advisor is an interactive assistant trained on official government gazettes, department portals, and helpline guidelines to answer questions about required documents, application steps, and deadlines."
-    },
-    {
-      q: "Does the portal cover State Government schemes as well as Central schemes?",
-      a: "Yes. GovSchemeAI indexes welfare opportunities launched by the Central Government of India as well as state administrations across all 36 States and Union Territories."
-    }
-  ];
-
-  const testimonials = [
-    {
-      name: "Rameshwar Prasad",
-      role: "Farmer, Uttar Pradesh",
-      quote: "GovSchemeAI verified my land holding size and age constraints, matching me directly to PM-KISAN. The document checklist saved me weeks of office visits."
-    },
-    {
-      name: "Anjali Deshmukh",
-      role: "Engineering Student, Maharashtra",
-      quote: "Finding state scholarships used to be overwhelming. GovSchemeAI evaluated my OBC category and income level, highlighting 3 eligible education grants instantly."
-    },
-    {
-      name: "Harish Nair",
-      role: "MSME Entrepreneur, Karnataka",
-      quote: "The business subsidy lookup was accurate and fast. The Digital Scheme Advisor provided exact helpline numbers and bank submission guidelines for Mudra."
-    }
-  ];
-
-  const categories = [
-    { icon: '🌾', name: 'Agriculture & Farmers', slug: 'agriculture', desc: 'Crop insurance, equipment credit, fertilizer subsidies, and PM-KISAN grants.' },
-    { icon: '🎓', name: 'Education & Learning', slug: 'education', desc: 'Pre-matric & post-matric scholarships, fellowships, and student education loans.' },
-    { icon: '🏥', name: 'Health & Wellness', slug: 'health', desc: 'Ayushman Bharat insurance, maternal aid, and subsidized hospital treatments.' },
-    { icon: '🏠', name: 'Housing & Infrastructure', slug: 'housing', desc: 'PM Awas Yojana urban & rural housing grants, toilet construction aids.' },
-    { icon: '💼', name: 'Employment & Skill Development', slug: 'employment', desc: 'Skill India training programs, self-employment credit, and labor welfare cards.' },
-    { icon: '🚀', name: 'MSME & Business Credit', slug: 'business', desc: 'PMEGP loans, Mudra credit line, startup subsidies, and collateral-free capital.' }
-  ];
-
-  const steps = [
-    {
-      step: '01',
-      title: 'Enter Citizen Profile',
-      desc: 'Fill out the 3-step questionnaire with basic demographics (age, state, income, category).'
-    },
-    {
-      step: '02',
-      title: 'Automated Criteria Evaluation',
-      desc: 'Our rule engine matches your details against verified department gazettes and scheme rules.'
-    },
-    {
-      step: '03',
-      title: 'Review Matches & Apply Direct',
-      desc: 'Access eligibility scores, document checklists, and official portal application links.'
-    }
-  ];
+export default function HomePage() {
+  const { language, t } = useApp();
+  const [openFaq, setOpenFaq] = useState<number | null>(0);
 
   const toggleFaq = (idx: number) => {
     setOpenFaq(openFaq === idx ? null : idx);
   };
 
-  return (
-    <div className="relative min-h-screen flex flex-col justify-start py-8 sm:py-12 px-4 sm:px-6 lg:px-8 space-y-20 overflow-hidden">
-      {/* Background Geometric Accent */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-[500px] pointer-events-none overflow-hidden opacity-20 z-0">
-        <div className="absolute -top-20 left-1/3 w-[500px] h-[500px] rounded-full bg-blue-600/30 blur-[140px]" />
-        <div className="absolute top-40 right-1/4 w-[400px] h-[400px] rounded-full bg-amber-600/20 blur-[120px]" />
-      </div>
+  const studentSchemes = COMPREHENSIVE_SCHEMES.filter(s => s.hub_category === 'student');
+  const startupSchemes = COMPREHENSIVE_SCHEMES.filter(s => s.hub_category === 'startup');
+  const farmerSchemes = COMPREHENSIVE_SCHEMES.filter(s => s.hub_category === 'farmer');
+  const womenSchemes = COMPREHENSIVE_SCHEMES.filter(s => s.hub_category === 'women');
 
-      {/* Hero & Questionnaire Section */}
-      <div className="mx-auto max-w-7xl w-full flex flex-col lg:flex-row gap-10 lg:gap-14 items-start justify-between relative z-10 pt-4">
-        {/* Left Column: Hero Copy & Portal Emblem */}
-        <div className="flex-1 space-y-8 text-left animate-fade-in lg:pt-4">
-          <div className="space-y-5">
-            {/* Top Official Badge */}
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-blue-500/30 bg-blue-950/60 text-xs font-semibold text-blue-300">
-              <ShieldCheck className="h-4 w-4 text-blue-400" />
-              <span>National Citizen Welfare Portal • Official Rule Engine</span>
+  const faqs = [
+    {
+      q: "How does GovSchemeAI determine scheme eligibility?",
+      a: "GovSchemeAI evaluates citizen profile parameters (age, state, annual income, social category, and occupation) directly against official gazettes published by Central & State Ministries."
+    },
+    {
+      q: "Is my personal data saved or stored on any server?",
+      a: "No. Your profile questionnaire is processed locally within your session. GovSchemeAI prioritizes citizen privacy and data security."
+    },
+    {
+      q: "Are the scheme application links official?",
+      a: "Yes, 100% of external links route directly to official government portals such as NSP (scholarships.gov.in), PM-KISAN (pmkisan.gov.in), and Startup India (startupindia.gov.in)."
+    },
+    {
+      q: "Can I check eligibility for state-specific schemes?",
+      a: "Yes! GovSchemeAI indexes welfare programs across all 36 States and Union Territories of India."
+    }
+  ];
+
+  return (
+    <div className="space-y-16 pb-16 bg-slate-50 text-slate-900 animate-fade-in">
+      {/* 1. HERO BANNER */}
+      <section className="bg-white border-b border-slate-200 py-12 sm:py-16 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+        <div className="mx-auto max-w-7xl grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
+          {/* Left Text */}
+          <div className="lg:col-span-7 space-y-6">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 border border-blue-200 text-xs font-extrabold text-blue-800 uppercase tracking-wider">
+              <ShieldCheck className="h-4 w-4 text-blue-600" />
+              <span>National Citizen Services Portal • Digital India Initiative</span>
             </div>
 
-            {/* Hero Heading */}
-            <h1 className="text-3xl sm:text-5xl lg:text-5xl font-black text-slate-100 tracking-tight leading-[1.15]">
-              Discover Government Schemes You Qualify For
+            <h1 className="text-3xl sm:text-5xl font-black text-slate-900 tracking-tight leading-tight">
+              Discover Government Welfare Schemes <span className="text-blue-600">You Qualify For</span>
             </h1>
 
-            {/* Hero Subtitle */}
-            <p className="text-sm sm:text-base text-slate-300 max-w-2xl leading-relaxed">
-              Evaluate eligibility against official Central and State government guidelines in seconds. Eliminate multi-portal confusion and access financial aid, scholarships, and farming subsidies directly.
+            <p className="text-sm sm:text-base text-slate-600 font-normal leading-relaxed max-w-2xl">
+              Access verified Central and State welfare programs. Evaluate rule eligibility, check required documents, and apply directly on official government portals.
             </p>
 
-            {/* Hero Dual CTAs */}
             <div className="flex flex-wrap items-center gap-3 pt-2">
-              <button
-                onClick={() => {
-                  const formElem = document.getElementById('eligibility-section');
-                  formElem?.scrollIntoView({ behavior: 'smooth' });
-                }}
-                className="px-6 py-3 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white rounded-xl font-bold text-xs shadow-lg shadow-blue-600/25 flex items-center gap-2 transition-all cursor-pointer"
+              <a
+                href="#eligibility-wizard"
+                className="px-6 py-3.5 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-bold rounded-xl text-xs sm:text-sm transition-all shadow-md hover:shadow-lg flex items-center gap-2 cursor-pointer"
               >
                 <span>Check Scheme Eligibility</span>
                 <ArrowRight className="h-4 w-4" />
-              </button>
+              </a>
 
               <Link
                 href="/schemes"
-                className="px-6 py-3 bg-slate-900/80 hover:bg-slate-800 border border-white/10 text-slate-200 hover:text-white rounded-xl font-semibold text-xs transition-all flex items-center gap-2"
+                className="px-6 py-3.5 bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold rounded-xl text-xs sm:text-sm transition-all border border-slate-200 flex items-center gap-2 cursor-pointer"
               >
-                <Search className="h-4 w-4 text-slate-400" />
+                <Search className="h-4 w-4 text-slate-600" />
                 <span>Browse All Schemes</span>
               </Link>
             </div>
-          </div>
 
-          {/* Key Portal Statistics */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-4 border-t border-white/[0.08]">
-            <div className="gov-card p-3.5 rounded-xl text-left border-white/[0.06]">
-              <div className="text-lg sm:text-xl font-black text-slate-100">
-                {totalSchemes !== null ? `${totalSchemes}+` : '130+'}
+            {/* Quick Metrics */}
+            <div className="grid grid-cols-3 gap-4 pt-4 border-t border-slate-100 max-w-lg text-xs">
+              <div>
+                <div className="font-black text-slate-900 text-base">500+</div>
+                <div className="text-slate-500 text-[11px]">Indexed Schemes</div>
               </div>
-              <div className="text-[10px] uppercase tracking-wider text-slate-400 font-bold mt-0.5">
-                Active Schemes
+              <div>
+                <div className="font-black text-blue-600 text-base">36</div>
+                <div className="text-slate-500 text-[11px]">States & UTs</div>
               </div>
-            </div>
-
-            <div className="gov-card p-3.5 rounded-xl text-left border-white/[0.06]">
-              <div className="text-lg sm:text-xl font-black text-amber-400">36</div>
-              <div className="text-[10px] uppercase tracking-wider text-slate-400 font-bold mt-0.5">
-                States & UTs
-              </div>
-            </div>
-
-            <div className="gov-card p-3.5 rounded-xl text-left border-white/[0.06]">
-              <div className="text-lg sm:text-xl font-black text-blue-400">9</div>
-              <div className="text-[10px] uppercase tracking-wider text-slate-400 font-bold mt-0.5">
-                Target Sectors
-              </div>
-            </div>
-
-            <div className="gov-card p-3.5 rounded-xl text-left border-white/[0.06]">
-              <div className="text-lg sm:text-xl font-black text-emerald-400">100%</div>
-              <div className="text-[10px] uppercase tracking-wider text-slate-400 font-bold mt-0.5">
-                Verified Rules
+              <div>
+                <div className="font-black text-emerald-600 text-base">100%</div>
+                <div className="text-slate-500 text-[11px]">Verified Portals</div>
               </div>
             </div>
           </div>
-        </div>
 
-        {/* Right Column: Guided Form */}
-        <div id="eligibility-section" className="w-full lg:max-w-xl animate-slide-up shrink-0">
-          <EligibilityForm />
-        </div>
-      </div>
-
-      {/* How It Works Section */}
-      <div className="mx-auto max-w-7xl w-full space-y-8 relative z-10 pt-4">
-        <div className="text-center space-y-2">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-950/60 border border-blue-500/20 text-[11px] font-bold text-blue-300 uppercase tracking-wider">
-            Clear Workflow
-          </div>
-          <h2 className="text-2xl sm:text-3xl font-black text-slate-100">
-            How GovSchemeAI Works
-          </h2>
-          <p className="text-xs sm:text-sm text-slate-400 max-w-lg mx-auto">
-            A simple, transparent 3-step evaluation model designed for all Indian citizens.
-          </p>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {steps.map((st, idx) => (
-            <div key={idx} className="gov-card p-6 rounded-2xl border border-white/[0.08] relative space-y-3">
-              <div className="text-3xl font-black text-blue-500/40">{st.step}</div>
-              <h3 className="text-base font-bold text-slate-100">{st.title}</h3>
-              <p className="text-xs text-slate-400 leading-relaxed">{st.desc}</p>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Scheme Categories Grid */}
-      <div className="mx-auto max-w-7xl w-full space-y-8 relative z-10">
-        <div className="text-center space-y-2">
-          <h2 className="text-2xl sm:text-3xl font-black text-slate-100">
-            Explore Welfare Opportunities by Sector
-          </h2>
-          <p className="text-xs sm:text-sm text-slate-400 max-w-lg mx-auto">
-            Select a target sector to view specialized Central and State programs.
-          </p>
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {categories.map((cat, idx) => (
-            <Link
-              href={`/schemes?category=${cat.slug}`}
-              key={idx}
-              className="gov-card gov-card-hover p-6 rounded-2xl flex flex-col justify-between border border-white/[0.08] group cursor-pointer space-y-4"
-            >
-              <div className="flex items-center gap-3">
-                <span className="text-2xl p-2 rounded-xl bg-slate-900 border border-white/10">{cat.icon}</span>
-                <h3 className="font-bold text-slate-100 group-hover:text-blue-400 transition-colors text-base">
-                  {cat.name}
-                </h3>
-              </div>
-              <p className="text-xs text-slate-400 leading-relaxed">{cat.desc}</p>
-              <div className="text-xs text-blue-400 font-bold flex items-center gap-1 group-hover:underline pt-2 border-t border-white/[0.04]">
-                <span>Browse Sector Schemes</span>
-                <ArrowRight className="h-3 w-3 group-hover:translate-x-0.5 transition-transform" />
-              </div>
-            </Link>
-          ))}
-        </div>
-      </div>
-
-      {/* Citizen Success Stories / Testimonials */}
-      <div className="mx-auto max-w-7xl w-full space-y-8 relative z-10">
-        <div className="text-center space-y-2">
-          <h2 className="text-2xl sm:text-3xl font-black text-slate-100">
-            Trusted by Beneficiaries Across India
-          </h2>
-          <p className="text-xs sm:text-sm text-slate-400 max-w-lg mx-auto">
-            Hear how farmers, students, and small business owners matched with verified benefits.
-          </p>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {testimonials.map((t, idx) => (
-            <div key={idx} className="gov-card p-6 rounded-2xl border border-white/[0.08] flex flex-col justify-between space-y-4">
-              <div className="space-y-3">
-                <div className="flex gap-1">
-                  {[1, 2, 3, 4, 5].map((s) => (
-                    <Star key={s} className="h-3.5 w-3.5 fill-amber-400 text-amber-400" />
-                  ))}
-                </div>
-                <p className="text-xs sm:text-sm text-slate-300 leading-relaxed italic">
-                  "{t.quote}"
-                </p>
-              </div>
-              <div className="border-t border-white/[0.06] pt-3">
-                <h4 className="font-bold text-xs text-slate-100">{t.name}</h4>
-                <p className="text-[10px] text-slate-400 font-medium">{t.role}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* FAQ Section */}
-      <div className="mx-auto max-w-3xl w-full space-y-8 relative z-10">
-        <div className="text-center space-y-2">
-          <h2 className="text-2xl sm:text-3xl font-black text-slate-100 flex items-center justify-center gap-2">
-            <HelpCircle className="h-6 w-6 text-blue-400" />
-            Frequently Asked Questions
-          </h2>
-          <p className="text-xs sm:text-sm text-slate-400">
-            Answers regarding rule calculations, data security, and scheme updates.
-          </p>
-        </div>
-
-        <div className="space-y-3">
-          {faqs.map((faq, idx) => {
-            const isOpen = openFaq === idx;
-            return (
-              <div
-                key={idx}
-                className="gov-card rounded-2xl overflow-hidden border border-white/[0.08] transition-all"
-              >
-                <button
-                  onClick={() => toggleFaq(idx)}
-                  className="w-full px-6 py-4 text-left flex justify-between items-center hover:bg-white/[0.02] transition-all cursor-pointer"
-                >
-                  <span className="font-bold text-sm text-slate-100">{faq.q}</span>
-                  {isOpen ? (
-                    <ChevronUp className="h-4 w-4 text-slate-400 shrink-0" />
-                  ) : (
-                    <ChevronDown className="h-4 w-4 text-slate-400 shrink-0" />
-                  )}
-                </button>
-                {isOpen && (
-                  <div className="px-6 pb-5 pt-1 text-xs sm:text-sm text-slate-300 leading-relaxed border-t border-white/[0.04] bg-slate-900/50 animate-fade-in">
-                    {faq.a}
+          {/* Right Eligibility Assessment Card */}
+          <div className="lg:col-span-5">
+            <div className="gov-card rounded-3xl p-6 sm:p-7 bg-white border border-slate-200 shadow-xl space-y-5">
+              <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                <div className="flex items-center gap-2">
+                  <div className="p-2 rounded-xl bg-blue-50 border border-blue-200 text-blue-700">
+                    <Landmark className="h-5 w-5" />
                   </div>
-                )}
+                  <div>
+                    <div className="text-xs font-bold text-slate-900">Instant Scheme Evaluator</div>
+                    <div className="text-[10px] text-slate-500">Department Criteria Evaluation</div>
+                  </div>
+                </div>
+                <span className="text-[9px] font-extrabold uppercase px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 border border-emerald-200">
+                  Live Engine
+                </span>
               </div>
+
+              <div className="space-y-3 text-xs text-slate-600">
+                <div className="flex items-center gap-2 bg-slate-50 p-3 rounded-xl border border-slate-100">
+                  <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0" />
+                  <span>Evaluates Age, Annual Income, Category & State</span>
+                </div>
+                <div className="flex items-center gap-2 bg-slate-50 p-3 rounded-xl border border-slate-100">
+                  <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0" />
+                  <span>Displays Match % & Rule Breakdown</span>
+                </div>
+                <div className="flex items-center gap-2 bg-slate-50 p-3 rounded-xl border border-slate-100">
+                  <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0" />
+                  <span>Lists Direct Document Checklists</span>
+                </div>
+              </div>
+
+              <a
+                href="#eligibility-wizard"
+                className="w-full py-3 bg-slate-900 hover:bg-slate-800 text-white rounded-xl font-bold text-xs flex items-center justify-center gap-2 transition-all cursor-pointer shadow-sm"
+              >
+                <span>Start 3-Step Wizard Below</span>
+                <ArrowRight className="h-4 w-4 text-blue-400" />
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 2. QUICK ELIGIBILITY FORM WIZARD */}
+      <section id="eligibility-wizard" className="mx-auto max-w-4xl px-4 sm:px-6 scroll-mt-24">
+        <EligibilityForm />
+      </section>
+
+      {/* 3. POPULAR SCHEMES */}
+      <section className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight flex items-center gap-2">
+              <Sparkles className="h-6 w-6 text-amber-500" />
+              Popular National Schemes
+            </h2>
+            <p className="text-xs text-slate-500">Top welfare programs accessed by citizens across India</p>
+          </div>
+          <Link href="/schemes" className="text-xs font-bold text-blue-600 hover:underline flex items-center gap-1">
+            <span>View All Schemes</span>
+            <ArrowRight className="h-3.5 w-3.5" />
+          </Link>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {COMPREHENSIVE_SCHEMES.slice(0, 6).map((sch) => (
+            <SchemeCard key={sch.id} scheme={{ ...sch, match_score: 1.0, rules_matched: 0, rules_total: 0 } as any} isMatchedView={false} />
+          ))}
+        </div>
+      </section>
+
+      {/* 4. BROWSE CATEGORIES */}
+      <section className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-6">
+        <div className="text-center space-y-1">
+          <h2 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">Browse Schemes by Sector</h2>
+          <p className="text-xs text-slate-500 max-w-lg mx-auto">Explore targeted welfare programs tailored to your specific field and category.</p>
+        </div>
+
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
+          {[
+            { title: "Student Hub", icon: GraduationCap, color: "text-blue-600", bg: "bg-blue-50 border-blue-200", href: "/hubs/student" },
+            { title: "Startup Hub", icon: Rocket, color: "text-amber-600", bg: "bg-amber-50 border-amber-200", href: "/hubs/startup" },
+            { title: "Farmer Hub", icon: Tractor, color: "text-emerald-600", bg: "bg-emerald-50 border-emerald-200", href: "/hubs/farmer" },
+            { title: "Women Hub", icon: HeartHandshake, color: "text-pink-600", bg: "bg-pink-50 border-pink-200", href: "/hubs/women" },
+            { title: "Youth Hub", icon: Briefcase, color: "text-cyan-600", bg: "bg-cyan-50 border-cyan-200", href: "/hubs/youth" },
+          ].map((cat, idx) => {
+            const CIcon = cat.icon;
+            return (
+              <Link
+                key={idx}
+                href={cat.href}
+                className="gov-card p-5 rounded-2xl border border-slate-200 bg-white hover:border-blue-400 hover:shadow-md transition-all text-center space-y-3 group"
+              >
+                <div className={`p-3 rounded-2xl ${cat.bg} border w-fit mx-auto group-hover:scale-105 transition-transform`}>
+                  <CIcon className={`h-6 w-6 ${cat.color}`} />
+                </div>
+                <div className="text-xs font-bold text-slate-900 group-hover:text-blue-600 transition-colors">{cat.title}</div>
+              </Link>
             );
           })}
         </div>
-      </div>
+      </section>
 
-      {/* Call to Action CTA */}
-      <div className="mx-auto max-w-5xl w-full relative z-10 pt-4">
-        <div className="gov-card bg-gradient-to-br from-blue-950/40 via-slate-900 to-slate-950 rounded-3xl p-8 sm:p-12 border border-white/[0.1] text-center space-y-5 relative overflow-hidden shadow-2xl">
-          <div className="space-y-2 relative z-10">
-            <h2 className="text-2xl sm:text-3xl font-black text-slate-100">Check Your Scheme Qualification</h2>
-            <p className="text-xs sm:text-sm text-slate-300 max-w-md mx-auto leading-relaxed">
-              Don't leave government benefits unclaimed. Run an eligibility check or consult the Digital Scheme Advisor today.
-            </p>
+      {/* 5. LATEST GOVERNMENT UPDATES */}
+      <section className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="gov-card p-6 sm:p-8 rounded-3xl bg-white border border-slate-200 shadow-sm space-y-4">
+          <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+            <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
+              <Bell className="h-5 w-5 text-blue-600" />
+              Latest Government Gazette Announcements
+            </h3>
+            <Link href="/news" className="text-xs font-bold text-blue-600 hover:underline">View All News</Link>
           </div>
-          <div className="flex flex-wrap justify-center gap-3 relative z-10">
-            <button
-              onClick={() => {
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-              }}
-              className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold shadow-lg shadow-blue-600/30 transition-all cursor-pointer text-xs"
-            >
-              <span>Start Questionnaire</span>
-              <ArrowRight className="h-4 w-4" />
-            </button>
-            <Link
-              href="/chat"
-              className="inline-flex items-center gap-2 px-6 py-3 bg-slate-800 hover:bg-slate-700 border border-white/10 text-slate-200 rounded-xl font-semibold transition-all text-xs"
-            >
-              <span>Consult Scheme Advisor</span>
-            </Link>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
+            <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-1">
+              <span className="text-[9px] font-extrabold uppercase px-2 py-0.5 rounded bg-blue-100 text-blue-800">PIB Gazette</span>
+              <div className="font-bold text-slate-900">PM Internship Scheme Phase II Opened</div>
+              <p className="text-slate-500 text-[11px]">1.25 Lakh new internship slots in top 500 companies with ₹5,000 monthly stipend.</p>
+            </div>
+            <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-1">
+              <span className="text-[9px] font-extrabold uppercase px-2 py-0.5 rounded bg-emerald-100 text-emerald-800">Scholarship Alert</span>
+              <div className="font-bold text-slate-900">NSP 2.0 Registration Window Extended</div>
+              <p className="text-slate-500 text-[11px]">Apply online via National Scholarship Portal with Aadhaar-seeded accounts.</p>
+            </div>
+            <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-1">
+              <span className="text-[9px] font-extrabold uppercase px-2 py-0.5 rounded bg-amber-100 text-amber-800">Startup India</span>
+              <div className="font-bold text-slate-900">Seed Fund Grants Disbursed</div>
+              <p className="text-slate-500 text-[11px]">Up to ₹20 Lakh proof-of-concept capital released to 3,500+ startups.</p>
+            </div>
           </div>
         </div>
-      </div>
+      </section>
+
+      {/* 6. SCHOLARSHIPS SECTION */}
+      <section className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-4">
+        <div className="flex items-center justify-between">
+          <h2 className="text-lg sm:text-xl font-bold text-slate-900 flex items-center gap-2">
+            <GraduationCap className="h-5 w-5 text-blue-600" />
+            Student Scholarships & Fellowships
+          </h2>
+          <Link href="/hubs/student" className="text-xs font-bold text-blue-600 hover:underline">View All Scholarships</Link>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {studentSchemes.map(sch => (
+            <SchemeCard key={sch.id} scheme={{ ...sch, match_score: 1.0, rules_matched: 0, rules_total: 0 } as any} isMatchedView={false} />
+          ))}
+        </div>
+      </section>
+
+      {/* 7. STARTUP PROGRAMS SECTION */}
+      <section className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-4">
+        <div className="flex items-center justify-between">
+          <h2 className="text-lg sm:text-xl font-bold text-slate-900 flex items-center gap-2">
+            <Rocket className="h-5 w-5 text-amber-600" />
+            Startup & Entrepreneurship Capital
+          </h2>
+          <Link href="/hubs/startup" className="text-xs font-bold text-amber-600 hover:underline">View All Startup Programs</Link>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {startupSchemes.map(sch => (
+            <SchemeCard key={sch.id} scheme={{ ...sch, match_score: 1.0, rules_matched: 0, rules_total: 0 } as any} isMatchedView={false} />
+          ))}
+        </div>
+      </section>
+
+      {/* 8. FARMER BENEFITS SECTION */}
+      <section className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-4">
+        <div className="flex items-center justify-between">
+          <h2 className="text-lg sm:text-xl font-bold text-slate-900 flex items-center gap-2">
+            <Tractor className="h-5 w-5 text-emerald-600" />
+            Farmer & Agriculture Welfare
+          </h2>
+          <Link href="/hubs/farmer" className="text-xs font-bold text-emerald-600 hover:underline">View All Farmer Schemes</Link>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {farmerSchemes.map(sch => (
+            <SchemeCard key={sch.id} scheme={{ ...sch, match_score: 1.0, rules_matched: 0, rules_total: 0 } as any} isMatchedView={false} />
+          ))}
+        </div>
+      </section>
+
+      {/* 9. WOMEN WELFARE SECTION */}
+      <section className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-4">
+        <div className="flex items-center justify-between">
+          <h2 className="text-lg sm:text-xl font-bold text-slate-900 flex items-center gap-2">
+            <HeartHandshake className="h-5 w-5 text-pink-600" />
+            Women Empowerment & Nari Shakti
+          </h2>
+          <Link href="/hubs/women" className="text-xs font-bold text-pink-600 hover:underline">View All Women Schemes</Link>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {womenSchemes.map(sch => (
+            <SchemeCard key={sch.id} scheme={{ ...sch, match_score: 1.0, rules_matched: 0, rules_total: 0 } as any} isMatchedView={false} />
+          ))}
+        </div>
+      </section>
+
+      {/* 10. HOW IT WORKS */}
+      <section className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="gov-card p-8 sm:p-10 rounded-3xl bg-white border border-slate-200 shadow-sm space-y-8 text-center">
+          <div className="space-y-1">
+            <h2 className="text-xl sm:text-2xl font-black text-slate-900">How GovSchemeAI Works for Citizens</h2>
+            <p className="text-xs text-slate-500 max-w-md mx-auto">Three simple steps to evaluate eligibility and claim government welfare benefits.</p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-left">
+            <div className="space-y-3 p-5 rounded-2xl bg-slate-50 border border-slate-200">
+              <div className="h-8 w-8 rounded-xl bg-blue-600 text-white font-black text-sm flex items-center justify-center">1</div>
+              <h3 className="text-sm font-bold text-slate-900">Enter Profile Details</h3>
+              <p className="text-xs text-slate-600 leading-relaxed">Fill your age, state, annual family income, occupation, and social category in the 3-step wizard.</p>
+            </div>
+            <div className="space-y-3 p-5 rounded-2xl bg-slate-50 border border-slate-200">
+              <div className="h-8 w-8 rounded-xl bg-blue-600 text-white font-black text-sm flex items-center justify-center">2</div>
+              <h3 className="text-sm font-bold text-slate-900">Rule Evaluation Scan</h3>
+              <p className="text-xs text-slate-600 leading-relaxed">Engine evaluates rules against official department criteria to compute match percentage and requirements.</p>
+            </div>
+            <div className="space-y-3 p-5 rounded-2xl bg-slate-50 border border-slate-200">
+              <div className="h-8 w-8 rounded-xl bg-blue-600 text-white font-black text-sm flex items-center justify-center">3</div>
+              <h3 className="text-sm font-bold text-slate-900">Apply Directly</h3>
+              <p className="text-xs text-slate-600 leading-relaxed">View required documents checklist and click to apply directly on verified government department portals.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 11. SUCCESS STATISTICS CARDS */}
+      <section className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+          <div className="gov-card p-6 rounded-2xl bg-white border border-slate-200 text-center space-y-1 shadow-xs">
+            <div className="text-3xl sm:text-4xl font-black text-slate-900">500+</div>
+            <div className="text-xs font-bold text-slate-600 uppercase tracking-wider">Active Schemes</div>
+          </div>
+          <div className="gov-card p-6 rounded-2xl bg-white border border-slate-200 text-center space-y-1 shadow-xs">
+            <div className="text-3xl sm:text-4xl font-black text-blue-600">36</div>
+            <div className="text-xs font-bold text-slate-600 uppercase tracking-wider">States & UTs</div>
+          </div>
+          <div className="gov-card p-6 rounded-2xl bg-white border border-slate-200 text-center space-y-1 shadow-xs">
+            <div className="text-3xl sm:text-4xl font-black text-emerald-600">50+</div>
+            <div className="text-xs font-bold text-slate-600 uppercase tracking-wider">Departments</div>
+          </div>
+          <div className="gov-card p-6 rounded-2xl bg-white border border-slate-200 text-center space-y-1 shadow-xs">
+            <div className="text-3xl sm:text-4xl font-black text-amber-600">100%</div>
+            <div className="text-xs font-bold text-slate-600 uppercase tracking-wider">Verified Sources</div>
+          </div>
+        </div>
+      </section>
+
+      {/* 12. FAQ ACCORDION */}
+      <section className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 space-y-6">
+        <div className="text-center space-y-1">
+          <h2 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">Frequently Asked Questions</h2>
+          <p className="text-xs text-slate-500">Everything you need to know about scheme eligibility and portal verification</p>
+        </div>
+
+        <div className="space-y-3">
+          {faqs.map((faq, idx) => (
+            <div key={idx} className="gov-card rounded-2xl border border-slate-200 bg-white overflow-hidden">
+              <button
+                onClick={() => toggleFaq(idx)}
+                className="w-full p-4 sm:p-5 text-left font-bold text-xs sm:text-sm text-slate-900 flex justify-between items-center cursor-pointer hover:bg-slate-50 transition-colors"
+              >
+                <span>{faq.q}</span>
+                {openFaq === idx ? <ChevronUp className="h-4 w-4 text-blue-600 shrink-0" /> : <ChevronDown className="h-4 w-4 text-slate-400 shrink-0" />}
+              </button>
+
+              {openFaq === idx && (
+                <div className="px-4 sm:px-5 pb-5 text-xs text-slate-600 leading-relaxed border-t border-slate-100 pt-3 bg-slate-50/50">
+                  {faq.a}
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      </section>
     </div>
   );
 }
-

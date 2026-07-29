@@ -75,7 +75,7 @@ export const SchemeCard: React.FC<SchemeCardProps> = ({ scheme, isMatchedView = 
   return (
     <div 
       onClick={handleCardClick}
-      className="gov-card gov-card-hover rounded-2xl p-5 sm:p-6 transition-all duration-300 relative overflow-hidden group cursor-pointer flex flex-col justify-between"
+      className="gov-card gov-card-hover rounded-2xl p-5 sm:p-6 transition-all duration-200 relative overflow-hidden group cursor-pointer flex flex-col justify-between bg-white border border-slate-200 shadow-2xs hover:shadow-md hover:border-blue-400"
     >
       {/* Top Accent Strip */}
       <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-600 via-blue-500 to-amber-500" />
@@ -84,11 +84,11 @@ export const SchemeCard: React.FC<SchemeCardProps> = ({ scheme, isMatchedView = 
         {/* Header Badges & Bookmark */}
         <div className="flex items-start justify-between gap-3">
           <div className="flex flex-wrap items-center gap-2 flex-1">
-            <span className="text-[10px] uppercase font-bold tracking-wider px-2.5 py-0.5 rounded bg-blue-950/80 text-blue-300 border border-blue-500/30">
+            <span className="text-[10px] uppercase font-extrabold tracking-wider px-2.5 py-0.5 rounded bg-blue-50 text-blue-700 border border-blue-200">
               {scheme.category_name || 'General Sector'}
             </span>
-            <span className="text-[10px] uppercase font-bold tracking-wider px-2.5 py-0.5 rounded bg-amber-950/70 text-amber-300 border border-amber-500/30">
-              {scheme.level === 'state' ? ((scheme as any).state || scheme.state_code || 'State Government') : 'Central Government'}
+            <span className="text-[10px] uppercase font-extrabold tracking-wider px-2.5 py-0.5 rounded bg-slate-100 text-slate-700 border border-slate-200">
+              {scheme.level === 'state' ? ((scheme as any).state || scheme.state_code || 'State Govt') : 'Central Govt'}
             </span>
           </div>
 
@@ -98,10 +98,10 @@ export const SchemeCard: React.FC<SchemeCardProps> = ({ scheme, isMatchedView = 
               onClick={toggleBookmark}
               aria-label="Bookmark scheme"
               title={isBookmarked ? "Remove Bookmark" : "Save Scheme"}
-              className="p-1.5 rounded-lg bg-slate-900/80 border border-white/10 hover:border-blue-400 text-slate-400 hover:text-white transition-all cursor-pointer"
+              className="p-1.5 rounded-lg bg-slate-50 border border-slate-200 hover:border-blue-400 text-slate-500 hover:text-blue-700 transition-all cursor-pointer"
             >
               {isBookmarked ? (
-                <BookmarkCheck className="h-4 w-4 text-blue-400" />
+                <BookmarkCheck className="h-4 w-4 text-blue-600" />
               ) : (
                 <Bookmark className="h-4 w-4" />
               )}
@@ -109,7 +109,7 @@ export const SchemeCard: React.FC<SchemeCardProps> = ({ scheme, isMatchedView = 
 
             {/* Match Score Badge */}
             {isMatchedView && (
-              <div className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-emerald-950/60 border border-emerald-500/30 text-emerald-300">
+              <div className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-700">
                 <ShieldCheck className="h-3.5 w-3.5" />
                 <span className="text-xs font-black">{Math.round(scheme.match_score * 100)}%</span>
               </div>
@@ -119,21 +119,21 @@ export const SchemeCard: React.FC<SchemeCardProps> = ({ scheme, isMatchedView = 
 
         {/* Scheme Name & Ministry */}
         <div className="space-y-1">
-          <h3 className="text-base sm:text-lg font-bold text-slate-100 leading-snug group-hover:text-blue-400 transition-colors">
+          <h3 className="text-base sm:text-lg font-bold text-slate-900 leading-snug group-hover:text-blue-600 transition-colors">
             <Link href={`/schemes/${scheme.slug}`} onClick={handleInnerLinkClick}>
               {displayName}
             </Link>
           </h3>
           {scheme.ministry && (
-            <p className="text-xs text-slate-400 font-medium leading-normal">{scheme.ministry}</p>
+            <p className="text-xs text-slate-500 font-medium leading-normal">{scheme.ministry}</p>
           )}
         </div>
 
         {/* Benefits Amount Highlight */}
         {scheme.benefits_amount && (
-          <div className="flex items-center gap-2.5 bg-slate-900/70 border border-white/[0.08] p-3 rounded-xl">
-            <span className="text-xs font-semibold text-slate-400">{t('benefits')}:</span>
-            <span className="text-xs sm:text-sm font-bold text-emerald-400">
+          <div className="flex items-center gap-2.5 bg-slate-50 border border-slate-200 p-3 rounded-xl">
+            <span className="text-xs font-semibold text-slate-600">{t('benefits')}:</span>
+            <span className="text-xs sm:text-sm font-bold text-emerald-700">
               {/^\d+$/.test(scheme.benefits_amount.trim()) 
                 ? formatIndianCurrency(scheme.benefits_amount.trim()) 
                 : scheme.benefits_amount}
@@ -143,27 +143,27 @@ export const SchemeCard: React.FC<SchemeCardProps> = ({ scheme, isMatchedView = 
 
         {/* Evaluation Summary */}
         {isMatchedView && aiExplanation && (
-          <div className="p-3.5 rounded-xl bg-blue-950/40 border border-blue-500/20 text-xs text-slate-300 leading-relaxed italic animate-fade-in">
-            <span className="font-bold text-blue-300 block mb-1">Criteria Analysis:</span>
+          <div className="p-3.5 rounded-xl bg-blue-50 border border-blue-200 text-xs text-slate-700 leading-relaxed italic animate-fade-in">
+            <span className="font-bold text-blue-800 block mb-1">Criteria Analysis:</span>
             "{aiExplanation}"
           </div>
         )}
 
         {/* Rules Checklist */}
         {isMatchedView && scheme.rules_evaluation && scheme.rules_evaluation.length > 0 && (
-          <div className="space-y-1.5 border-t border-white/[0.06] pt-3">
-            <span className="text-[9px] uppercase tracking-wider font-extrabold text-slate-400 block">
+          <div className="space-y-1.5 border-t border-slate-100 pt-3">
+            <span className="text-[9px] uppercase tracking-wider font-extrabold text-slate-500 block">
               Evaluated Qualifications:
             </span>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
               {scheme.rules_evaluation.slice(0, 4).map((rule, rIdx) => {
                 const passed = rule.startsWith('✓');
                 return (
-                  <div key={rIdx} className="flex items-center gap-1.5 text-xs text-slate-300">
+                  <div key={rIdx} className="flex items-center gap-1.5 text-xs text-slate-700">
                     {passed ? (
-                      <CheckCircle2 className="h-3.5 w-3.5 text-emerald-400 shrink-0" />
+                      <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600 shrink-0" />
                     ) : (
-                      <XCircle className="h-3.5 w-3.5 text-red-400 shrink-0" />
+                      <XCircle className="h-3.5 w-3.5 text-red-500 shrink-0" />
                     )}
                     <span className="truncate">{rule.replace(/[✓✗]\s*/, '')}</span>
                   </div>
@@ -175,8 +175,8 @@ export const SchemeCard: React.FC<SchemeCardProps> = ({ scheme, isMatchedView = 
       </div>
 
       {/* Action Row */}
-      <div className="flex items-center justify-between border-t border-white/[0.06] pt-3.5 mt-4 shrink-0">
-        <span className="text-xs text-blue-400 font-bold group-hover:underline flex items-center gap-1">
+      <div className="flex items-center justify-between border-t border-slate-100 pt-3.5 mt-4 shrink-0">
+        <span className="text-xs text-blue-600 font-bold group-hover:underline flex items-center gap-1">
           <span>View Details & Checklist</span>
           <ArrowRight className="h-3.5 w-3.5 group-hover:translate-x-0.5 transition-transform" />
         </span>
@@ -186,9 +186,9 @@ export const SchemeCard: React.FC<SchemeCardProps> = ({ scheme, isMatchedView = 
             <button
               onClick={handleExplain}
               disabled={aiLoading}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold border border-blue-500/30 bg-blue-950/40 text-blue-300 hover:bg-blue-900/60 transition-all cursor-pointer"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold border border-blue-200 bg-blue-50 text-blue-700 hover:bg-blue-100 transition-all cursor-pointer"
             >
-              <ShieldCheck className="h-3.5 w-3.5 text-blue-400" />
+              <ShieldCheck className="h-3.5 w-3.5 text-blue-600" />
               {aiLoading ? 'Evaluating...' : t('explainWhy')}
             </button>
           )}
@@ -199,7 +199,7 @@ export const SchemeCard: React.FC<SchemeCardProps> = ({ scheme, isMatchedView = 
               target="_blank"
               rel="noopener noreferrer"
               onClick={handleInnerLinkClick}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-bold transition-all cursor-pointer shadow"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-bold transition-all cursor-pointer shadow-xs"
             >
               <Globe className="h-3.5 w-3.5" />
               {t('applyNow')}
@@ -211,4 +211,5 @@ export const SchemeCard: React.FC<SchemeCardProps> = ({ scheme, isMatchedView = 
   );
 };
 export default SchemeCard;
+
 
