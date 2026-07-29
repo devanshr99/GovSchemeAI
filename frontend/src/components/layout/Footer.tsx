@@ -2,27 +2,24 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { Mail, ShieldCheck } from 'lucide-react';
+import { Mail, ShieldCheck, ExternalLink, Heart } from 'lucide-react';
 import Logo from '../common/Logo';
 
 export const Footer: React.FC = () => {
   return (
-    <footer className="border-t border-slate-200 bg-slate-900 text-slate-300 mt-auto pt-12 pb-8">
+    <footer className="border-t border-white/[0.08] bg-[#071126] text-slate-400 mt-auto pt-10 pb-6">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-8">
         {/* Main Footer Links */}
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-8 pb-8 border-b border-slate-800">
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-8 pb-8 border-b border-white/[0.06]">
           {/* Col 1: Brand & Disclaimer */}
           <div className="space-y-3 md:col-span-1">
             <Link href="/" className="inline-block hover:opacity-90 transition-opacity">
-              <div className="flex items-center gap-2">
-                <div className="h-7 w-7 rounded-xl bg-blue-600 flex items-center justify-center text-white font-black text-sm">G</div>
-                <span className="font-bold text-white text-lg">GovScheme<span className="text-blue-400">AI</span></span>
-              </div>
+              <Logo variant="full" size="md" />
             </Link>
             <p className="text-xs text-slate-400 leading-relaxed">
-              GovSchemeAI is a handcrafted Digital Government Services Platform evaluating citizen eligibility against verified department gazettes.
+              GovSchemeAI is a comprehensive Digital Government Services Platform evaluating citizen eligibility against verified department gazettes.
             </p>
-            <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-blue-950 border border-blue-800 text-[10px] font-bold text-blue-300">
+            <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-blue-900/30 border border-blue-500/20 text-[10px] font-semibold text-blue-300">
               <ShieldCheck className="h-3.5 w-3.5 text-blue-400" />
               <span>500+ Active Schemes</span>
             </div>
@@ -30,7 +27,7 @@ export const Footer: React.FC = () => {
 
           {/* Col 2: Sector Hubs */}
           <div className="space-y-3">
-            <h4 className="text-xs font-bold uppercase tracking-wider text-white">Sector Hubs</h4>
+            <h4 className="text-xs font-bold uppercase tracking-wider text-slate-200">Sector Hubs</h4>
             <ul className="space-y-2 text-xs">
               <li>
                 <Link href="/hubs/student" className="hover:text-blue-400 transition-colors">
@@ -62,7 +59,7 @@ export const Footer: React.FC = () => {
 
           {/* Col 3: Portal Tools */}
           <div className="space-y-3">
-            <h4 className="text-xs font-bold uppercase tracking-wider text-white">Citizen Services</h4>
+            <h4 className="text-xs font-bold uppercase tracking-wider text-slate-200">Citizen Services</h4>
             <ul className="space-y-2 text-xs">
               <li>
                 <Link href="/dashboard" className="hover:text-blue-400 transition-colors">
@@ -94,7 +91,7 @@ export const Footer: React.FC = () => {
 
           {/* Col 4: Featured Categories */}
           <div className="space-y-3">
-            <h4 className="text-xs font-bold uppercase tracking-wider text-white">Categories</h4>
+            <h4 className="text-xs font-bold uppercase tracking-wider text-slate-200">Categories</h4>
             <ul className="space-y-2 text-xs">
               <li>
                 <Link href="/schemes?category=education" className="hover:text-blue-400 transition-colors">
@@ -121,7 +118,7 @@ export const Footer: React.FC = () => {
 
           {/* Col 5: Developer & Contact */}
           <div className="space-y-3">
-            <h4 className="text-xs font-bold uppercase tracking-wider text-white">Engineering & Lead</h4>
+            <h4 className="text-xs font-bold uppercase tracking-wider text-slate-200">Engineering & Lead</h4>
             <p className="text-xs text-slate-400">
               Designed & Built by:
             </p>
@@ -138,7 +135,7 @@ export const Footer: React.FC = () => {
                 href="https://github.com/devanshr99"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="p-2 rounded-lg bg-slate-800 border border-slate-700 hover:border-blue-400 text-slate-300 hover:text-white transition-all"
+                className="p-2 rounded-lg bg-slate-900 border border-white/[0.08] hover:border-blue-500/40 text-slate-300 hover:text-white transition-all"
                 aria-label="GitHub Repository"
               >
                 <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -150,7 +147,7 @@ export const Footer: React.FC = () => {
                 href="https://www.linkedin.com/in/devansh-rastogi-a86a83323/"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="p-2 rounded-lg bg-slate-800 border border-slate-700 hover:border-blue-400 text-slate-300 hover:text-[#0a66c2] transition-all"
+                className="p-2 rounded-lg bg-slate-900 border border-white/[0.08] hover:border-blue-500/40 text-slate-300 hover:text-[#0a66c2] transition-all"
                 aria-label="LinkedIn Profile"
               >
                 <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -161,7 +158,7 @@ export const Footer: React.FC = () => {
               </a>
               <a
                 href="mailto:devanshrastogi993@gmail.com"
-                className="p-2 rounded-lg bg-slate-800 border border-slate-700 hover:border-amber-400 text-slate-300 hover:text-amber-400 transition-all"
+                className="p-2 rounded-lg bg-slate-900 border border-white/[0.08] hover:border-amber-500/40 text-slate-300 hover:text-amber-400 transition-all"
                 aria-label="Email Contact"
               >
                 <Mail className="h-4 w-4" />
@@ -171,13 +168,13 @@ export const Footer: React.FC = () => {
         </div>
 
         {/* Bottom Strip */}
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-[11px] text-slate-400 font-medium">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-[11px] text-slate-500 font-medium">
           <div>
             © {new Date().getFullYear()} GovSchemeAI. All Rights Reserved. Digital India Government Portal Platform.
           </div>
           <div className="flex items-center gap-1">
             <span>Lead Engineer:</span>
-            <Link href="/about-developer" className="text-white hover:text-blue-400 font-bold underline decoration-blue-500/40">
+            <Link href="/about-developer" className="text-slate-300 hover:text-blue-400 font-semibold underline decoration-blue-500/30">
               Devansh Rastogi
             </Link>
           </div>
@@ -187,6 +184,5 @@ export const Footer: React.FC = () => {
   );
 };
 export default Footer;
-
 
 
