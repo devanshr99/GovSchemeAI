@@ -31,46 +31,22 @@ export const Logo: React.FC<LogoProps> = ({
       xmlns="http://www.w3.org/2000/svg"
       aria-hidden="true"
     >
-      {/* Outer Government Welfare Shield Emblem */}
+      {/* Premium Minimal White Government Shield & Document Emblem */}
       <path
-        d="M18 3L6 8V17C6 25.28 11.12 32.65 18 35C24.88 32.65 30 25.28 30 17V8L18 3Z"
-        fill="#1A56DB"
-      />
-      {/* Subtle Saffron Crest Notch */}
-      <circle cx="18" cy="8.5" r="2.2" fill="#FF9933" />
-      {/* Document Sheet */}
-      <rect
-        x="11"
-        y="12"
-        width="14"
-        height="15"
-        rx="2"
-        fill="#FFFFFF"
-      />
-      {/* Document Lines */}
-      <line
-        x1="14"
-        y1="15.5"
-        x2="22"
-        y2="15.5"
-        stroke="#1E3A8A"
-        strokeWidth="1.5"
-        strokeLinecap="round"
-      />
-      <line
-        x1="14"
-        y1="18.5"
-        x2="19"
-        y2="18.5"
-        stroke="#94A3B8"
-        strokeWidth="1.5"
-        strokeLinecap="round"
-      />
-      {/* Verified Scheme Emerald Green Checkmark */}
-      <path
-        d="M13.5 22.5L16 25L21.5 19.5"
-        stroke="#059669"
+        d="M18 3.5L7 8V17C7 24.5 11.6 31.2 18 33.5C24.4 31.2 29 24.5 29 17V8L18 3.5Z"
+        stroke="#FFFFFF"
         strokeWidth="2.2"
+        strokeLinejoin="round"
+        fill="none"
+      />
+      {/* Subtle Ashoka Chakra Geometry (Indian Identity Motif) */}
+      <circle cx="18" cy="12.5" r="3.2" stroke="#FFFFFF" strokeWidth="1.4" fill="none" opacity="0.9" />
+      <circle cx="18" cy="12.5" r="0.9" fill="#FFFFFF" />
+      {/* Integrated Minimal Checkmark (Citizen Welfare & Scheme Approval) */}
+      <path
+        d="M11.5 20.5L15.5 24.5L24.5 15.5"
+        stroke="#FFFFFF"
+        strokeWidth="2.6"
         strokeLinecap="round"
         strokeLinejoin="round"
       />
@@ -85,7 +61,7 @@ export const Logo: React.FC<LogoProps> = ({
     <div className={`inline-flex items-center gap-2.5 ${className}`}>
       {Symbol}
       <span className={`${textSizes[size]} font-bold tracking-tight font-sans`}>
-        <span className="text-slate-100">GovScheme</span>
+        <span className="text-white">GovScheme</span>
         <span className="text-[#38BDF8] ml-0.5 font-extrabold">AI</span>
       </span>
     </div>

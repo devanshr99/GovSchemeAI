@@ -9,9 +9,12 @@ export const metadata: Metadata = {
   description: 'GovSchemeAI helps Indian citizens discover government schemes, check eligibility, and receive AI-powered recommendations instantly.',
   keywords: ['government schemes', 'India', 'scholarships', 'subsidies', 'pension', 'PM-KISAN', 'eligibility matching'],
   icons: {
-    icon: '/logo-icon.svg',
+    icon: [
+      { url: '/logo-icon.svg', type: 'image/svg+xml' },
+      { url: '/favicon.ico', sizes: 'any' }
+    ],
     shortcut: '/logo-icon.svg',
-    apple: '/logo-icon.svg',
+    apple: '/apple-touch-icon.png',
   },
   manifest: '/manifest.json',
   openGraph: {
