@@ -1,49 +1,53 @@
 @import "tailwindcss";
 
 :root {
-  --background: #0f172a;
+  --background: #0b1329;
   --foreground: #f8fafc;
-  --primary: #1a56db;
-  --secondary: #f97316;
-  --success: #059669;
-  --card-bg: rgba(30, 41, 59, 0.7);
+  --primary-navy: #123b7a;
+  --primary-navy-dark: #0a2540;
+  --royal-blue: #1d4ed8;
+  --saffron: #e06d10;
+  --emerald-green: #059669;
+  --card-bg: rgba(15, 23, 42, 0.75);
   --card-border: rgba(255, 255, 255, 0.08);
 }
 
 body {
-  background: radial-gradient(circle at 50% 0%, #1e293b 0%, #0f172a 70%);
+  background: #0b132b;
+  background-image: 
+    radial-gradient(at 50% 0%, rgba(18, 59, 122, 0.25) 0px, transparent 60%),
+    radial-gradient(at 100% 100%, rgba(15, 23, 42, 0.8) 0px, transparent 50%);
   color: var(--foreground);
   font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
   min-height: 100vh;
   overflow-x: hidden;
 }
 
-/* Glassmorphism utility */
-.glass-panel {
-  background: var(--card-bg);
+/* Official Government Card Styling */
+.gov-card {
+  background: rgba(15, 23, 42, 0.7);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  border: 1px solid var(--card-border);
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.4);
 }
 
-.glass-panel-hover {
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+.gov-card-hover {
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.glass-panel-hover:hover {
-  transform: translateY(-4px);
-  border-color: rgba(255, 255, 255, 0.15);
-  box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.4), 0 0 15px rgba(26, 86, 219, 0.15);
-  background: rgba(30, 41, 59, 0.85);
+.gov-card-hover:hover {
+  transform: translateY(-2px);
+  border-color: rgba(29, 78, 216, 0.4);
+  box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.5), 0 0 20px -5px rgba(29, 78, 216, 0.15);
+  background: rgba(15, 23, 42, 0.85);
 }
 
-/* Gradient text */
-.gradient-text {
-  background: linear-gradient(135deg, #38bdf8 0%, #1a56db 50%, #f97316 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+/* Official Header Utility */
+.gov-header-title {
+  color: #f8fafc;
+  font-weight: 800;
+  letter-spacing: -0.025em;
 }
 
 /* Custom Scrollbar */
@@ -51,39 +55,35 @@ body {
   width: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: #0f172a;
+  background: #0b132b;
 }
 ::-webkit-scrollbar-thumb {
-  background: #334155;
+  background: #1e293b;
   border-radius: 3px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #475569;
+  background: #334155;
 }
 
-/* Input Styles */
+/* Form Controls */
 input, select, textarea {
-  background: rgba(15, 23, 42, 0.6);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  color: white;
+  background: rgba(15, 23, 42, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #f8fafc;
   transition: all 0.2s ease;
 }
 
 input:focus, select:focus, textarea:focus {
-  border-color: var(--primary);
-  box-shadow: 0 0 0 2px rgba(26, 86, 219, 0.25);
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
   outline: none;
-  background: rgba(15, 23, 42, 0.8);
+  background: rgba(15, 23, 42, 0.95);
 }
 
-/* Shimmer animation for loading skeleton */
+/* Shimmer Loading Skeleton */
 @keyframes shimmer {
-  0% {
-    background-position: -200% 0;
-  }
-  100% {
-    background-position: 200% 0;
-  }
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
 }
 
 .skeleton-shimmer {
@@ -94,98 +94,59 @@ input:focus, select:focus, textarea:focus {
 
 /* Fade in animation */
 @keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(8px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 .animate-fade-in {
-  animation: fadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  animation: fadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 /* Slide up animation */
 @keyframes slideUp {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 .animate-slide-up {
-  animation: slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
-/* Slide down for mobile nav */
+/* Slide down animation */
 @keyframes slideDown {
-  from {
-    opacity: 0;
-    transform: translateY(-10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(-8px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 .animate-slide-down {
   animation: slideDown 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
-/* Stagger children animation delays */
-.stagger-1 { animation-delay: 0.05s; }
-.stagger-2 { animation-delay: 0.1s; }
-.stagger-3 { animation-delay: 0.15s; }
-.stagger-4 { animation-delay: 0.2s; }
-
-/* Smooth option styling */
+/* Option styling */
 option {
-  background: #1e293b;
-  color: #e2e8f0;
+  background: #0f172a;
+  color: #f8fafc;
 }
 
-/* Keyboard Navigation Focus Indicator Compliance (WCAG 2.1 AA 2.4.7) */
+/* Keyboard Focus Compliance (WCAG 2.1 AA) */
 a:focus-visible, 
 button:focus-visible, 
 input:focus-visible, 
 select:focus-visible, 
 textarea:focus-visible, 
-[role="button"]:focus-visible, 
-[role="option"]:focus-visible,
-[role="listbox"]:focus-visible {
+[role="button"]:focus-visible {
   outline: 2px solid #3b82f6 !important;
   outline-offset: 2px !important;
-  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.2) !important;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3) !important;
 }
 
-/* Typewriter Cursor animation */
-@keyframes blink {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0; }
-}
-
-.typewriter-cursor::after {
-  content: '▋';
-  display: inline-block;
-  color: var(--primary);
-  margin-left: 2px;
-  animation: blink 1s step-end infinite;
-}
-
-/* Custom Table Styles inside markdown */
+/* Markdown Table Styles */
 .markdown-table-wrapper {
   overflow-x: auto;
   margin: 1rem 0;
   border-radius: 0.75rem;
-  border: 1px solid var(--card-border);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(15, 23, 42, 0.6);
 }
 
 .markdown-table {
@@ -196,16 +157,16 @@ textarea:focus-visible,
 }
 
 .markdown-table th {
-  background: rgba(255, 255, 255, 0.05);
-  color: white;
+  background: rgba(18, 59, 122, 0.4);
+  color: #f8fafc;
   font-weight: 700;
   padding: 0.75rem 1rem;
-  border-bottom: 2px solid var(--card-border);
+  border-bottom: 2px solid rgba(255, 255, 255, 0.1);
 }
 
 .markdown-table td {
   padding: 0.75rem 1rem;
-  border-bottom: 1px solid var(--card-border);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
   color: #cbd5e1;
 }
 
@@ -214,14 +175,6 @@ textarea:focus-visible,
 }
 
 .markdown-table tr:hover td {
-  background: rgba(255, 255, 255, 0.02);
+  background: rgba(255, 255, 255, 0.03);
 }
 
-/* Circular Progress Animation */
-@keyframes progress {
-  from { stroke-dashoffset: 283; }
-}
-
-.circular-progress-circle {
-  transition: stroke-dashoffset 0.8s ease-in-out;
-}

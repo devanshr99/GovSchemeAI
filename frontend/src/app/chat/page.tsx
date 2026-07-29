@@ -3,7 +3,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useApp } from '../../context/AppContext';
 import { api } from '../../lib/api';
-import { MessageSquare, Send, Sparkles, RefreshCw, Bot, User as UserIcon, WifiOff, FileText, ArrowRight } from 'lucide-react';
+import { MessageSquare, Send, RefreshCw, User as UserIcon, WifiOff, FileText, ArrowRight, ShieldCheck, Landmark } from 'lucide-react';
 
 interface ChatMessage {
   role: 'user' | 'assistant';
@@ -23,7 +23,7 @@ function renderInline(text: string) {
       return <em key={i} className="italic text-slate-300">{part.slice(1, -1)}</em>;
     }
     if (part.startsWith('`') && part.endsWith('`')) {
-      return <code key={i} className="px-1.5 py-0.5 rounded bg-slate-900 border border-white/[0.06] text-orange-300 font-mono text-xs">{part.slice(1, -1)}</code>;
+      return <code key={i} className="px-1.5 py-0.5 rounded bg-slate-900 border border-white/[0.08] text-amber-300 font-mono text-xs">{part.slice(1, -1)}</code>;
     }
     return <span key={i}>{part}</span>;
   });
@@ -42,7 +42,7 @@ function renderMarkdown(text: string) {
   const flushParagraph = (key: string) => {
     if (currentParagraphLines.length > 0) {
       renderedElements.push(
-        <p key={key} className="text-sm leading-relaxed mb-3 last:mb-0 text-slate-200">
+        <p key={key} className="text-xs sm:text-sm leading-relaxed mb-3 last:mb-0 text-slate-200">
           {currentParagraphLines.map((line, lIdx) => (
             <React.Fragment key={lIdx}>
               {renderInline(line)}
@@ -91,7 +91,6 @@ function renderMarkdown(text: string) {
     const line = lines[i];
     const trimmed = line.trim();
 
-    // Check for Table Row
     if (trimmed.startsWith('|') && trimmed.endsWith('|')) {
       flushParagraph(`p-before-tbl-${i}`);
       inTable = true;
@@ -100,7 +99,6 @@ function renderMarkdown(text: string) {
         .slice(1, -1)
         .map(c => c.trim());
       
-      // If it is divider row like |---|---|
       if (cells.every(c => c.match(/^:?-+:?$/))) {
         continue;
       }
@@ -115,13 +113,12 @@ function renderMarkdown(text: string) {
         flushTable(`tbl-${i}`);
       }
 
-      // Check for bullet line
       if (trimmed.startsWith('- ') || trimmed.startsWith('• ') || trimmed.startsWith('* ')) {
         flushParagraph(`p-before-bullet-${i}`);
         const content = trimmed.replace(/^[-•*]\s*/, '');
         renderedElements.push(
           <ul key={`ul-${i}`} className="list-disc list-inside space-y-1 my-1.5">
-            <li className="text-sm leading-relaxed pl-2 text-slate-300">
+            <li className="text-xs sm:text-sm leading-relaxed pl-2 text-slate-300">
               {renderInline(content)}
             </li>
           </ul>
@@ -170,11 +167,8 @@ export default function ChatAssistant() {
     setInput('');
     setConnectionError(false);
 
-    // Append user message immediately
     const userMsg: ChatMessage = { role: 'user', content: text };
     setMessages(prev => [...prev, userMsg]);
-
-    // Append assistant streaming placeholder
     setMessages(prev => [...prev, { role: 'assistant', content: '', isStreaming: true }]);
 
     let accumulatedResponse = '';
@@ -215,8 +209,8 @@ export default function ChatAssistant() {
             const last = next[next.length - 1];
             if (last && last.role === 'assistant') {
               last.content = accumulatedResponse 
-                ? accumulatedResponse + '\n\n*(Connection lost. Please try again)*'
-                : 'I could not connect to the AI service. Please make sure the backend is running and try again.';
+                ? accumulatedResponse + '\n\n*(Connection interrupted. Please retry)*'
+                : 'Could not connect to the Scheme Advisor service. Please check your backend connection.';
               last.isStreaming = false;
             }
             return next;
@@ -231,7 +225,7 @@ export default function ChatAssistant() {
         ...prev,
         {
           role: 'assistant',
-          content: 'I could not connect to the AI service. Please make sure the backend is running and try again.',
+          content: 'Could not connect to the Digital Scheme Advisor service. Please ensure backend server is running.',
         },
       ]);
       setLoading(false);
@@ -248,17 +242,17 @@ export default function ChatAssistant() {
   const getSuggestedQuestions = () => {
     if (language === 'hi') {
       return [
-        'मैं किन योजनाओं के लिए पात्र हूं?',
-        'PM-KISAN के लिए कैसे आवेदन करें?',
-        'आयुष्मान भारत के लिए कौन से दस्तावेज चाहिए?',
-        'योजनाओं की पात्रता कैसे जाँचे?',
+        'मैं किन सरकारी योजनाओं के लिए पात्र हूं?',
+        'PM-KISAN आवेदन हेतु आवश्यक दस्तावेज़ क्या हैं?',
+        'आयुष्मान भारत के स्वास्थ्य लाभ कैसे लें?',
+        'छात्रवृत्तियों की पात्रता सीमा क्या है?',
       ];
     }
     return [
-      'Which schemes am I eligible for?',
-      'How to apply for PM-KISAN?',
-      'What documents do I need for Ayushman Bharat?',
-      'Compare PM-KISAN and PM-AWAS',
+      'Which central schemes am I eligible for?',
+      'How to apply for PM-KISAN grants?',
+      'Required documents for Ayushman Bharat?',
+      'Education scholarships for SC/ST/OBC students',
     ];
   };
 
@@ -274,41 +268,46 @@ export default function ChatAssistant() {
   };
 
   return (
-    <div className="mx-auto max-w-3xl w-full py-8 px-4 sm:px-6 lg:px-8 flex-1 flex flex-col" style={{ height: 'calc(100vh - 120px)' }}>
-      {/* Header */}
-      <div className="flex items-center justify-between border-b border-white/[0.08] pb-4 mb-4 shrink-0">
+    <div className="mx-auto max-w-4xl w-full py-6 px-4 sm:px-6 lg:px-8 flex-1 flex flex-col" style={{ height: 'calc(100vh - 110px)' }}>
+      {/* Header Banner */}
+      <div className="gov-card p-4 rounded-2xl border border-white/[0.08] mb-4 flex items-center justify-between shrink-0 shadow-lg">
         <div className="flex items-center gap-3">
-          <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-blue-500/20 to-orange-500/20 border border-white/[0.08] flex items-center justify-center">
-            <Bot className="h-5 w-5 text-blue-400" />
+          <div className="h-10 w-10 rounded-xl bg-blue-950/80 border border-blue-500/30 flex items-center justify-center text-blue-400">
+            <ShieldCheck className="h-5 w-5" />
           </div>
           <div>
-            <h1 className="text-xl font-bold text-slate-100">{t('chatAssistant')}</h1>
+            <h1 className="text-base sm:text-lg font-bold text-slate-100 flex items-center gap-2">
+              <span>{t('chatAssistant')}</span>
+              <span className="text-[9px] uppercase tracking-wider font-extrabold px-2 py-0.5 rounded bg-emerald-950 border border-emerald-500/30 text-emerald-300">
+                Official Desk
+              </span>
+            </h1>
             <p className="text-[10px] text-slate-400 font-semibold uppercase tracking-wider">
-              {sessionId ? `Session: ${sessionId.slice(0, 8)}...` : 'New Conversation'}
+              {sessionId ? `Session Reference: ${sessionId.slice(0, 8)}...` : 'National Scheme Consultation Desk'}
             </p>
           </div>
         </div>
 
         <div className="flex items-center gap-2">
           {connectionError && (
-            <div className="flex items-center gap-1.5 text-xs text-red-400 bg-red-500/10 border border-red-500/20 px-2.5 py-1 rounded-lg">
-              <WifiOff className="h-3.5 w-3.5" />
-              Backend offline
+            <div className="flex items-center gap-1.5 text-xs text-red-300 bg-red-950/60 border border-red-500/30 px-2.5 py-1 rounded-lg">
+              <WifiOff className="h-3.5 w-3.5 text-red-400" />
+              Offline
             </div>
           )}
 
           <button
             onClick={resetChat}
-            className="p-2 rounded-lg hover:bg-white/[0.03] text-xs text-slate-400 hover:text-white transition-all cursor-pointer flex items-center gap-1.5 border border-white/[0.08]"
+            className="px-3 py-1.5 rounded-xl hover:bg-white/[0.04] text-xs text-slate-300 hover:text-white transition-all cursor-pointer flex items-center gap-1.5 border border-white/[0.08] bg-slate-900/60"
           >
             <RefreshCw className="h-3.5 w-3.5" />
-            <span>Reset</span>
+            <span>Reset Desk</span>
           </button>
         </div>
       </div>
 
       {/* Messages area */}
-      <div className="flex-1 overflow-y-auto pr-1 space-y-5 mb-4 min-h-0">
+      <div className="flex-1 overflow-y-auto pr-1 space-y-4 mb-4 min-h-0">
         {messages.map((msg, idx) => (
           <div
             key={idx}
@@ -316,30 +315,30 @@ export default function ChatAssistant() {
           >
             {/* Avatar */}
             <div
-              className={`h-8 w-8 rounded-full flex items-center justify-center shrink-0 mt-1 ${
+              className={`h-8 w-8 rounded-xl flex items-center justify-center shrink-0 mt-1 shadow-sm ${
                 msg.role === 'user'
-                  ? 'bg-blue-600 border border-blue-500'
-                  : 'bg-gradient-to-br from-orange-500/20 to-blue-500/20 border border-white/[0.08]'
+                  ? 'bg-blue-600 border border-blue-500 text-white'
+                  : 'bg-slate-900 border border-blue-500/30 text-blue-400'
               }`}
             >
               {msg.role === 'user'
-                ? <UserIcon className="h-4 w-4 text-white" />
-                : <Sparkles className="h-4 w-4 text-orange-400" />
+                ? <UserIcon className="h-4 w-4" />
+                : <Landmark className="h-4 w-4 text-blue-300" />
               }
             </div>
 
             {/* Bubble */}
             <div className={`flex flex-col max-w-[85%] ${msg.role === 'user' ? 'items-end' : 'items-start'}`}>
               <div
-                className={`p-4 rounded-2xl border leading-relaxed ${
+                className={`p-4 rounded-2xl border leading-relaxed text-xs sm:text-sm ${
                   msg.role === 'user'
-                    ? 'bg-blue-600 border-blue-500/50 text-white rounded-tr-none'
-                    : 'glass-panel text-slate-100 rounded-tl-none'
-                } ${msg.isStreaming ? 'typewriter-cursor' : ''}`}
+                    ? 'bg-blue-600 border-blue-500/50 text-white rounded-tr-none shadow'
+                    : 'gov-card text-slate-100 rounded-tl-none border-white/[0.08]'
+                }`}
               >
                 {msg.role === 'assistant'
                   ? <div className="space-y-1">{renderMarkdown(msg.content)}</div>
-                  : <p className="text-sm leading-relaxed">{msg.content}</p>
+                  : <p className="text-xs sm:text-sm leading-relaxed">{msg.content}</p>
                 }
               </div>
             </div>
@@ -351,14 +350,14 @@ export default function ChatAssistant() {
 
       {/* Suggested Questions */}
       {!loading && (
-        <div className="mb-4 shrink-0 animate-fade-in">
-          <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-2">Suggested Actions:</p>
+        <div className="mb-3 shrink-0 animate-fade-in">
+          <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-2">Recommended Queries:</p>
           <div className="flex flex-wrap gap-2">
             {getSuggestedQuestions().map((q, idx) => (
               <button
                 key={idx}
                 onClick={() => handleSendMessage(q)}
-                className="text-xs px-3.5 py-2.5 rounded-xl bg-white/[0.02] border border-white/[0.05] hover:border-blue-500/30 text-slate-300 hover:text-blue-400 hover:bg-blue-500/5 flex items-center gap-1.5 transition-all text-left cursor-pointer"
+                className="text-xs px-3 py-2 rounded-xl bg-slate-900/80 border border-white/[0.08] hover:border-blue-500/40 text-slate-300 hover:text-blue-300 hover:bg-blue-950/40 flex items-center gap-1.5 transition-all text-left cursor-pointer"
               >
                 <span>{q}</span>
                 <ArrowRight className="h-3 w-3 opacity-60 shrink-0" />
@@ -379,7 +378,7 @@ export default function ChatAssistant() {
           onKeyDown={handleKeyDown}
           disabled={loading}
           maxLength={500}
-          className="w-full pl-4 pr-14 py-4 rounded-2xl text-sm disabled:opacity-60"
+          className="w-full pl-4 pr-14 py-3.5 rounded-2xl text-xs sm:text-sm bg-slate-900 border border-white/[0.12] focus:border-blue-500 text-white disabled:opacity-60 shadow-lg"
         />
         <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
           {input.length > 400 && (
@@ -388,7 +387,7 @@ export default function ChatAssistant() {
           <button
             onClick={() => handleSendMessage(input)}
             disabled={loading || !input.trim()}
-            className="p-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white transition-all disabled:opacity-40 disabled:hover:bg-blue-600 cursor-pointer"
+            className="p-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white transition-all disabled:opacity-40 disabled:hover:bg-blue-600 cursor-pointer shadow"
           >
             <Send className="h-4 w-4" />
           </button>
@@ -397,3 +396,4 @@ export default function ChatAssistant() {
     </div>
   );
 }
+
