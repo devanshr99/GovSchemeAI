@@ -5,7 +5,6 @@ import { api } from '../../lib/api';
 import { SchemeCard, Category } from '../../types/scheme';
 import { ShieldCheck, Plus, Settings, BarChart2, Eye, Trash2, AlertCircle, CheckCircle2, Loader2 } from 'lucide-react';
 import Link from 'next/link';
-import Logo from '../../components/common/Logo';
 
 interface ActionFeedback {
   type: 'success' | 'error';
@@ -108,8 +107,8 @@ export default function AdminPanel() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-white/[0.08] pb-6">
         <div className="space-y-1">
-          <h1 className="text-3xl font-extrabold text-slate-100 flex items-center gap-3">
-            <Logo variant="icon" size="md" />
+          <h1 className="text-3xl font-extrabold text-slate-100 flex items-center gap-2">
+            <Settings className="h-7 w-7 text-orange-400" />
             GovSchemeAI Admin Panel
           </h1>
           <p className="text-xs text-slate-400">

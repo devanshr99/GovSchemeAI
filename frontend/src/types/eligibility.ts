@@ -7,7 +7,7 @@ export interface EligibilityRequest {
   district?: string;
   occupation: string;
   annual_income: number;
-  category: 'general' | 'obc' | 'sc' | 'st' | 'ews';
+  category: 'general' | 'obc' | 'sc' | 'st';
   disability: boolean;
   is_student: boolean;
   is_farmer: boolean;
@@ -16,14 +16,10 @@ export interface EligibilityRequest {
   is_bpl: boolean;
   land_holding_hectares?: number;
   language: 'en' | 'hi';
-  industry?: string;
-  funding_stage?: string;
 }
 
 export interface EligibleSchemeResult extends SchemeCard {
   match_score: number;
-  match_percentage: number;
-  confidence_score: number;
   rules_matched: number;
   rules_total: number;
   ai_explanation?: string;
@@ -34,9 +30,6 @@ export interface EligibleSchemeResult extends SchemeCard {
   helpline?: string;
   deadline?: string;
   rules_evaluation?: string[];
-  reasons_eligible: string[];
-  reasons_ineligible: string[];
-  alternative_schemes?: SchemeCard[];
 }
 
 export interface EligibilityResponse {
@@ -45,6 +38,4 @@ export interface EligibilityResponse {
   schemes: EligibleSchemeResult[];
   profile_summary: string;
   ai_summary?: string;
-  confidence_average?: number;
 }
-

@@ -8,9 +8,9 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import {
   ArrowLeft, Globe, Phone, Calendar, Award, ShieldCheck,
-  FileText, MapPin, ExternalLink, Clock, Building2,
+  FileText, MapPin, Sparkles, ExternalLink, Clock, Building2,
   ChevronRight, Share2, Bookmark, BookmarkCheck, Copy, CheckCircle2,
-  XCircle, Info, ShieldAlert, Landmark
+  XCircle, Info, ShieldAlert
 } from 'lucide-react';
 
 export default function SchemeDetailPage({ params }: { params: Promise<{ slug: string }> }) {
@@ -39,16 +39,20 @@ export default function SchemeDetailPage({ params }: { params: Promise<{ slug: s
     setLoading(true);
     setError(null);
 
+    // Fetch details
     api.getSchemeDetail(slug)
       .then(res => {
         setScheme(res);
+        // Check local bookmarks state
         if (typeof window !== 'undefined') {
           const saved = JSON.parse(localStorage.getItem('govscheme_bookmarks') || '[]');
           setIsBookmarked(saved.includes(slug));
         }
 
+        // Evaluate eligibility based on saved local profile if it exists
         const profile = api.getProfileFromStorage();
         if (profile && res.id) {
+          // Send evaluation request or do it locally
           api.checkEligibility(profile)
             .then((checkRes) => {
               const matchedScheme = checkRes.schemes.find((s) => s.slug === slug);
@@ -67,6 +71,7 @@ export default function SchemeDetailPage({ params }: { params: Promise<{ slug: s
                   failedRules: failed
                 });
               } else {
+                // If it is active but user is strictly not eligible, checkRes.schemes won't contain it
                 setUserProfileCheck({
                   status: 'not_eligible',
                   passedRules: [],
@@ -74,12 +79,12 @@ export default function SchemeDetailPage({ params }: { params: Promise<{ slug: s
                 });
               }
             })
-            .catch(err => console.error('Eligibility evaluation failed:', err));
+            .catch(err => console.error('Eligibility dynamic evaluate failed:', err));
         }
       })
       .catch(err => {
         console.error(err);
-        setError('Scheme details not found or portal service offline.');
+        setError('Scheme not found or server is offline.');
       })
       .finally(() => setLoading(false));
   }, [slug]);
@@ -123,16 +128,20 @@ export default function SchemeDetailPage({ params }: { params: Promise<{ slug: s
 
   if (loading) {
     return (
-      <div className="mx-auto max-w-5xl w-full py-16 px-4 space-y-8">
+      <div className="mx-auto max-w-4xl w-full py-16 px-4 space-y-8">
         <div className="flex items-center gap-2 mb-6">
-          <div className="h-4 w-24 rounded bg-slate-900 skeleton-shimmer" />
+          <div className="h-4 w-24 rounded bg-slate-800 skeleton-shimmer" />
         </div>
-        <div className="gov-card rounded-3xl p-8 space-y-6">
+        <div className="glass-panel rounded-2xl p-8 space-y-6">
           <div className="space-y-3">
-            <div className="h-8 w-3/4 rounded bg-slate-900 skeleton-shimmer" />
-            <div className="h-4 w-1/2 rounded bg-slate-900 skeleton-shimmer" />
+            <div className="h-8 w-3/4 rounded bg-slate-800 skeleton-shimmer" />
+            <div className="h-4 w-1/2 rounded bg-slate-800 skeleton-shimmer" />
           </div>
-          <div className="h-24 rounded-xl bg-slate-900 skeleton-shimmer" />
+          <div className="h-24 rounded-xl bg-slate-800 skeleton-shimmer" />
+          <div className="grid grid-cols-2 gap-4">
+            <div className="h-16 rounded-xl bg-slate-800 skeleton-shimmer" />
+            <div className="h-16 rounded-xl bg-slate-800 skeleton-shimmer" />
+          </div>
         </div>
       </div>
     );
@@ -141,19 +150,19 @@ export default function SchemeDetailPage({ params }: { params: Promise<{ slug: s
   if (error || !scheme) {
     return (
       <div className="mx-auto max-w-3xl w-full py-16 px-4 text-center space-y-6">
-        <div className="inline-flex h-16 w-16 items-center justify-center rounded-full bg-slate-900 border border-white/[0.08]">
+        <div className="inline-flex h-16 w-16 items-center justify-center rounded-full bg-slate-800 border border-white/[0.08]">
           <FileText className="h-8 w-8 text-red-400" />
         </div>
         <div className="space-y-2">
-          <h2 className="text-2xl font-bold text-slate-100">Scheme Detail Not Found</h2>
-          <p className="text-slate-400 max-w-md mx-auto text-xs">{error || 'The requested scheme record could not be retrieved.'}</p>
+          <h2 className="text-2xl font-bold text-slate-100">Scheme Not Found</h2>
+          <p className="text-slate-400 max-w-md mx-auto">{error || 'The scheme you are looking for could not be found.'}</p>
         </div>
         <Link
           href="/schemes"
-          className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold shadow transition-all text-xs"
+          className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold shadow-lg transition-all"
         >
           <ArrowLeft className="h-4 w-4" />
-          Back to Scheme Directory
+          Back to Schemes
         </Link>
       </div>
     );
@@ -164,8 +173,10 @@ export default function SchemeDetailPage({ params }: { params: Promise<{ slug: s
   const displayBenefits = language === 'hi' && scheme.benefits_hi ? scheme.benefits_hi : scheme.benefits;
   const displayAppProcess = language === 'hi' && scheme.application_process_hi ? scheme.application_process_hi : scheme.application_process;
 
+  // Extract income limit if available
   const incomeLimitRule = scheme.eligibility_rules_summary.find(r => r.toLowerCase().includes('income'));
 
+  // Get state readable name
   const stateNames: Record<string, string> = {
     "UP": "Uttar Pradesh", "MH": "Maharashtra", "DL": "Delhi", "KA": "Karnataka",
     "TN": "Tamil Nadu", "GJ": "Gujarat", "RJ": "Rajasthan", "MP": "Madhya Pradesh",
@@ -174,49 +185,53 @@ export default function SchemeDetailPage({ params }: { params: Promise<{ slug: s
   const stateDisplayName = scheme.state_code ? (stateNames[scheme.state_code] || scheme.state_code) : 'All India';
 
   return (
-    <div className="mx-auto max-w-5xl w-full py-8 sm:py-12 px-4 sm:px-6 lg:px-8 space-y-8 animate-fade-in relative z-10">
+    <div className="mx-auto max-w-5xl w-full py-12 px-4 sm:px-6 lg:px-8 space-y-8 animate-fade-in relative z-10">
+      {/* Toast Alert */}
       {toast && (
-        <div className="fixed bottom-8 right-8 px-5 py-3 rounded-xl bg-slate-900 border border-emerald-500/30 text-emerald-300 text-xs font-semibold shadow-2xl backdrop-blur-md flex items-center gap-2 animate-fade-in z-50">
-          <CheckCircle2 className="h-4 w-4 text-emerald-400" />
+        <div className="fixed bottom-8 right-8 px-5 py-3 rounded-xl bg-slate-900/90 border border-emerald-500/20 text-emerald-400 text-sm font-semibold shadow-2xl backdrop-blur-md flex items-center gap-2 animate-fade-in z-50">
+          <CheckCircle2 className="h-4 w-4" />
           {toast}
         </div>
       )}
 
-      {/* Top action bar */}
+      {/* Top action row */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <button
           onClick={() => router.back()}
-          className="inline-flex items-center gap-2 text-xs text-slate-300 hover:text-white transition-all group font-semibold cursor-pointer"
+          className="inline-flex items-center gap-2 text-sm text-slate-400 hover:text-white transition-all group font-medium cursor-pointer"
         >
           <ArrowLeft className="h-4 w-4 group-hover:-translate-x-1 transition-transform" />
           {t('back')}
         </button>
 
         <div className="flex flex-wrap items-center gap-2">
+          {/* Bookmark */}
           <button
             onClick={toggleBookmark}
-            className={`px-3.5 py-2 rounded-xl border transition-all cursor-pointer flex items-center gap-2 text-xs font-semibold ${
+            className={`p-2.5 rounded-xl border transition-all cursor-pointer flex items-center gap-2 text-xs font-bold ${
               isBookmarked
-                ? 'bg-blue-950/80 border-blue-500/40 text-blue-300'
-                : 'bg-slate-900/60 border-white/[0.08] text-slate-300 hover:text-white'
+                ? 'bg-blue-500/10 border-blue-500/30 text-blue-400'
+                : 'bg-white/[0.02] border-white/[0.08] text-slate-400 hover:text-white hover:border-white/20'
             }`}
           >
-            {isBookmarked ? <BookmarkCheck className="h-4 w-4 text-blue-400" /> : <Bookmark className="h-4 w-4" />}
+            {isBookmarked ? <BookmarkCheck className="h-4 w-4" /> : <Bookmark className="h-4 w-4" />}
             <span>{isBookmarked ? 'Saved' : 'Save Scheme'}</span>
           </button>
 
+          {/* Share */}
           <button
             onClick={handleShare}
-            className="px-3.5 py-2 rounded-xl bg-slate-900/60 border border-white/[0.08] text-slate-300 hover:text-white transition-all cursor-pointer flex items-center gap-2 text-xs font-semibold"
+            className="p-2.5 rounded-xl bg-white/[0.02] border border-white/[0.08] text-slate-400 hover:text-white hover:border-white/20 transition-all cursor-pointer flex items-center gap-2 text-xs font-bold"
           >
             <Share2 className="h-4 w-4" />
             <span>Share</span>
           </button>
 
+          {/* Copy website link */}
           {scheme.official_website && (
             <button
               onClick={handleCopyLink}
-              className="px-3.5 py-2 rounded-xl bg-slate-900/60 border border-white/[0.08] text-slate-300 hover:text-white transition-all cursor-pointer flex items-center gap-2 text-xs font-semibold"
+              className="p-2.5 rounded-xl bg-white/[0.02] border border-white/[0.08] text-slate-400 hover:text-white hover:border-white/20 transition-all cursor-pointer flex items-center gap-2 text-xs font-bold"
             >
               <Copy className="h-4 w-4" />
               <span>Copy Link</span>
@@ -225,99 +240,105 @@ export default function SchemeDetailPage({ params }: { params: Promise<{ slug: s
         </div>
       </div>
 
-      {/* Main detail card */}
-      <div className="gov-card rounded-3xl overflow-hidden relative border border-white/[0.08] shadow-2xl">
-        <div className="h-1.5 bg-gradient-to-r from-blue-600 via-blue-500 to-amber-500" />
+      {/* Main card */}
+      <div className="glass-panel rounded-3xl overflow-hidden relative">
+        <div className="h-1.5 bg-gradient-to-r from-orange-500 via-blue-500 to-emerald-500" />
 
         <div className="p-6 sm:p-10 space-y-8">
           {/* Header */}
           <div className="space-y-4">
             <div className="flex flex-wrap items-center gap-2">
-              <span className="text-[10px] uppercase font-bold tracking-wider px-3 py-1 rounded-lg bg-blue-950/80 text-blue-300 border border-blue-500/30">
-                {scheme.category_icon || '📁'} {scheme.category_name || 'General Sector'}
+              <span className="text-[10px] uppercase font-bold tracking-wider px-3 py-1.5 rounded-lg bg-blue-500/10 text-blue-400 border border-blue-500/20">
+                {scheme.category_icon || '📁'} {scheme.category_name || 'General'}
               </span>
-              <span className="text-[10px] uppercase font-bold tracking-wider px-3 py-1 rounded-lg bg-amber-950/70 text-amber-300 border border-amber-500/30">
-                {scheme.level === 'state' ? 'State Government' : 'Central Government'}
+              <span className="text-[10px] uppercase font-bold tracking-wider px-3 py-1.5 rounded-lg bg-orange-500/10 text-orange-400 border border-orange-500/20">
+                {scheme.level || 'Central'}
               </span>
-              <span className="text-[10px] uppercase font-bold tracking-wider px-3 py-1 rounded-lg bg-slate-900 text-slate-300 border border-white/[0.08] flex items-center gap-1">
+              <span className="text-[10px] uppercase font-bold tracking-wider px-3 py-1.5 rounded-lg bg-slate-800 text-slate-300 border border-white/[0.08] flex items-center gap-1">
                 <MapPin className="h-3 w-3" />
                 {stateDisplayName}
               </span>
             </div>
 
-            <h1 className="text-2xl sm:text-4xl font-black text-slate-100 leading-tight">{displayName}</h1>
+            <h1 className="text-3xl sm:text-4xl font-black text-slate-100 leading-tight">{displayName}</h1>
 
             {scheme.ministry && (
               <div className="flex items-center gap-2 text-slate-400">
-                <Building2 className="h-4.5 w-4.5 text-blue-400 shrink-0" />
-                <span className="font-semibold text-slate-300 text-xs sm:text-sm">{scheme.ministry}</span>
+                <Building2 className="h-5 w-5 text-blue-400 shrink-0" />
+                <span className="font-semibold text-slate-300">{scheme.ministry}</span>
               </div>
             )}
           </div>
 
-          {/* Highlights Row */}
+          {/* Core Highlights Row */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="p-4 rounded-2xl bg-slate-900/60 border border-white/[0.08] flex gap-3.5 items-center">
-              <div className="h-10 w-10 rounded-xl bg-amber-950/60 flex items-center justify-center border border-amber-500/30 text-amber-400 shrink-0">
-                <Award className="h-5 w-5" />
+            {/* Benefit Amount */}
+            <div className="p-4 rounded-2xl bg-gradient-to-br from-orange-500/5 to-transparent border border-orange-500/15 flex gap-3.5 items-center">
+              <div className="h-11 w-11 rounded-xl bg-orange-500/10 flex items-center justify-center border border-orange-500/20 text-orange-400">
+                <Award className="h-6 w-6" />
               </div>
               <div>
                 <span className="text-[9px] uppercase tracking-wider font-extrabold text-slate-400 block">{t('benefits')}</span>
-                <span className="text-sm font-bold text-emerald-400">{scheme.benefits_amount || 'Various Benefits'}</span>
+                <span className="text-lg font-black text-orange-400">{scheme.benefits_amount || 'Various Benefits'}</span>
               </div>
             </div>
 
-            <div className="p-4 rounded-2xl bg-slate-900/60 border border-white/[0.08] flex gap-3.5 items-center">
-              <div className="h-10 w-10 rounded-xl bg-blue-950/60 flex items-center justify-center border border-blue-500/30 text-blue-400 shrink-0">
-                <FileText className="h-5 w-5" />
+            {/* Income Limit */}
+            <div className="p-4 rounded-2xl bg-gradient-to-br from-blue-500/5 to-transparent border border-blue-500/15 flex gap-3.5 items-center">
+              <div className="h-11 w-11 rounded-xl bg-blue-500/10 flex items-center justify-center border border-blue-500/20 text-blue-400">
+                <FileText className="h-6 w-6" />
               </div>
               <div>
-                <span className="text-[9px] uppercase tracking-wider font-extrabold text-slate-400 block">Income Ceiling</span>
-                <span className="text-xs font-bold text-blue-300">
-                  {incomeLimitRule ? incomeLimitRule.replace(/income/gi, '').replace(/[✓✗:-]/g, '').trim() : 'No Income Limit'}
+                <span className="text-[9px] uppercase tracking-wider font-extrabold text-slate-400 block">Income Threshold</span>
+                <span className="text-sm font-black text-blue-400">
+                  {incomeLimitRule ? incomeLimitRule.replace(/income/gi, '').replace(/[✓✗:-]/g, '').trim() : 'No Limit'}
                 </span>
               </div>
             </div>
 
-            <div className="p-4 rounded-2xl bg-slate-900/60 border border-white/[0.08] flex gap-3.5 items-center">
-              <div className="h-10 w-10 rounded-xl bg-emerald-950/60 flex items-center justify-center border border-emerald-500/30 text-emerald-400 shrink-0">
-                <Calendar className="h-5 w-5" />
+            {/* Deadline */}
+            <div className="p-4 rounded-2xl bg-gradient-to-br from-emerald-500/5 to-transparent border border-emerald-500/15 flex gap-3.5 items-center">
+              <div className="h-11 w-11 rounded-xl bg-emerald-500/10 flex items-center justify-center border border-emerald-500/20 text-emerald-400">
+                <Calendar className="h-6 w-6" />
               </div>
               <div>
                 <span className="text-[9px] uppercase tracking-wider font-extrabold text-slate-400 block">{t('deadline')}</span>
-                <span className="text-xs font-bold text-emerald-400">{scheme.deadline || 'Ongoing / Always Open'}</span>
+                <span className="text-sm font-black text-emerald-400">{scheme.deadline || 'Always Open'}</span>
               </div>
             </div>
           </div>
 
-          {/* User Evaluation Dynamic Card */}
+          {/* User Profile matching dynamic indicator */}
           {userProfileCheck.status !== 'not_scanned' && (
             <div className={`p-5 rounded-2xl border flex gap-4 ${
               userProfileCheck.status === 'eligible'
-                ? 'bg-emerald-950/40 border-emerald-500/30 text-slate-200'
-                : 'bg-red-950/40 border-red-500/30 text-slate-200'
+                ? 'bg-emerald-500/5 border-emerald-500/20 text-slate-200'
+                : 'bg-red-500/5 border-red-500/20 text-slate-200'
             }`}>
-              <div className="mt-0.5 shrink-0">
+              <div className="mt-1 shrink-0">
                 {userProfileCheck.status === 'eligible'
-                  ? <CheckCircle2 className="h-5 w-5 text-emerald-400" />
-                  : <ShieldAlert className="h-5 w-5 text-red-400" />
+                  ? <CheckCircle2 className="h-6 w-6 text-emerald-400 animate-pulse" />
+                  : <ShieldAlert className="h-6 w-6 text-red-400" />
                 }
               </div>
-              <div className="space-y-1.5">
-                <h4 className="font-bold text-xs text-slate-100">
+              <div className="space-y-2">
+                <h4 className="font-extrabold text-sm text-slate-100 flex items-center gap-1.5">
                   {userProfileCheck.status === 'eligible'
-                    ? 'Evaluated Eligible for Your Saved Profile'
-                    : 'Profile Criteria Disqualification'}
+                    ? 'Matches Your Profile Criteria!'
+                    : 'Disqualified Criteria Detected'}
                 </h4>
-                <ul className="space-y-1 text-xs">
+                <p className="text-xs text-slate-400">
+                  Based on your saved profile preferences:
+                </p>
+                <ul className="space-y-1 mt-1 text-xs">
                   {userProfileCheck.passedRules.map((rule, idx) => (
                     <li key={`p-${idx}`} className="flex items-center gap-1.5 text-slate-300">
-                      <span className="text-emerald-400 font-bold">✓</span> {rule}
+                      <span className="text-emerald-400">✓</span> {rule}
                     </li>
                   ))}
                   {userProfileCheck.failedRules.map((rule, idx) => (
-                    <li key={`f-${idx}`} className="flex items-center gap-1.5 text-red-300">
-                      <span className="font-bold">✗</span> {rule}
+                    <li key={`f-${idx}`} className="flex items-center gap-1.5 text-red-400">
+                      <span>✗</span> {rule}
                     </li>
                   ))}
                 </ul>
@@ -325,14 +346,28 @@ export default function SchemeDetailPage({ params }: { params: Promise<{ slug: s
             </div>
           )}
 
-          {/* Overview */}
+          {/* AI Summary Block */}
+          {scheme.ai_summary && (
+            <div className="p-5 rounded-2xl bg-orange-500/5 border border-orange-500/10 space-y-2 relative overflow-hidden">
+              <div className="absolute top-0 right-0 h-16 w-16 bg-gradient-to-bl from-orange-500/5 to-transparent pointer-events-none" />
+              <h3 className="text-xs font-bold uppercase tracking-wider text-orange-400 flex items-center gap-1.5">
+                <Sparkles className="h-4 w-4 text-orange-400 animate-pulse" />
+                AI Smart Summary
+              </h3>
+              <p className="text-sm text-slate-300 leading-relaxed italic">
+                "{scheme.ai_summary}"
+              </p>
+            </div>
+          )}
+
+          {/* Description */}
           {displayDesc && (
             <div className="space-y-3">
-              <h2 className="text-xs font-bold uppercase tracking-wider text-slate-300 flex items-center gap-2 border-b border-white/[0.06] pb-2">
+              <h2 className="text-sm font-bold uppercase tracking-wider text-slate-400 flex items-center gap-2 border-b border-white/[0.04] pb-2">
                 <Info className="h-4 w-4 text-blue-400" />
                 Scheme Overview
               </h2>
-              <p className="text-xs sm:text-sm text-slate-300 leading-relaxed bg-slate-900/50 p-5 rounded-2xl border border-white/[0.06]">
+              <p className="text-sm text-slate-300 leading-relaxed bg-white/[0.01] p-5 rounded-2xl border border-white/[0.04]">
                 {displayDesc}
               </p>
             </div>
@@ -341,26 +376,26 @@ export default function SchemeDetailPage({ params }: { params: Promise<{ slug: s
           {/* Benefits Detail */}
           {displayBenefits && (
             <div className="space-y-3">
-              <h2 className="text-xs font-bold uppercase tracking-wider text-slate-300 flex items-center gap-2 border-b border-white/[0.06] pb-2">
-                <Award className="h-4 w-4 text-amber-400" />
-                Welfare Benefits & Subsidies
+              <h2 className="text-sm font-bold uppercase tracking-wider text-slate-400 flex items-center gap-2 border-b border-white/[0.04] pb-2">
+                <Award className="h-4 w-4 text-orange-400" />
+                Welfare Benefits & Incentives
               </h2>
-              <p className="text-xs sm:text-sm text-slate-300 leading-relaxed bg-slate-900/50 p-5 rounded-2xl border border-white/[0.06]">
+              <p className="text-sm text-slate-300 leading-relaxed bg-orange-500/[0.01] p-5 rounded-2xl border border-orange-500/[0.04]">
                 {displayBenefits}
               </p>
             </div>
           )}
 
-          {/* Rules Checklist */}
+          {/* Eligibility Criteria Checklist */}
           {scheme.eligibility_rules_summary && scheme.eligibility_rules_summary.length > 0 && (
             <div className="space-y-3">
-              <h2 className="text-xs font-bold uppercase tracking-wider text-slate-300 flex items-center gap-2 border-b border-white/[0.06] pb-2">
+              <h2 className="text-sm font-bold uppercase tracking-wider text-slate-400 flex items-center gap-2 border-b border-white/[0.04] pb-2">
                 <ShieldCheck className="h-4 w-4 text-emerald-400" />
-                Mandatory Qualification Rules
+                Mandatory Eligibility Rules
               </h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {scheme.eligibility_rules_summary.map((rule, idx) => (
-                  <div key={idx} className="flex items-start gap-3 text-xs text-slate-300 bg-slate-900/50 p-3.5 rounded-xl border border-white/[0.06]">
+                  <div key={idx} className="flex items-start gap-3 text-sm text-slate-300 bg-white/[0.01] p-4 rounded-xl border border-white/[0.04]">
                     <CheckCircle2 className="h-4 w-4 text-emerald-400 shrink-0 mt-0.5" />
                     <span>{rule}</span>
                   </div>
@@ -372,14 +407,14 @@ export default function SchemeDetailPage({ params }: { params: Promise<{ slug: s
           {/* Required Documents */}
           {scheme.required_documents && scheme.required_documents.length > 0 && (
             <div className="space-y-3">
-              <h2 className="text-xs font-bold uppercase tracking-wider text-slate-300 flex items-center gap-2 border-b border-white/[0.06] pb-2">
+              <h2 className="text-sm font-bold uppercase tracking-wider text-slate-400 flex items-center gap-2 border-b border-white/[0.04] pb-2">
                 <FileText className="h-4 w-4 text-blue-400" />
-                Required Verification Documents
+                {t('documents')} Checklist
               </h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {scheme.required_documents.map((doc, idx) => (
-                  <div key={idx} className="flex items-center gap-3 text-xs text-slate-300 bg-slate-900/50 p-3.5 rounded-xl border border-white/[0.06]">
-                    <div className="h-5 w-5 rounded bg-blue-950 flex items-center justify-center shrink-0 border border-blue-500/30 text-blue-300 text-[10px] font-bold">
+                  <div key={idx} className="flex items-center gap-3 text-sm text-slate-300 bg-slate-800/40 p-4 rounded-xl border border-white/[0.04] hover:bg-slate-800/60 transition-all">
+                    <div className="h-6 w-6 rounded-md bg-blue-500/10 flex items-center justify-center shrink-0 border border-blue-500/20 text-blue-400">
                       {idx + 1}
                     </div>
                     <span className="font-medium">{doc}</span>
@@ -389,31 +424,43 @@ export default function SchemeDetailPage({ params }: { params: Promise<{ slug: s
             </div>
           )}
 
-          {/* Application Workflow */}
+          {/* Application Process */}
           {displayAppProcess && (
             <div className="space-y-3">
-              <h2 className="text-xs font-bold uppercase tracking-wider text-slate-300 flex items-center gap-2 border-b border-white/[0.06] pb-2">
-                <Landmark className="h-4 w-4 text-indigo-400" />
-                Official Application Workflow
+              <h2 className="text-sm font-bold uppercase tracking-wider text-slate-400 flex items-center gap-2 border-b border-white/[0.04] pb-2">
+                <Sparkles className="h-4 w-4 text-indigo-400" />
+                How to Apply (Step-by-Step)
               </h2>
-              <div className="text-xs sm:text-sm text-slate-300 leading-relaxed bg-slate-900/50 p-5 rounded-2xl border border-white/[0.06] whitespace-pre-line">
+              <div className="text-sm text-slate-300 leading-relaxed bg-indigo-500/[0.01] p-5 rounded-2xl border border-indigo-500/[0.04] whitespace-pre-line">
                 {displayAppProcess}
               </div>
             </div>
           )}
         </div>
 
-        {/* Footer Actions */}
-        <div className="border-t border-white/[0.08] bg-slate-950/60 p-6 sm:p-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+        {/* Helpline, websites and apply CTA */}
+        <div className="border-t border-white/[0.08] bg-white/[0.01] p-6 sm:p-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
           <div className="flex flex-wrap gap-4">
             {scheme.helpline && (
               <div className="flex items-center gap-3">
-                <div className="h-9 w-9 rounded-xl bg-blue-950 flex items-center justify-center border border-blue-500/30 text-blue-400 shrink-0">
+                <div className="h-9 w-9 rounded-lg bg-blue-500/10 flex items-center justify-center border border-blue-500/20 text-blue-400 shrink-0">
                   <Phone className="h-4 w-4" />
                 </div>
                 <div>
-                  <div className="text-[9px] uppercase font-bold tracking-wider text-slate-400">Toll-Free Helpline</div>
-                  <div className="text-xs sm:text-sm font-bold text-slate-200">{scheme.helpline}</div>
+                  <div className="text-[8px] uppercase font-bold tracking-wider text-slate-500">{t('helpline')}</div>
+                  <div className="text-sm font-bold text-slate-200">{scheme.helpline}</div>
+                </div>
+              </div>
+            )}
+
+            {scheme.launched_date && (
+              <div className="flex items-center gap-3">
+                <div className="h-9 w-9 rounded-lg bg-emerald-500/10 flex items-center justify-center border border-emerald-500/20 text-emerald-400 shrink-0">
+                  <Clock className="h-4 w-4" />
+                </div>
+                <div>
+                  <div className="text-[8px] uppercase font-bold tracking-wider text-slate-500">Launched On</div>
+                  <div className="text-sm font-bold text-slate-200">{scheme.launched_date}</div>
                 </div>
               </div>
             )}
@@ -425,10 +472,10 @@ export default function SchemeDetailPage({ params }: { params: Promise<{ slug: s
                 href={scheme.official_website}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex-1 md:flex-initial inline-flex items-center justify-center gap-2 px-5 py-3 bg-slate-900 border border-white/10 hover:border-white/20 text-slate-200 hover:text-white rounded-xl text-xs font-bold transition-all cursor-pointer"
+                className="flex-1 md:flex-initial inline-flex items-center justify-center gap-2 px-5 py-3 bg-white/[0.03] border border-white/[0.08] hover:border-white/20 hover:bg-white/[0.06] text-slate-300 hover:text-white rounded-xl text-xs font-bold transition-all cursor-pointer"
               >
-                <Globe className="h-4 w-4 text-blue-400" />
-                Official Department Portal
+                <Globe className="h-4 w-4" />
+                Official Portal
                 <ExternalLink className="h-3 w-3 opacity-60" />
               </a>
             )}
@@ -437,7 +484,7 @@ export default function SchemeDetailPage({ params }: { params: Promise<{ slug: s
                 href={scheme.application_url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex-1 md:flex-initial inline-flex items-center justify-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold shadow-lg transition-all cursor-pointer"
+                className="flex-1 md:flex-initial inline-flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-orange-500 to-blue-600 hover:from-orange-600 hover:to-blue-700 text-white rounded-xl text-xs font-black shadow-lg shadow-blue-500/25 hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer"
               >
                 <ExternalLink className="h-4 w-4" />
                 {t('applyNow')}
@@ -446,7 +493,73 @@ export default function SchemeDetailPage({ params }: { params: Promise<{ slug: s
           </div>
         </div>
       </div>
+
+      {/* Related and Similar Schemes */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 pt-4">
+        {/* Related Schemes */}
+        {scheme.related_schemes && scheme.related_schemes.length > 0 && (
+          <div className="space-y-4">
+            <h3 className="text-lg font-black text-slate-200 flex items-center gap-2">
+              <Sparkles className="h-4.5 w-4.5 text-blue-400" />
+              Related Category Schemes
+            </h3>
+            <div className="space-y-3">
+              {scheme.related_schemes.map((rel) => (
+                <Link
+                  href={`/schemes/${rel.slug}`}
+                  key={rel.id}
+                  className="block glass-panel p-4 rounded-xl border-white/[0.06] hover:border-blue-500/20 hover:bg-white/[0.02] transition-all group"
+                >
+                  <div className="flex justify-between items-start gap-3">
+                    <div className="space-y-1">
+                      <span className="text-[8px] uppercase font-bold tracking-wider text-blue-400 block">
+                        {rel.category_name || 'General'}
+                      </span>
+                      <h4 className="font-bold text-sm text-slate-200 group-hover:text-blue-400 transition-colors line-clamp-1">
+                        {language === 'hi' && rel.name_hi ? rel.name_hi : rel.name}
+                      </h4>
+                      {rel.ministry && <p className="text-[10px] text-slate-500">{rel.ministry}</p>}
+                    </div>
+                    <ChevronRight className="h-4 w-4 text-slate-500 group-hover:text-blue-400 group-hover:translate-x-0.5 transition-all shrink-0 mt-1" />
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Similar Level Schemes */}
+        {scheme.similar_schemes && scheme.similar_schemes.length > 0 && (
+          <div className="space-y-4">
+            <h3 className="text-lg font-black text-slate-200 flex items-center gap-2">
+              <Award className="h-4.5 w-4.5 text-orange-400" />
+              Similar Level Schemes
+            </h3>
+            <div className="space-y-3">
+              {scheme.similar_schemes.map((sim) => (
+                <Link
+                  href={`/schemes/${sim.slug}`}
+                  key={sim.id}
+                  className="block glass-panel p-4 rounded-xl border-white/[0.06] hover:border-orange-500/20 hover:bg-white/[0.02] transition-all group"
+                >
+                  <div className="flex justify-between items-start gap-3">
+                    <div className="space-y-1">
+                      <span className="text-[8px] uppercase font-bold tracking-wider text-orange-400 block">
+                        {sim.level || 'Central'}
+                      </span>
+                      <h4 className="font-bold text-sm text-slate-200 group-hover:text-orange-400 transition-colors line-clamp-1">
+                        {language === 'hi' && sim.name_hi ? sim.name_hi : sim.name}
+                      </h4>
+                      {sim.ministry && <p className="text-[10px] text-slate-500">{sim.ministry}</p>}
+                    </div>
+                    <ChevronRight className="h-4 w-4 text-slate-500 group-hover:text-orange-400 group-hover:translate-x-0.5 transition-all shrink-0 mt-1" />
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
-
