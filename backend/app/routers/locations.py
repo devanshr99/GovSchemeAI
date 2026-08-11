@@ -2,9 +2,9 @@
 Locations API router — states and districts lookup.
 """
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select
+from sqlalchemy import select, or_
 
 from app.database import get_db
 from app.models.location import State, District
@@ -26,17 +26,25 @@ async def get_states(db: AsyncSession = Depends(get_db)):
 @router.get("/districts/{state_code}")
 async def get_districts(state_code: str, db: AsyncSession = Depends(get_db)):
     """Get all districts for a state."""
-    # Verify state exists
-    state = await db.get(State, state_code.upper())
-    if not state:
-        raise HTTPException(status_code=404, detail="State not found")
-
+    code_upper = state_code.strip().upper()
+    
     result = await db.execute(
         select(District)
-        .where(District.state_code == state_code.upper())
+        .where(or_(District.state_code == code_upper, District.state_code == state_code))
         .order_by(District.name)
     )
     districts = result.scalars().all()
+
+    if not districts:
+        # Fallback check if state_code passed is state name e.g. "Uttar Pradesh"
+        result = await db.execute(
+            select(District)
+            .join(State, District.state_code == State.code)
+            .where(State.name.ilike(f"%{state_code}%"))
+            .order_by(District.name)
+        )
+        districts = result.scalars().all()
+
     return [
         {"id": d.id, "name": d.name, "name_hi": d.name_hi}
         for d in districts
