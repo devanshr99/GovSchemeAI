@@ -12,6 +12,7 @@ import {
 import { api } from '../lib/api';
 import { EligibleSchemeResult } from '../types/eligibility';
 import Link from 'next/link';
+import { Footer } from '../components/layout/Footer';
 
 export default function Home() {
   const { t } = useApp();
@@ -370,6 +371,9 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      {/* HOME PAGE FOOTER */}
+      <Footer />
 
     </div>
   );

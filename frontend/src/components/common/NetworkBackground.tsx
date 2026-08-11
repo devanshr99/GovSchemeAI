@@ -9,9 +9,7 @@ interface Particle {
   vy: number;
   radius: number;
   color: string;
-  glowColor: string;
-  pulseSpeed: number;
-  pulseAngle: number;
+  alpha: number;
 }
 
 export const NetworkBackground: React.FC = () => {
@@ -33,13 +31,16 @@ export const NetworkBackground: React.FC = () => {
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
     const isMobile = width < 768;
-    const particleCount = isMobile ? 30 : 65;
-    const maxDistance = isMobile ? 100 : 140;
+    // Sparse, subtle cluster density with large whitespace
+    const particleCount = isMobile ? 14 : 24;
+    const maxDistance = isMobile ? 110 : 150;
 
-    const colors = [
-      { core: 'rgba(139, 92, 246, 0.85)', glow: 'rgba(139, 92, 246, 0.3)' }, // Purple
-      { core: 'rgba(168, 85, 247, 0.85)', glow: 'rgba(168, 85, 247, 0.3)' }, // Bright Purple
-      { core: 'rgba(6, 182, 212, 0.85)', glow: 'rgba(6, 182, 212, 0.35)' }, // Cyan Accent
+    // Muted cyan/teal colors with low opacity and subtle purple accent
+    const nodePalette = [
+      { color: 'rgb(6, 182, 212)', alpha: 0.35 },    // Soft Cyan
+      { color: 'rgb(13, 148, 136)', alpha: 0.30 },   // Muted Teal
+      { color: 'rgb(34, 211, 238)', alpha: 0.25 },   // Pale Cyan
+      { color: 'rgb(139, 92, 246)', alpha: 0.20 },   // Muted Violet Accent
     ];
 
     const initParticles = () => {
@@ -48,8 +49,8 @@ export const NetworkBackground: React.FC = () => {
       height = canvas.height = window.innerHeight;
 
       for (let i = 0; i < particleCount; i++) {
-        const colorObj = colors[Math.floor(Math.random() * colors.length)];
-        const speed = prefersReducedMotion ? 0 : 0.15 + Math.random() * 0.25;
+        const palette = nodePalette[Math.floor(Math.random() * nodePalette.length)];
+        const speed = prefersReducedMotion ? 0 : 0.04 + Math.random() * 0.06;
         const angle = Math.random() * Math.PI * 2;
 
         particles.push({
@@ -57,11 +58,9 @@ export const NetworkBackground: React.FC = () => {
           y: Math.random() * height,
           vx: Math.cos(angle) * speed,
           vy: Math.sin(angle) * speed,
-          radius: Math.random() * 1.5 + 1,
-          color: colorObj.core,
-          glowColor: colorObj.glow,
-          pulseSpeed: 0.01 + Math.random() * 0.02,
-          pulseAngle: Math.random() * Math.PI * 2,
+          radius: Math.random() * 1.2 + 1.2, // 1.2px - 2.4px small subtle nodes
+          color: palette.color,
+          alpha: palette.alpha,
         });
       }
     };
@@ -71,23 +70,15 @@ export const NetworkBackground: React.FC = () => {
     const draw = () => {
       ctx.clearRect(0, 0, width, height);
 
-      // Draw background gradient fill for depth
-      const gradient = ctx.createRadialGradient(
-        width / 2,
-        height * 0.2,
-        0,
-        width / 2,
-        height / 2,
-        Math.max(width, height)
-      );
-      gradient.addColorStop(0, '#0D0F16');
-      gradient.addColorStop(0.5, '#08090D');
+      // Dark subtle gradient base
+      const gradient = ctx.createLinearGradient(0, 0, 0, height);
+      gradient.addColorStop(0, '#08090D');
+      gradient.addColorStop(0.5, '#07080C');
       gradient.addColorStop(1, '#050608');
-
       ctx.fillStyle = gradient;
       ctx.fillRect(0, 0, width, height);
 
-      // Connect nearby particles with subtle lines
+      // Draw subtle connecting geometric lines (5% to 10% opacity max)
       for (let i = 0; i < particles.length; i++) {
         for (let j = i + 1; j < particles.length; j++) {
           const dx = particles[i].x - particles[j].x;
@@ -95,18 +86,19 @@ export const NetworkBackground: React.FC = () => {
           const dist = Math.sqrt(dx * dx + dy * dy);
 
           if (dist < maxDistance) {
-            const alpha = (1 - dist / maxDistance) * 0.14;
+            // Line opacity range 0.03 to 0.09
+            const lineAlpha = (1 - dist / maxDistance) * 0.08;
             ctx.beginPath();
             ctx.moveTo(particles[i].x, particles[i].y);
             ctx.lineTo(particles[j].x, particles[j].y);
-            ctx.strokeStyle = `rgba(139, 92, 246, ${alpha})`;
-            ctx.lineWidth = 0.75;
+            ctx.strokeStyle = `rgba(6, 182, 212, ${lineAlpha})`;
+            ctx.lineWidth = 0.6;
             ctx.stroke();
           }
         }
       }
 
-      // Render nodes
+      // Draw small, low-contrast nodes
       for (let i = 0; i < particles.length; i++) {
         const p = particles[i];
 
@@ -114,26 +106,15 @@ export const NetworkBackground: React.FC = () => {
           p.x += p.vx;
           p.y += p.vy;
 
-          if (p.x < -10) p.x = width + 10;
-          if (p.x > width + 10) p.x = -10;
-          if (p.y < -10) p.y = height + 10;
-          if (p.y > height + 10) p.y = -10;
-
-          p.pulseAngle += p.pulseSpeed;
+          if (p.x < -20) p.x = width + 20;
+          if (p.x > width + 20) p.x = -20;
+          if (p.y < -20) p.y = height + 20;
+          if (p.y > height + 20) p.y = -20;
         }
 
-        const currentRadius = p.radius + Math.sin(p.pulseAngle) * 0.4;
-
-        // Outer glow
         ctx.beginPath();
-        ctx.arc(p.x, p.y, currentRadius * 3, 0, Math.PI * 2);
-        ctx.fillStyle = p.glowColor;
-        ctx.fill();
-
-        // Core particle
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, currentRadius, 0, Math.PI * 2);
-        ctx.fillStyle = p.color;
+        ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+        ctx.fillStyle = p.color.replace('rgb', 'rgba').replace(')', `, ${p.alpha})`);
         ctx.fill();
       }
 
