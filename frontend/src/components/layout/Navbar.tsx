@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useApp } from '../../context/AppContext';
+import { api } from '../../lib/api';
 import { Logo } from '../common/Logo';
 import { LanguagePicker } from './LanguagePicker';
 import { 
@@ -15,10 +16,7 @@ import {
   UserCheck, 
   Menu, 
   X, 
-  Settings, 
-  Bell, 
-  Sparkles,
-  ArrowRight
+  Settings
 } from 'lucide-react';
 
 export const Navbar: React.FC = () => {
@@ -33,15 +31,11 @@ export const Navbar: React.FC = () => {
   // Check backend health on mount
   useEffect(() => {
     const checkHealth = async () => {
-      try {
-        const res = await fetch('/api/health', { method: 'GET' });
-        setBackendOnline(res.ok);
-      } catch {
-        setBackendOnline(false);
-      }
+      const isOnline = await api.getHealth();
+      setBackendOnline(isOnline);
     };
     checkHealth();
-    const interval = setInterval(checkHealth, 60_000);
+    const interval = setInterval(checkHealth, 30_000);
     return () => clearInterval(interval);
   }, []);
 
@@ -118,7 +112,7 @@ export const Navbar: React.FC = () => {
 
             {/* Backend Health Dot */}
             <div
-              className="hidden xl:flex items-center gap-1.5 px-2 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider bg-[#101217] border border-[#242832]"
+              className="hidden xl:flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider bg-[#101217] border border-[#242832]"
               title={backendOnline === null ? 'Checking backend status...' : backendOnline ? 'API Engine Online' : 'API Engine Offline'}
             >
               <div

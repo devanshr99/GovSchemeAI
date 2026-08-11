@@ -6,7 +6,7 @@ import socket
 import urllib.parse
 from datetime import datetime, timedelta
 from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy import text, select
+from sqlalchemy import text, select, func
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.config import get_settings
@@ -19,7 +19,7 @@ settings = get_settings()
 
 
 async def run_full_system_check(db: AsyncSession) -> tuple[str, dict]:
-    """Unified system health validator checking all 7 targets."""
+    """Unified system health validator checking system targets."""
     health_status = "healthy"
     details = {}
 
@@ -143,7 +143,6 @@ async def run_full_system_check(db: AsyncSession) -> tuple[str, dict]:
 
     # 7. AI Service Status Check
     try:
-        # Check if settings have keys configured
         api_keys_configured = bool(settings.gemini_api_key or settings.openai_api_key or settings.anthropic_api_key or settings.openrouter_api_key)
         details["ai_service"] = {
             "status": "up" if api_keys_configured else "not_configured",
@@ -158,26 +157,30 @@ async def run_full_system_check(db: AsyncSession) -> tuple[str, dict]:
     return health_status, details
 
 
+@router.get("")
+@router.get("/")
+async def primary_health_probe(db: AsyncSession = Depends(get_db)):
+    """Fast primary health probe for Render load balancers and frontend navbar status."""
+    try:
+        await db.execute(text("SELECT 1"))
+        return {
+            "status": "healthy",
+            "service": "govschemeai-api",
+            "app": settings.app_name,
+            "version": settings.app_version,
+            "timestamp": datetime.utcnow().isoformat() + "Z"
+        }
+    except Exception as e:
+        raise HTTPException(
+            status_code=503,
+            detail={"status": "unhealthy", "service": "govschemeai-api", "error": str(e)}
+        )
+
+
 @router.get("/live")
 async def liveness_probe(db: AsyncSession = Depends(get_db)):
-    """Verify that the FastAPI application and dependencies are alive."""
-    health_status, details = await run_full_system_check(db)
-    response_data = {
-        "status": health_status,
-        "app": settings.app_name,
-        "version": settings.app_version,
-        "timestamp": datetime.utcnow().isoformat() + "Z",
-        "details": details
-    }
-    if health_status == "unhealthy":
-        raise HTTPException(status_code=503, detail=response_data)
-    return response_data
-
-
-@router.get("")
-async def legacy_health_check(db: AsyncSession = Depends(get_db)):
-    """Fallback compatible endpoint for default check."""
-    return await liveness_probe(db)
+    """Verify that the FastAPI application process and primary DB are alive."""
+    return await primary_health_probe(db)
 
 
 @router.get("/ready")

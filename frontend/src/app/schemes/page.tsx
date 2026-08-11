@@ -71,13 +71,14 @@ export default function SchemesBrowse() {
   // Autocomplete suggestions prefix fetch
   useEffect(() => {
     if (search.trim().length >= 2) {
-      fetch(`/api/search/autocomplete?prefix=${encodeURIComponent(search.trim())}`)
-        .then(res => res.json())
+      api.getAutocomplete(search.trim())
         .then(data => {
-          if (data && data.suggestions) {
-            setSuggestions(data.suggestions);
-            setShowSuggestions(true);
+          if (Array.isArray(data)) {
+            setSuggestions(data);
+          } else if (data && (data as any).suggestions) {
+            setSuggestions((data as any).suggestions);
           }
+          setShowSuggestions(true);
         })
         .catch(err => console.error('Failed to fetch suggestions', err));
     } else {

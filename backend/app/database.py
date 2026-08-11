@@ -1,16 +1,26 @@
 """
 Database engine and session management.
 Supports SQLite (dev) and PostgreSQL (prod) via async SQLAlchemy.
+Automatically normalizes connection strings for cloud deployments (e.g. Render/Supabase).
 """
 
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
 from sqlalchemy.orm import DeclarativeBase
-from sqlalchemy import event
 from app.config import get_settings
 
 settings = get_settings()
 
-_is_sqlite = "sqlite" in settings.database_url
+raw_db_url = settings.database_url
+
+# Normalize postgres URL schemes for asyncpg driver compatibility
+if raw_db_url.startswith("postgres://"):
+    db_url = raw_db_url.replace("postgres://", "postgresql+asyncpg://", 1)
+elif raw_db_url.startswith("postgresql://") and not raw_db_url.startswith("postgresql+asyncpg://"):
+    db_url = raw_db_url.replace("postgresql://", "postgresql+asyncpg://", 1)
+else:
+    db_url = raw_db_url
+
+_is_sqlite = "sqlite" in db_url
 
 # Build engine with optimized pool configuration
 _engine_kwargs = {
@@ -30,8 +40,7 @@ else:
         "pool_pre_ping": True,   # Verify connections are alive before checkout
     })
 
-engine = create_async_engine(settings.database_url, **_engine_kwargs)
-
+engine = create_async_engine(db_url, **_engine_kwargs)
 
 async_session = async_sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
 
@@ -64,6 +73,11 @@ async def failover_database_engine_async(new_url: str):
     """Dynamic failover to switch database connections in real time without reloading the process."""
     global engine, async_session
     await engine.dispose()
+    
+    if new_url.startswith("postgres://"):
+        new_url = new_url.replace("postgres://", "postgresql+asyncpg://", 1)
+    elif new_url.startswith("postgresql://") and not new_url.startswith("postgresql+asyncpg://"):
+        new_url = new_url.replace("postgresql://", "postgresql+asyncpg://", 1)
+
     engine = create_async_engine(new_url, **_engine_kwargs)
     async_session = async_sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
-

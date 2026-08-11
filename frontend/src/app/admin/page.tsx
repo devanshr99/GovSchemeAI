@@ -55,13 +55,7 @@ export default function AdminPanel() {
     setActionLoading(prev => ({ ...prev, [id]: true }));
     const newStatus = !currentStatus;
     try {
-      const res = await fetch(`/api/schemes/${id}/status`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ is_active: newStatus }),
-      });
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-
+      await api.toggleSchemeStatus(id, newStatus);
       setSchemes(prev => prev.map(s => s.id === id ? { ...s, is_active: newStatus } : s));
       if (newStatus) setActiveCount(c => c + 1);
       else setActiveCount(c => c - 1);
@@ -78,8 +72,7 @@ export default function AdminPanel() {
     if (!window.confirm(`Are you sure you want to permanently delete "${name}"?`)) return;
     setActionLoading(prev => ({ ...prev, [`del_${id}`]: true }));
     try {
-      const res = await fetch(`/api/schemes/${id}`, { method: 'DELETE' });
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      await api.deleteScheme(id);
 
       setSchemes(prev => {
         const removed = prev.find(s => s.id === id);
