@@ -1,9 +1,10 @@
 """
 Database engine and session management.
 Supports SQLite (dev) and PostgreSQL (prod) via async SQLAlchemy.
-Automatically normalizes connection strings for cloud deployments (e.g. Render/Supabase).
+Automatically normalizes connection strings and configures SSL for cloud deployments (e.g. Render/Supabase).
 """
 
+import ssl
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
 from sqlalchemy.orm import DeclarativeBase
 from app.config import get_settings
@@ -31,8 +32,18 @@ if _is_sqlite:
     # SQLite needs check_same_thread=False for async
     _engine_kwargs["connect_args"] = {"check_same_thread": False}
 else:
-    # PostgreSQL / production pool tuning
+    # PostgreSQL / cloud database configuration (Render / Supabase / AWS RDS)
+    connect_args = {}
+    
+    # Configure SSL context for PostgreSQL connections if required or on cloud hosts
+    if "sslmode=require" in db_url or "render.com" in db_url or not settings.debug:
+        ssl_ctx = ssl.create_default_context()
+        ssl_ctx.check_hostname = False
+        ssl_ctx.verify_mode = ssl.CERT_NONE
+        connect_args["ssl"] = ssl_ctx
+
     _engine_kwargs.update({
+        "connect_args": connect_args,
         "pool_size": 10,         # Persistent connections
         "max_overflow": 20,      # Burst connections beyond pool_size
         "pool_recycle": 300,     # Recycle stale connections every 5 min
@@ -79,5 +90,6 @@ async def failover_database_engine_async(new_url: str):
     elif new_url.startswith("postgresql://") and not new_url.startswith("postgresql+asyncpg://"):
         new_url = new_url.replace("postgresql://", "postgresql+asyncpg://", 1)
 
-    engine = create_async_engine(new_url, **_engine_kwargs)
+    failover_kwargs = dict(_engine_kwargs)
+    engine = create_async_engine(new_url, **failover_kwargs)
     async_session = async_sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)

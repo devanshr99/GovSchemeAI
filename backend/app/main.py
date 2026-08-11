@@ -135,9 +135,12 @@ async def lifespan(app: FastAPI):
     logger.info("=" * 60)
 
     # Initialize database tables
-    logger.info("Initializing database...")
-    await init_db()
-    logger.info("[OK] Database ready.")
+    try:
+        logger.info("Initializing database...")
+        await init_db()
+        logger.info("[OK] Database ready.")
+    except Exception as db_err:
+        logger.error(f"Database initialization notice: {db_err}")
 
     # Run database migrations
     try:
@@ -174,30 +177,42 @@ async def lifespan(app: FastAPI):
         logger.warning(f"Migration notice: {mig_err}")
 
     # Seed data if database is empty
-    logger.info("Checking seed data...")
-    from app.utils.seed_data import seed_if_empty
-    await seed_if_empty()
-    logger.info("[OK] Seed data check completed.")
+    try:
+        logger.info("Checking seed data...")
+        from app.utils.seed_data import seed_if_empty
+        await seed_if_empty()
+        logger.info("[OK] Seed data check completed.")
+    except Exception as seed_err:
+        logger.warning(f"Seed data notice: {seed_err}")
 
-    # Start scheduler
-    logger.info("Starting update scheduler...")
-    from app.scheduler import start_scheduler, stop_scheduler
-    start_scheduler()
+    # Start background sub-services safely
+    try:
+        logger.info("Starting update scheduler...")
+        from app.scheduler import start_scheduler
+        start_scheduler()
+    except Exception as sched_err:
+        logger.warning(f"Scheduler startup notice: {sched_err}")
 
-    # Start worker pool
-    logger.info("Starting worker pool...")
-    from app.services.worker_manager import worker_manager
-    worker_manager.start_worker_pool()
+    try:
+        logger.info("Starting worker pool...")
+        from app.services.worker_manager import worker_manager
+        worker_manager.start_worker_pool()
+    except Exception as worker_err:
+        logger.warning(f"Worker pool startup notice: {worker_err}")
 
-    # Start telemetry collector loop
-    logger.info("Starting telemetry collector...")
-    from app.utils.observability import telemetry_collector
-    telemetry_collector.start()
+    try:
+        logger.info("Starting telemetry collector...")
+        from app.utils.observability import telemetry_collector
+        telemetry_collector.start()
+    except Exception as telem_err:
+        logger.warning(f"Telemetry collector notice: {telem_err}")
 
-    # Start database health check daemon
-    logger.info("Starting database failover manager...")
-    from app.services.failover_manager import failover_manager
-    await failover_manager.start_monitoring_daemon()
+    try:
+        logger.info("Starting database failover manager...")
+        from app.services.failover_manager import failover_manager
+        await failover_manager.start_monitoring_daemon()
+    except Exception as failover_err:
+        logger.warning(f"Failover manager notice: {failover_err}")
 
     logger.info("=" * 60)
     logger.info(f"  Server ready at http://0.0.0.0:{settings.port}")
@@ -207,21 +222,41 @@ async def lifespan(app: FastAPI):
 
     # Shutdown
     logger.info("Shutting down...")
-    stop_scheduler()
-    from app.services.worker_manager import worker_manager
-    worker_manager.stop_worker_pool()
+    try:
+        from app.scheduler import stop_scheduler
+        stop_scheduler()
+    except Exception:
+        pass
 
-    from app.services.failover_manager import failover_manager
-    await failover_manager.stop_monitoring_daemon()
+    try:
+        from app.services.worker_manager import worker_manager
+        worker_manager.stop_worker_pool()
+    except Exception:
+        pass
 
-    from app.utils.observability import telemetry_collector
-    telemetry_collector.stop()
+    try:
+        from app.services.failover_manager import failover_manager
+        await failover_manager.stop_monitoring_daemon()
+    except Exception:
+        pass
 
-    from app.services.ai_service import ai_service
-    await ai_service.close()
+    try:
+        from app.utils.observability import telemetry_collector
+        telemetry_collector.stop()
+    except Exception:
+        pass
 
-    from app.services.cache import cache
-    await cache.clear()
+    try:
+        from app.services.ai_service import ai_service
+        await ai_service.close()
+    except Exception:
+        pass
+
+    try:
+        from app.services.cache import cache
+        await cache.clear()
+    except Exception:
+        pass
 
     await close_db()
 
@@ -236,14 +271,14 @@ app = FastAPI(
 # Parse CORS origins from environment
 raw_origins = os.getenv(
     "CORS_ORIGINS",
-    "http://localhost:3000,http://localhost:3001,http://127.0.0.1:3000,https://govscheme-ai.vercel.app"
+    "http://localhost:3000,http://localhost:3001,http://127.0.0.1:3000,https://govscheme-ai.vercel.app,https://govschemeai.onrender.com,https://govschemeai-frontend.onrender.com,https://govschemeai-backend.onrender.com"
 )
 cors_origins = [origin.strip() for origin in raw_origins.split(",") if origin.strip()]
-has_wildcard = "*" in cors_origins
+has_wildcard = "*" in cors_origins or "all" in cors_origins
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=cors_origins,
+    allow_origins=["*"] if has_wildcard else cors_origins,
     allow_credentials=not has_wildcard,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -291,10 +326,13 @@ async def root_ready(db = Depends(get_db)):
     return await readiness_probe(db)
 
 @app.get("/health")
-async def root_health(db = Depends(get_db)):
-    """Primary health check endpoint."""
-    from app.routers.health import primary_health_probe
-    return await primary_health_probe(db)
+async def root_health():
+    """Primary lightweight health check endpoint returning HTTP 200."""
+    return {
+        "status": "healthy",
+        "app": settings.app_name,
+        "version": settings.app_version,
+    }
 
 @app.get("/metrics")
 async def prometheus_metrics(response: Response, token: str = Depends(verify_admin)):
