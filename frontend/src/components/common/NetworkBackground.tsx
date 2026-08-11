@@ -35,12 +35,12 @@ export const NetworkBackground: React.FC = () => {
     const particleCount = isMobile ? 22 : 40;
     const maxDistance = isMobile ? 120 : 155;
 
-    // Premium Purple & Lavender Palette
+    // Palette: Soft cyan, muted teal, pale cyan, and subtle violet accent
     const nodePalette = [
-      { color: 'rgba(167, 139, 250, 0.55)', glow: 'rgba(167, 139, 250, 0.18)' },  // Lavender (#A78BFA)
-      { color: 'rgba(192, 132, 252, 0.48)', glow: 'rgba(192, 132, 252, 0.15)' },  // Soft Purple (#C084FC)
-      { color: 'rgba(139, 92, 246, 0.45)', glow: 'rgba(139, 92, 246, 0.14)' },   // Violet (#8B5CF6)
-      { color: 'rgba(34, 211, 238, 0.38)', glow: 'rgba(34, 211, 238, 0.10)' },   // Subtle Cyan Accent
+      { color: 'rgba(6, 182, 212, 0.52)', glow: 'rgba(6, 182, 212, 0.16)' },   // Soft Cyan
+      { color: 'rgba(13, 148, 136, 0.48)', glow: 'rgba(13, 148, 136, 0.14)' },  // Muted Teal
+      { color: 'rgba(34, 211, 238, 0.42)', glow: 'rgba(34, 211, 238, 0.12)' },  // Pale Cyan
+      { color: 'rgba(139, 92, 246, 0.38)', glow: 'rgba(139, 92, 246, 0.10)' },  // Subtle Violet
     ];
 
     const initParticles = () => {
@@ -50,7 +50,8 @@ export const NetworkBackground: React.FC = () => {
 
       for (let i = 0; i < particleCount; i++) {
         const palette = nodePalette[Math.floor(Math.random() * nodePalette.length)];
-        const speed = prefersReducedMotion ? 0 : 0.06 + Math.random() * 0.08;
+        // Slow graceful motion
+        const speed = prefersReducedMotion ? 0 : 0.07 + Math.random() * 0.09;
         const angle = Math.random() * Math.PI * 2;
 
         particles.push({
@@ -70,22 +71,15 @@ export const NetworkBackground: React.FC = () => {
     const draw = () => {
       ctx.clearRect(0, 0, width, height);
 
-      // Deep dark purple radial atmospheric background
-      const gradient = ctx.createRadialGradient(
-        width * 0.5,
-        height * 0.25,
-        0,
-        width * 0.5,
-        height * 0.5,
-        Math.max(width, height)
-      );
-      gradient.addColorStop(0, '#100B1C');
-      gradient.addColorStop(0.5, '#0B0814');
-      gradient.addColorStop(1, '#06040A');
+      // Deep dark background fill
+      const gradient = ctx.createLinearGradient(0, 0, 0, height);
+      gradient.addColorStop(0, '#08090D');
+      gradient.addColorStop(0.5, '#07080C');
+      gradient.addColorStop(1, '#050608');
       ctx.fillStyle = gradient;
       ctx.fillRect(0, 0, width, height);
 
-      // Draw subtle purple connecting lines (10% to 16% opacity)
+      // Draw clearly visible connecting geometric lines (10% to 16% opacity)
       for (let i = 0; i < particles.length; i++) {
         for (let j = i + 1; j < particles.length; j++) {
           const dx = particles[i].x - particles[j].x;
@@ -93,18 +87,19 @@ export const NetworkBackground: React.FC = () => {
           const dist = Math.sqrt(dx * dx + dy * dy);
 
           if (dist < maxDistance) {
+            // Line opacity range ~0.04 to 0.15
             const lineAlpha = (1 - dist / maxDistance) * 0.15;
             ctx.beginPath();
             ctx.moveTo(particles[i].x, particles[i].y);
             ctx.lineTo(particles[j].x, particles[j].y);
-            ctx.strokeStyle = `rgba(167, 139, 250, ${lineAlpha})`;
+            ctx.strokeStyle = `rgba(6, 182, 212, ${lineAlpha})`;
             ctx.lineWidth = 0.85;
             ctx.stroke();
           }
         }
       }
 
-      // Draw clearly visible nodes with soft purple halo glow
+      // Draw clearly visible nodes with soft low-radius glow
       for (let i = 0; i < particles.length; i++) {
         const p = particles[i];
 

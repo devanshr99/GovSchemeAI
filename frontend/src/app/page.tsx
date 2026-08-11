@@ -7,7 +7,7 @@ import { SchemeCard } from '../components/schemes/SchemeCard';
 import {
   ShieldCheck, Search, Sparkles, HelpCircle, ChevronDown, ChevronUp,
   GraduationCap, Rocket, Sprout, HeartHandshake, Briefcase, Building2,
-  ArrowRight, Bot, CheckCircle2, UserCheck, Layers, Award, Landmark, Globe
+  ArrowRight, Bot
 } from 'lucide-react';
 import { api } from '../lib/api';
 import { EligibleSchemeResult } from '../types/eligibility';
@@ -21,7 +21,7 @@ export default function Home() {
   const [openFaq, setOpenFaq] = useState<number | null>(null);
 
   useEffect(() => {
-    // Fetch live statistics and featured schemes from backend
+    // Fetch statistics and featured schemes from backend
     api.getSchemes({ pageSize: 6, activeOnly: true })
       .then(res => {
         setTotalSchemes(res.total);
@@ -62,257 +62,165 @@ export default function Home() {
       title: 'Women Welfare', 
       slug: 'women', 
       icon: HeartHandshake, 
-      desc: 'Maternity assistance, Lakhpati Didi, self-help group capital & girl child savings.' 
+      desc: 'Maternity assistance, self-help group credits, girl child education & health plans.' 
+    },
+    { 
+      title: 'Youth & Employment', 
+      slug: 'youth', 
+      icon: Briefcase, 
+      desc: 'Skill development, apprenticeship allowances, employment registration benefits.' 
     },
     { 
       title: 'MSME & Business', 
       slug: 'msme', 
-      icon: Briefcase, 
-      desc: 'PMEGP credit subsidies, ZED certification rebates, technology upgradation funds.' 
-    },
-    { 
-      title: 'Healthcare & Pension', 
-      slug: 'healthcare', 
       icon: Building2, 
-      desc: 'Ayushman Bharat cashless coverage, PM Vaya Vandana & Atal Pension Yojana.' 
+      desc: 'Micro enterprise collateral-free credit, machinery subsidy & export promotion.' 
     },
   ];
 
   const faqs = [
     {
-      q: 'How does GovSchemeAI determine my scheme eligibility?',
-      a: 'GovSchemeAI checks your demographic profile (age, state, annual income, occupation, category) against official eligibility rules indexed directly from Central and State Government notifications.'
+      q: "How does GovSchemeAI determine scheme eligibility?",
+      a: "Our engine executes direct rule validation logic matching your demographic parameters (age, income limit, gender, state residence, category, and occupation) against verified government criteria documents."
     },
     {
-      q: 'Is GovSchemeAI an official Government website?',
-      a: 'GovSchemeAI is an independent, citizen-first technology discovery platform. We aggregate and verify data from official public government portals (.gov.in and .nic.in) to help citizens navigate schemes.'
+      q: "Is GovSchemeAI an official government portal?",
+      a: "GovSchemeAI is an independent, citizen-focused discovery platform. We index centralized and state schemes and direct users directly to official portal links (.gov.in) for submission."
     },
     {
-      q: 'Are there any fees for checking scheme eligibility?',
-      a: 'No. GovSchemeAI is 100% free for all Indian citizens. We never charge any fees or request bank details.'
+      q: "Is my personal information stored or sold?",
+      a: "No. All profile inputs are processed temporarily and saved exclusively in your browser's local storage for your session convenience."
     },
     {
-      q: 'How do I apply for a scheme once matched?',
-      a: 'When you view a scheme on GovSchemeAI, we provide direct links to the official government application portal (e.g. pmkisan.gov.in, myscheme.gov.in, or scholarships.gov.in) so you can apply securely.'
+      q: "How often is scheme information updated?",
+      a: "Our staging update architecture index updates daily, tracking new circulars, budget allocations, and deadline announcements from department sources."
     }
   ];
 
+  const toggleFaq = (idx: number) => {
+    setOpenFaq(openFaq === idx ? null : idx);
+  };
+
   return (
-    <div className="space-y-20 sm:space-y-28 pb-12 relative z-10">
-
-      {/* ============================================================ */}
-      {/* HOMEPAGE HERO — EDITORIAL COMPOSITION inspired by Reference */}
-      {/* ============================================================ */}
-      <section className="relative pt-8 sm:pt-16 pb-12 overflow-hidden bg-ambient-purple">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center">
-
-            {/* LEFT SIDE — Editorial Typography & CTAs */}
-            <div className="lg:col-span-7 space-y-6 sm:space-y-8 text-left">
-              
-              {/* Eyebrow Badge */}
-              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#8B5CF6]/15 border border-[#8B5CF6]/35 text-xs font-bold tracking-wider text-[#A78BFA] uppercase shadow-[0_0_15px_rgba(139,92,246,0.2)]">
-                <ShieldCheck className="h-4 w-4 text-[#A78BFA]" />
-                <span>GOVSCHEMEAI • VERIFIED GOVERNMENT SCHEME DATA</span>
-              </div>
-
-              {/* Large Editorial Headline */}
-              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-[1.1] text-[#F8FAFC]">
-                Discover Government <br className="hidden sm:block" />
-                <span className="text-gradient-purple">Schemes.</span> <br />
-                Made Simple for India.
-              </h1>
-
-              {/* Short Concise Description */}
-              <p className="text-base sm:text-lg text-[#CBD5E1] leading-relaxed max-w-xl font-normal">
-                Find government schemes, scholarships, subsidies, and welfare benefits you may qualify for — aggregated from verified Central and State government sources.
-              </p>
-
-              {/* Action Buttons */}
-              <div className="flex flex-wrap items-center gap-4 pt-2">
-                <a
-                  href="#eligibility-form"
-                  className="px-7 py-3.5 rounded-2xl text-sm font-bold purple-glow-btn flex items-center gap-2.5 cursor-pointer"
-                >
-                  <Sparkles className="h-4 w-4" />
-                  <span>Find Eligible Schemes</span>
-                </a>
-                <Link
-                  href="/schemes"
-                  className="px-6 py-3.5 rounded-2xl text-sm font-bold bg-[#171226] hover:bg-[#1F1833] border border-[#251B3B] hover:border-[#8B5CF6]/40 text-[#F8FAFC] transition-all flex items-center gap-2 cursor-pointer"
-                >
-                  <span>Browse Schemes</span>
-                  <ArrowRight className="h-4 w-4 text-[#A78BFA]" />
-                </Link>
-              </div>
-
-              {/* Trust Subtext */}
-              <div className="flex items-center gap-6 pt-4 text-xs font-medium text-[#94A3B8] border-t border-[#251B3B]/80 max-w-lg">
-                <div className="flex items-center gap-1.5">
-                  <CheckCircle2 className="h-4 w-4 text-emerald-400" />
-                  <span>100% Free Service</span>
-                </div>
-                <div className="flex items-center gap-1.5">
-                  <CheckCircle2 className="h-4 w-4 text-[#A78BFA]" />
-                  <span>No Registration Required</span>
-                </div>
-                <div className="flex items-center gap-1.5">
-                  <CheckCircle2 className="h-4 w-4 text-[#C084FC]" />
-                  <span>Direct Official Links</span>
-                </div>
-              </div>
+    <div className="relative min-h-screen flex flex-col justify-start py-8 sm:py-12 px-4 sm:px-6 lg:px-8 space-y-16 sm:space-y-24 overflow-hidden">
+      
+      {/* HERO SECTION */}
+      <section className="mx-auto max-w-7xl w-full flex flex-col lg:flex-row gap-12 items-center justify-between relative z-10 pt-4">
+        
+        {/* Left Hero Content */}
+        <div className="flex-1 space-y-8 text-left animate-fade-in">
+          
+          <div className="space-y-5">
+            {/* Verified Badge */}
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-[#8B5CF6]/30 bg-[#8B5CF6]/10 text-xs font-semibold text-[#A855F7]">
+              <ShieldCheck className="h-4 w-4 text-[#22C55E]" />
+              <span className="tracking-wider uppercase text-[10px] font-bold">GOVSCHEMEAI • VERIFIED GOVERNMENT SCHEME DATA</span>
             </div>
 
-            {/* RIGHT SIDE — Interactive Layered Citizen Eligibility Preview Panel */}
-            <div className="lg:col-span-5 relative">
-              
-              {/* Soft purple atmospheric backdrop glow */}
-              <div className="absolute -inset-4 bg-gradient-to-tr from-[#8B5CF6]/20 via-[#C084FC]/10 to-transparent blur-3xl rounded-3xl pointer-events-none" />
+            {/* Main Headline */}
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-[1.1] text-[#F5F5F7]">
+              Find Government Schemes <br className="hidden sm:inline" />
+              <span className="text-purple-gradient">You May Be Eligible For</span>
+            </h1>
 
-              {/* Layered Floating Card Container */}
-              <div className="purple-card-interactive rounded-3xl p-6 sm:p-7 relative z-10 space-y-5">
-                
-                {/* Floating Top Badge */}
-                <div className="flex items-center justify-between border-b border-[#251B3B] pb-4">
-                  <div className="flex items-center gap-2">
-                    <div className="h-2.5 w-2.5 rounded-full bg-emerald-400 animate-pulse" />
-                    <span className="text-xs font-extrabold uppercase tracking-wider text-[#F8FAFC]">
-                      CITIZEN ELIGIBILITY ENGINE
-                    </span>
-                  </div>
-                  <span className="text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-400">
-                    98.4% MATCH ACCURACY
-                  </span>
-                </div>
-
-                {/* Profile Criteria Preview Grid */}
-                <div className="grid grid-cols-2 gap-3 text-xs">
-                  <div className="p-3 rounded-xl bg-[#120E1E] border border-[#251B3B]">
-                    <span className="text-[#94A3B8] block text-[10px] font-semibold uppercase">Citizen Age</span>
-                    <span className="text-[#F8FAFC] font-bold text-sm">25 Years</span>
-                  </div>
-                  <div className="p-3 rounded-xl bg-[#120E1E] border border-[#251B3B]">
-                    <span className="text-[#94A3B8] block text-[10px] font-semibold uppercase">State / UT</span>
-                    <span className="text-[#F8FAFC] font-bold text-sm">Uttar Pradesh</span>
-                  </div>
-                  <div className="p-3 rounded-xl bg-[#120E1E] border border-[#251B3B]">
-                    <span className="text-[#94A3B8] block text-[10px] font-semibold uppercase">Annual Income</span>
-                    <span className="text-[#F8FAFC] font-bold text-sm">₹1,20,000 / year</span>
-                  </div>
-                  <div className="p-3 rounded-xl bg-[#120E1E] border border-[#251B3B]">
-                    <span className="text-[#94A3B8] block text-[10px] font-semibold uppercase">Occupation</span>
-                    <span className="text-[#F8FAFC] font-bold text-sm">Agriculture / Student</span>
-                  </div>
-                </div>
-
-                {/* Matched Scheme Cards Result Stack */}
-                <div className="space-y-2.5 pt-2">
-                  <span className="text-[11px] font-bold uppercase tracking-wider text-[#A78BFA] block">
-                    LIVE MATCHED SCHEMES FOUND:
-                  </span>
-
-                  <div className="p-3 rounded-xl bg-[#120E1E] border border-[#8B5CF6]/40 flex items-center justify-between">
-                    <div>
-                      <h4 className="text-xs font-bold text-[#F8FAFC]">PM-KISAN Samman Nidhi</h4>
-                      <p className="text-[10px] text-[#94A3B8]">Direct Financial Aid • ₹6,000 / year</p>
-                    </div>
-                    <span className="text-[10px] font-extrabold px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
-                      ELIGIBLE
-                    </span>
-                  </div>
-
-                  <div className="p-3 rounded-xl bg-[#120E1E] border border-[#251B3B] flex items-center justify-between">
-                    <div>
-                      <h4 className="text-xs font-bold text-[#F8FAFC]">PM Vidya Lakshmi Education Loan</h4>
-                      <p className="text-[10px] text-[#94A3B8]">Education Loan Interest Subsidy</p>
-                    </div>
-                    <span className="text-[10px] font-extrabold px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
-                      ELIGIBLE
-                    </span>
-                  </div>
-                </div>
-
-                {/* Interactive Action CTA */}
-                <a
-                  href="#eligibility-form"
-                  className="w-full py-3 rounded-xl text-xs font-bold bg-[#8B5CF6]/20 hover:bg-[#8B5CF6]/30 border border-[#8B5CF6]/40 text-[#A78BFA] transition-all flex items-center justify-center gap-2 cursor-pointer mt-2"
-                >
-                  <UserCheck className="h-4 w-4" />
-                  <span>Check Your Profile Eligibility Now</span>
-                </a>
-              </div>
-            </div>
-
+            {/* Supporting Subtitle */}
+            <p className="text-sm sm:text-base text-[#A1A1AA] max-w-xl leading-relaxed">
+              Discover scholarships, financial assistance, farmer benefits, startup support and welfare schemes tailored to your exact profile.
+            </p>
           </div>
+
+          {/* Action CTAs */}
+          <div className="flex flex-wrap items-center gap-4">
+            <a
+              href="#eligibility-form"
+              className="px-6 py-3.5 bg-[#8B5CF6] hover:bg-[#7C3AED] text-white rounded-xl text-xs font-extrabold shadow-lg shadow-[#8B5CF6]/25 hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer flex items-center gap-2"
+            >
+              <Sparkles className="h-4 w-4 text-purple-200" />
+              Check My Eligibility
+            </a>
+            <Link
+              href="/schemes"
+              className="px-6 py-3.5 bg-[#101217] hover:bg-[#141720] border border-[#242832] text-[#F5F5F7] hover:text-white rounded-xl text-xs font-extrabold transition-all flex items-center gap-2"
+            >
+              <Search className="h-4 w-4 text-[#A1A1AA]" />
+              Explore All Schemes
+            </Link>
+          </div>
+
+          {/* Real Statistics Row */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2">
+            <div className="gov-card p-3.5 rounded-xl border border-[#242832]">
+              <div className="text-xl sm:text-2xl font-black text-[#F5F5F7]">
+                {totalSchemes !== null ? totalSchemes : '130+'}
+              </div>
+              <div className="text-[10px] font-semibold uppercase text-[#71717A] tracking-wider mt-0.5">Active Schemes</div>
+            </div>
+
+            <div className="gov-card p-3.5 rounded-xl border border-[#242832]">
+              <div className="text-xl sm:text-2xl font-black text-[#A855F7]">36</div>
+              <div className="text-[10px] font-semibold uppercase text-[#71717A] tracking-wider mt-0.5">States & UTs</div>
+            </div>
+
+            <div className="gov-card p-3.5 rounded-xl border border-[#242832]">
+              <div className="text-xl sm:text-2xl font-black text-[#06B6D4]">50+</div>
+              <div className="text-[10px] font-semibold uppercase text-[#71717A] tracking-wider mt-0.5">Departments</div>
+            </div>
+
+            <div className="gov-card p-3.5 rounded-xl border border-[#242832]">
+              <div className="text-xl sm:text-2xl font-black text-[#22C55E]">100%</div>
+              <div className="text-[10px] font-semibold uppercase text-[#71717A] tracking-wider mt-0.5">Verified Sources</div>
+            </div>
+          </div>
+
+        </div>
+
+        {/* Right Hero Panel: Citizen Eligibility Card */}
+        <div id="eligibility-form" className="w-full lg:max-w-lg animate-slide-up">
+          <EligibilityForm />
         </div>
       </section>
 
-      {/* ============================================================ */}
-      {/* SECTION 1: LIVE PLATFORM STATISTICS (Real DB Data) */}
-      {/* ============================================================ */}
-      <section className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
-          <div className="purple-card rounded-2xl p-6 text-center space-y-1">
-            <span className="text-3xl sm:text-4xl font-black text-gradient-purple">
-              {totalSchemes !== null ? `${totalSchemes}+` : '129+'}
-            </span>
-            <span className="text-xs font-semibold uppercase tracking-wider text-[#94A3B8] block">
-              Verified Schemes
-            </span>
+      {/* SECTOR HUBS SECTION */}
+      <section className="mx-auto max-w-7xl w-full space-y-8 relative z-10">
+        <div className="flex flex-col sm:flex-row items-start sm:items-end justify-between gap-4 border-b border-[#242832] pb-4">
+          <div>
+            <span className="text-[10px] uppercase font-extrabold tracking-wider text-[#A855F7]">Categorized Portals</span>
+            <h2 className="text-2xl sm:text-3xl font-black text-[#F5F5F7] mt-1">
+              Explore Dedicated Sector Hubs
+            </h2>
           </div>
-
-          <div className="purple-card rounded-2xl p-6 text-center space-y-1">
-            <span className="text-3xl sm:text-4xl font-black text-gradient-purple">36</span>
-            <span className="text-xs font-semibold uppercase tracking-wider text-[#94A3B8] block">
-              States & UTs Covered
-            </span>
-          </div>
-
-          <div className="purple-card rounded-2xl p-6 text-center space-y-1">
-            <span className="text-3xl sm:text-4xl font-black text-gradient-purple">9+</span>
-            <span className="text-xs font-semibold uppercase tracking-wider text-[#94A3B8] block">
-              Major Sector Hubs
-            </span>
-          </div>
-
-          <div className="purple-card rounded-2xl p-6 text-center space-y-1">
-            <span className="text-3xl sm:text-4xl font-black text-gradient-purple">100%</span>
-            <span className="text-xs font-semibold uppercase tracking-wider text-[#94A3B8] block">
-              Official Gov Sources
-            </span>
-          </div>
-        </div>
-      </section>
-
-      {/* ============================================================ */}
-      {/* SECTION 2: POPULAR SCHEME CATEGORIES */}
-      {/* ============================================================ */}
-      <section className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-8">
-        <div className="text-center space-y-2 max-w-2xl mx-auto">
-          <h2 className="text-2xl sm:text-3xl font-black text-[#F8FAFC]">Browse Popular Sectors</h2>
-          <p className="text-xs sm:text-sm text-[#94A3B8]">
-            Discover targeted government schemes tailored for specific citizen demographics and industries.
-          </p>
+          <Link
+            href="/hubs"
+            className="text-xs font-bold text-[#A855F7] hover:underline flex items-center gap-1"
+          >
+            <span>View All Hubs</span>
+            <ArrowRight className="h-3.5 w-3.5" />
+          </Link>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
           {sectorHubs.map((hub) => {
             const Icon = hub.icon;
             return (
               <Link
                 key={hub.slug}
                 href={`/hubs/${hub.slug}`}
-                className="purple-card rounded-2xl p-6 space-y-4 group hover:border-[#8B5CF6]/50 transition-all cursor-pointer"
+                className="gov-card gov-card-hover p-6 rounded-2xl flex flex-col justify-between space-y-4 group cursor-pointer"
               >
-                <div className="h-12 w-12 rounded-xl bg-[#8B5CF6]/15 border border-[#8B5CF6]/30 flex items-center justify-center text-[#A78BFA] group-hover:scale-110 transition-transform">
-                  <Icon className="h-6 w-6" />
-                </div>
-                <div className="space-y-1.5">
-                  <h3 className="text-base font-bold text-[#F8FAFC] group-hover:text-[#A78BFA] transition-colors flex items-center justify-between">
-                    <span>{hub.title}</span>
-                    <ArrowRight className="h-4 w-4 opacity-0 group-hover:opacity-100 transition-opacity" />
+                <div className="space-y-3">
+                  <div className="h-11 w-11 rounded-xl bg-[#0D0F14] border border-[#242832] flex items-center justify-center group-hover:border-[#8B5CF6]/50 transition-colors">
+                    <Icon className="h-5 w-5 text-[#A855F7]" />
+                  </div>
+                  <h3 className="text-base font-bold text-[#F5F5F7] group-hover:text-[#A855F7] transition-colors">
+                    {hub.title}
                   </h3>
-                  <p className="text-xs text-[#94A3B8] leading-relaxed">{hub.desc}</p>
+                  <p className="text-xs text-[#A1A1AA] leading-relaxed">
+                    {hub.desc}
+                  </p>
+                </div>
+                <div className="flex items-center text-xs font-bold text-[#A855F7] pt-2">
+                  <span>Explore {hub.title}</span>
+                  <ArrowRight className="h-3.5 w-3.5 ml-1 group-hover:translate-x-1 transition-transform" />
                 </div>
               </Link>
             );
@@ -320,151 +228,89 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ============================================================ */}
-      {/* SECTION 3: FEATURED GOVERNMENT SCHEMES (Real API Data) */}
-      {/* ============================================================ */}
-      <section className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-8">
-        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 border-b border-[#251B3B] pb-4">
-          <div className="space-y-1">
-            <h2 className="text-2xl sm:text-3xl font-black text-[#F8FAFC]">Featured Government Schemes</h2>
-            <p className="text-xs sm:text-sm text-[#94A3B8]">
-              Active Central and State government welfare programs available for application.
-            </p>
+      {/* FEATURED SCHEMES GRID */}
+      {featuredSchemes.length > 0 && (
+        <section className="mx-auto max-w-7xl w-full space-y-8 relative z-10">
+          <div className="flex flex-col sm:flex-row items-start sm:items-end justify-between gap-4 border-b border-[#242832] pb-4">
+            <div>
+              <span className="text-[10px] uppercase font-extrabold tracking-wider text-[#06B6D4]">Indexed Database</span>
+              <h2 className="text-2xl sm:text-3xl font-black text-[#F5F5F7] mt-1">
+                Featured Government Opportunities
+              </h2>
+            </div>
+            <Link
+              href="/schemes"
+              className="text-xs font-bold text-[#A855F7] hover:underline flex items-center gap-1"
+            >
+              <span>Browse All {totalSchemes ? `${totalSchemes}+` : ''} Schemes</span>
+              <ArrowRight className="h-3.5 w-3.5" />
+            </Link>
           </div>
-          <Link
-            href="/schemes"
-            className="text-xs font-bold text-[#A78BFA] hover:underline flex items-center gap-1 shrink-0"
-          >
-            <span>View All Schemes</span>
-            <ArrowRight className="h-4 w-4" />
-          </Link>
-        </div>
 
-        {featuredSchemes.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {featuredSchemes.map((scheme) => (
               <SchemeCard key={scheme.slug} scheme={scheme} isMatchedView={false} />
             ))}
           </div>
-        ) : (
-          <div className="purple-card rounded-2xl p-12 text-center text-xs text-[#94A3B8]">
-            Loading active government schemes...
-          </div>
-        )}
-      </section>
+        </section>
+      )}
 
-      {/* ============================================================ */}
-      {/* SECTION 4: ELIGIBILITY INTERACTIVE FORM SECTION */}
-      {/* ============================================================ */}
-      <section id="eligibility-form" className="mx-auto max-w-5xl w-full px-4 sm:px-6 lg:px-8 pt-6">
-        <div className="purple-card-interactive rounded-3xl p-6 sm:p-10 space-y-8">
-          <div className="text-center space-y-2 max-w-xl mx-auto">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#8B5CF6]/15 border border-[#8B5CF6]/30 text-xs font-bold text-[#A78BFA]">
-              <Sparkles className="h-3.5 w-3.5" />
-              <span>MULTICRITERIA BENEFIT MATCHING</span>
-            </div>
-            <h2 className="text-2xl sm:text-3xl font-black text-[#F8FAFC]">
-              Find Schemes You May Qualify For
-            </h2>
-            <p className="text-xs sm:text-sm text-[#94A3B8]">
-              Fill out your basic demographic profile below to evaluate eligibility against official Central and State government notifications.
-            </p>
-          </div>
-
-          <EligibilityForm />
-        </div>
-      </section>
-
-      {/* ============================================================ */}
-      {/* SECTION 5: HOW GOVSCHEMEAI WORKS */}
-      {/* ============================================================ */}
-      <section className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-10">
+      {/* HOW IT WORKS PROCESS GRID */}
+      <section className="mx-auto max-w-7xl w-full space-y-8 relative z-10">
         <div className="text-center space-y-2 max-w-xl mx-auto">
-          <h2 className="text-2xl sm:text-3xl font-black text-[#F8FAFC]">How GovSchemeAI Works</h2>
-          <p className="text-xs sm:text-sm text-[#94A3B8]">
-            4 simple steps to discover and apply for eligible government benefits.
+          <span className="text-[10px] uppercase font-extrabold tracking-wider text-[#A855F7]">Structured Matching Process</span>
+          <h2 className="text-2xl sm:text-3xl font-black text-[#F5F5F7]">
+            How GovSchemeAI Works
+          </h2>
+          <p className="text-xs text-[#A1A1AA]">
+            Four deterministic steps between citizen profile parameters and verified benefit disbursement.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          <div className="purple-card rounded-2xl p-6 space-y-3 relative">
-            <span className="h-8 w-8 rounded-xl bg-[#8B5CF6]/20 border border-[#8B5CF6]/40 text-[#A78BFA] font-black text-sm flex items-center justify-center">
-              01
-            </span>
-            <h3 className="text-sm font-bold text-[#F8FAFC]">Tell Us About Yourself</h3>
-            <p className="text-xs text-[#94A3B8] leading-relaxed">
-              Enter basic details like your age, state, annual income, occupation, and category.
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+          <div className="gov-card p-6 rounded-2xl border border-[#242832] space-y-3 relative">
+            <span className="text-2xl font-black text-[#8B5CF6]/30">01</span>
+            <h3 className="text-sm font-bold text-[#F5F5F7]">Input Profile Details</h3>
+            <p className="text-xs text-[#A1A1AA] leading-relaxed">
+              Enter age, annual income, occupation, category, state, and land parameters.
             </p>
           </div>
 
-          <div className="purple-card rounded-2xl p-6 space-y-3 relative">
-            <span className="h-8 w-8 rounded-xl bg-[#8B5CF6]/20 border border-[#8B5CF6]/40 text-[#A78BFA] font-black text-sm flex items-center justify-center">
-              02
-            </span>
-            <h3 className="text-sm font-bold text-[#F8FAFC]">We Check Official Rules</h3>
-            <p className="text-xs text-[#94A3B8] leading-relaxed">
-              Our rules engine evaluates your profile against indexed Ministry notifications.
+          <div className="gov-card p-6 rounded-2xl border border-[#242832] space-y-3 relative">
+            <span className="text-2xl font-black text-[#8B5CF6]/30">02</span>
+            <h3 className="text-sm font-bold text-[#F5F5F7]">Rules Engine Scanning</h3>
+            <p className="text-xs text-[#A1A1AA] leading-relaxed">
+              Deterministic rule evaluation scans official ministry criteria matrices.
             </p>
           </div>
 
-          <div className="purple-card rounded-2xl p-6 space-y-3 relative">
-            <span className="h-8 w-8 rounded-xl bg-[#8B5CF6]/20 border border-[#8B5CF6]/40 text-[#A78BFA] font-black text-sm flex items-center justify-center">
-              03
-            </span>
-            <h3 className="text-sm font-bold text-[#F8FAFC]">Find Matching Schemes</h3>
-            <p className="text-xs text-[#94A3B8] leading-relaxed">
-              Receive a sorted list of eligible schemes with match percentages and requirement breakdowns.
+          <div className="gov-card p-6 rounded-2xl border border-[#242832] space-y-3 relative">
+            <span className="text-2xl font-black text-[#8B5CF6]/30">03</span>
+            <h3 className="text-sm font-bold text-[#F5F5F7]">Match Classification</h3>
+            <p className="text-xs text-[#A1A1AA] leading-relaxed">
+              Schemes are split into Eligible, Potentially Eligible, and Not Eligible categories.
             </p>
           </div>
 
-          <div className="purple-card rounded-2xl p-6 space-y-3 relative">
-            <span className="h-8 w-8 rounded-xl bg-[#8B5CF6]/20 border border-[#8B5CF6]/40 text-[#A78BFA] font-black text-sm flex items-center justify-center">
-              04
-            </span>
-            <h3 className="text-sm font-bold text-[#F8FAFC]">Apply via Official Sources</h3>
-            <p className="text-xs text-[#94A3B8] leading-relaxed">
-              Click direct links to apply on official government portals (ending in .gov.in).
+          <div className="gov-card p-6 rounded-2xl border border-[#242832] space-y-3 relative">
+            <span className="text-2xl font-black text-[#8B5CF6]/30">04</span>
+            <h3 className="text-sm font-bold text-[#F5F5F7]">Direct Portal Submission</h3>
+            <p className="text-xs text-[#A1A1AA] leading-relaxed">
+              Follow step-by-step document guidelines and apply directly on verified government links.
             </p>
           </div>
         </div>
       </section>
 
-      {/* ============================================================ */}
-      {/* SECTION 6: GOVERNMENT SOURCE TRUST SECTION */}
-      {/* ============================================================ */}
-      <section className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="purple-card rounded-3xl p-8 sm:p-10 border border-[#251B3B] space-y-6 text-center">
-          <div className="space-y-2 max-w-xl mx-auto">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-xs font-semibold text-emerald-400">
-              <ShieldCheck className="h-4 w-4" />
-              <span>VERIFIED OFFICIAL GOVERNMENT INDEXING</span>
-            </div>
-            <h2 className="text-xl sm:text-2xl font-black text-[#F8FAFC]">
-              Directly Aggregated From Official Portals
-            </h2>
-            <p className="text-xs text-[#94A3B8] leading-relaxed">
-              GovSchemeAI indexes government notifications and scheme guidelines from verified domain sources.
-            </p>
-          </div>
-
-          <div className="flex flex-wrap items-center justify-center gap-4 text-xs font-semibold text-[#CBD5E1]">
-            <span className="px-4 py-2 rounded-xl bg-[#120E1E] border border-[#251B3B]">India.gov.in</span>
-            <span className="px-4 py-2 rounded-xl bg-[#120E1E] border border-[#251B3B]">myScheme.gov.in</span>
-            <span className="px-4 py-2 rounded-xl bg-[#120E1E] border border-[#251B3B]">MyGov.in</span>
-            <span className="px-4 py-2 rounded-xl bg-[#120E1E] border border-[#251B3B]">pib.gov.in</span>
-            <span className="px-4 py-2 rounded-xl bg-[#120E1E] border border-[#251B3B]">scholarships.gov.in</span>
-          </div>
-        </div>
-      </section>
-
-      {/* ============================================================ */}
       {/* FAQ SECTION */}
-      {/* ============================================================ */}
-      <section className="mx-auto max-w-4xl w-full px-4 sm:px-6 lg:px-8 space-y-6">
+      <section className="mx-auto max-w-3xl w-full space-y-6 relative z-10">
         <div className="text-center space-y-2">
-          <h2 className="text-2xl sm:text-3xl font-black text-[#F8FAFC]">Frequently Asked Questions</h2>
-          <p className="text-xs sm:text-sm text-[#94A3B8]">
-            Clear answers on data verification, security, and application guidance.
+          <h2 className="text-2xl sm:text-3xl font-black text-[#F5F5F7] flex items-center justify-center gap-2">
+            <HelpCircle className="h-6 w-6 text-[#A855F7]" />
+            Frequently Asked Questions
+          </h2>
+          <p className="text-xs text-[#A1A1AA]">
+            Common clarifications regarding verified scheme indexing and privacy assurances.
           </p>
         </div>
 
@@ -474,21 +320,21 @@ export default function Home() {
             return (
               <div
                 key={idx}
-                className="purple-card rounded-2xl overflow-hidden border border-[#251B3B]"
+                className="gov-card rounded-xl overflow-hidden border border-[#242832] transition-all"
               >
                 <button
-                  onClick={() => setOpenFaq(isOpen ? null : idx)}
-                  className="w-full text-left px-6 py-4 flex items-center justify-between gap-4 font-bold text-xs sm:text-sm text-[#F8FAFC] hover:text-[#A78BFA] transition-colors cursor-pointer"
+                  onClick={() => toggleFaq(idx)}
+                  className="w-full px-5 py-4 text-left flex justify-between items-center hover:bg-white/[0.02] transition-colors cursor-pointer"
                 >
-                  <span>{faq.q}</span>
+                  <span className="font-bold text-xs sm:text-sm text-[#F5F5F7]">{faq.q}</span>
                   {isOpen ? (
-                    <ChevronUp className="h-4 w-4 text-[#94A3B8] shrink-0" />
+                    <ChevronUp className="h-4 w-4 text-[#A1A1AA] shrink-0" />
                   ) : (
-                    <ChevronDown className="h-4 w-4 text-[#94A3B8] shrink-0" />
+                    <ChevronDown className="h-4 w-4 text-[#A1A1AA] shrink-0" />
                   )}
                 </button>
                 {isOpen && (
-                  <div className="px-6 pb-4 pt-1 text-xs text-[#CBD5E1] leading-relaxed border-t border-[#251B3B] bg-[#120E1E] animate-fade-in">
+                  <div className="px-5 pb-4 pt-1 text-xs text-[#A1A1AA] leading-relaxed border-t border-[#242832] bg-[#0D0F14] animate-fade-in">
                     {faq.a}
                   </div>
                 )}
@@ -498,9 +344,35 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ============================================================ */}
+      {/* BOTTOM CTA BANNER */}
+      <section className="mx-auto max-w-5xl w-full relative z-10 pt-4">
+        <div className="gov-card rounded-3xl p-8 sm:p-12 border border-[#8B5CF6]/30 text-center space-y-6 relative overflow-hidden bg-gradient-to-br from-[#101217] via-[#141720] to-[#0D0F14]">
+          <div className="space-y-2 relative z-10">
+            <h2 className="text-2xl sm:text-3xl font-black text-[#F5F5F7]">Ready to Find Your Eligible Benefits?</h2>
+            <p className="text-xs sm:text-sm text-[#A1A1AA] max-w-md mx-auto leading-relaxed">
+              Run a quick 30-second eligibility check or consult our AI Scheme Advisor for document assistance.
+            </p>
+          </div>
+          <div className="flex flex-wrap items-center justify-center gap-4 relative z-10">
+            <a
+              href="#eligibility-form"
+              className="px-6 py-3 bg-[#8B5CF6] hover:bg-[#7C3AED] text-white rounded-xl text-xs font-bold transition-all shadow-md cursor-pointer flex items-center gap-2"
+            >
+              <Sparkles className="h-4 w-4" />
+              Check Eligibility Now
+            </a>
+            <Link
+              href="/chat"
+              className="px-6 py-3 bg-[#0D0F14] hover:bg-[#101217] border border-[#242832] text-[#F5F5F7] rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-2"
+            >
+              <Bot className="h-4 w-4 text-[#A855F7]" />
+              Ask Citizen Advisor AI
+            </Link>
+          </div>
+        </div>
+      </section>
+
       {/* HOME PAGE FOOTER */}
-      {/* ============================================================ */}
       <Footer />
 
     </div>

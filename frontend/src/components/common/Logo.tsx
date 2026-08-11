@@ -31,29 +31,29 @@ export const Logo: React.FC<LogoProps> = ({
       xmlns="http://www.w3.org/2000/svg"
       aria-hidden="true"
     >
-      {/* Outer Shield & Emblem Frame */}
+      {/* Outer Shield & Government Emblem Frame */}
       <path
         d="M20 3.5L7 9.2V18.5C7 26.8 12.4 34 20 36.8C27.6 34 33 26.8 33 18.5V9.2L20 3.5Z"
         fill="url(#govPurpleGradient)"
-        stroke="#A78BFA"
+        stroke="#A855F7"
         strokeWidth="1.5"
       />
       
-      {/* Inner Document Card */}
+      {/* Document Sheet Card */}
       <rect
         x="13.5"
         y="11.5"
         width="13"
         height="16"
         rx="2"
-        fill="#0B0814"
+        fill="#08090D"
         stroke="#8B5CF6"
         strokeWidth="1.2"
       />
 
-      {/* Lines */}
-      <line x1="16.5" y1="15" x2="23.5" y2="15" stroke="#F8FAFC" strokeWidth="1.2" strokeLinecap="round" />
-      <line x1="16.5" y1="18" x2="21.5" y2="18" stroke="#CBD5E1" strokeWidth="1.2" strokeLinecap="round" />
+      {/* Document Header Line */}
+      <line x1="16.5" y1="15" x2="23.5" y2="15" stroke="#F5F5F7" strokeWidth="1.2" strokeLinecap="round" />
+      <line x1="16.5" y1="18" x2="21.5" y2="18" stroke="#A1A1AA" strokeWidth="1.2" strokeLinecap="round" />
 
       {/* Verified Scheme Checkmark */}
       <path
@@ -64,14 +64,14 @@ export const Logo: React.FC<LogoProps> = ({
         strokeLinejoin="round"
       />
 
-      {/* Top Saffron Accent */}
+      {/* Subtle Saffron/Green Top & Bottom Accents for Official India Gov identity */}
       <circle cx="20" cy="6" r="1.2" fill="#F97316" />
 
       <defs>
         <linearGradient id="govPurpleGradient" x1="20" y1="3.5" x2="20" y2="36.8" gradientUnits="userSpaceOnUse">
-          <stop stopColor="#2E1A4A" />
-          <stop offset="0.6" stopColor="#1B122E" />
-          <stop offset="1" stopColor="#0B0814" />
+          <stop stopColor="#2E1065" />
+          <stop offset="0.6" stopColor="#1E1B4B" />
+          <stop offset="1" stopColor="#0F172A" />
         </linearGradient>
       </defs>
     </svg>
@@ -85,12 +85,12 @@ export const Logo: React.FC<LogoProps> = ({
     <div className={`inline-flex items-center gap-2.5 ${className}`}>
       {Symbol}
       <div className="flex flex-col justify-center">
-        <span className={`${textSizes[size]} font-black tracking-tight flex items-baseline leading-none`}>
-          <span className="text-[#F8FAFC]">GovScheme</span>
-          <span className="text-[#A78BFA] ml-0.5">AI</span>
+        <span className={`${textSizes[size]} font-bold tracking-tight font-sans flex items-baseline leading-none`}>
+          <span className="text-[#F5F5F7] font-extrabold">GovScheme</span>
+          <span className="text-[#A855F7] font-extrabold ml-0.5">AI</span>
         </span>
         {variant === 'with-subtitle' && (
-          <span className="text-[9px] font-semibold tracking-wider text-[#94A3B8] uppercase mt-0.5">
+          <span className="text-[10px] font-medium tracking-wider text-[#71717A] uppercase mt-0.5">
             Government Scheme Discovery Platform
           </span>
         )}
