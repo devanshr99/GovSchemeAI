@@ -1,7 +1,7 @@
 import React from 'react';
 
 interface LogoProps {
-  variant?: 'full' | 'icon';
+  variant?: 'full' | 'icon' | 'with-subtitle';
   size?: 'sm' | 'md' | 'lg';
   className?: string;
 }
@@ -13,8 +13,8 @@ export const Logo: React.FC<LogoProps> = ({
 }) => {
   const iconSizes = {
     sm: 'h-7 w-7',
-    md: 'h-9 w-9',
-    lg: 'h-11 w-11',
+    md: 'h-8 sm:h-9 w-8 sm:w-9',
+    lg: 'h-10 sm:h-11 w-10 sm:w-11',
   };
 
   const textSizes = {
@@ -25,53 +25,53 @@ export const Logo: React.FC<LogoProps> = ({
 
   const Symbol = (
     <svg
-      className={`${iconSizes[size]} shrink-0 transition-transform duration-200`}
+      className={`${iconSizes[size]} shrink-0 transition-transform duration-300 group-hover:scale-105`}
       viewBox="0 0 40 40"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
       aria-hidden="true"
     >
-      {/* Handcrafted Government Emblem: File + Shield + Chakra Geometry + Welfare Checkmark */}
-      {/* Outer Shield Frame */}
+      {/* Outer Shield & Government Emblem Frame */}
       <path
-        d="M20 4L7 9.5V19C7 27.5 12.5 34.8 20 37.5C27.5 34.8 33 27.5 33 19V9.5L20 4Z"
-        fill="url(#govShieldGradient)"
-        stroke="#1D4ED8"
-        strokeWidth="1.8"
+        d="M20 3.5L7 9.2V18.5C7 26.8 12.4 34 20 36.8C27.6 34 33 26.8 33 18.5V9.2L20 3.5Z"
+        fill="url(#govPurpleGradient)"
+        stroke="#A855F7"
+        strokeWidth="1.5"
       />
-      {/* Inner Document Body */}
-      <rect
-        x="13"
-        y="12"
-        width="14"
-        height="17"
-        rx="2"
-        fill="#0F172A"
-        stroke="#FFFFFF"
-        strokeWidth="1.2"
-        opacity="0.9"
-      />
-      {/* Document Lines */}
-      <line x1="16" y1="16" x2="24" y2="16" stroke="#94A3B8" strokeWidth="1.2" strokeLinecap="round" />
-      <line x1="16" y1="19" x2="22" y2="19" stroke="#94A3B8" strokeWidth="1.2" strokeLinecap="round" />
       
-      {/* Subtle India Geometric Wheel (Chakra Motif) */}
-      <circle cx="20" cy="10.5" r="2.2" stroke="#E06D10" strokeWidth="1.2" fill="none" />
-      <circle cx="20" cy="10.5" r="0.6" fill="#E06D10" />
+      {/* Document Sheet Card */}
+      <rect
+        x="13.5"
+        y="11.5"
+        width="13"
+        height="16"
+        rx="2"
+        fill="#08090D"
+        stroke="#8B5CF6"
+        strokeWidth="1.2"
+      />
 
-      {/* Welfare Checkmark */}
+      {/* Document Header Line */}
+      <line x1="16.5" y1="15" x2="23.5" y2="15" stroke="#F5F5F7" strokeWidth="1.2" strokeLinecap="round" />
+      <line x1="16.5" y1="18" x2="21.5" y2="18" stroke="#A1A1AA" strokeWidth="1.2" strokeLinecap="round" />
+
+      {/* Verified Scheme Checkmark */}
       <path
-        d="M15 24L18.5 27.5L25 21"
-        stroke="#10B981"
-        strokeWidth="2.2"
+        d="M16 22.5L18.5 25L23.5 19.5"
+        stroke="#22C55E"
+        strokeWidth="2"
         strokeLinecap="round"
         strokeLinejoin="round"
       />
 
+      {/* Subtle Saffron/Green Top & Bottom Accents for Official India Gov identity */}
+      <circle cx="20" cy="6" r="1.2" fill="#F97316" />
+
       <defs>
-        <linearGradient id="govShieldGradient" x1="20" y1="4" x2="20" y2="37.5" gradientUnits="userSpaceOnUse">
-          <stop stopColor="#123B7A" />
-          <stop offset="1" stopColor="#0A2540" />
+        <linearGradient id="govPurpleGradient" x1="20" y1="3.5" x2="20" y2="36.8" gradientUnits="userSpaceOnUse">
+          <stop stopColor="#2E1065" />
+          <stop offset="0.6" stopColor="#1E1B4B" />
+          <stop offset="1" stopColor="#0F172A" />
         </linearGradient>
       </defs>
     </svg>
@@ -84,13 +84,19 @@ export const Logo: React.FC<LogoProps> = ({
   return (
     <div className={`inline-flex items-center gap-2.5 ${className}`}>
       {Symbol}
-      <span className={`${textSizes[size]} font-bold tracking-tight font-sans flex items-baseline`}>
-        <span className="text-slate-100 font-extrabold">GovScheme</span>
-        <span className="text-slate-400 font-semibold text-[0.85em] ml-0.5 uppercase tracking-wider">AI</span>
-      </span>
+      <div className="flex flex-col justify-center">
+        <span className={`${textSizes[size]} font-bold tracking-tight font-sans flex items-baseline leading-none`}>
+          <span className="text-[#F5F5F7] font-extrabold">GovScheme</span>
+          <span className="text-[#A855F7] font-extrabold ml-0.5">AI</span>
+        </span>
+        {variant === 'with-subtitle' && (
+          <span className="text-[10px] font-medium tracking-wider text-[#71717A] uppercase mt-0.5">
+            Government Scheme Discovery Platform
+          </span>
+        )}
+      </div>
     </div>
   );
 };
 
 export default Logo;
-

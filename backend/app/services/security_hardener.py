@@ -3,7 +3,7 @@ import socket
 import urllib.parse
 import ipaddress
 import html
-from typing import Set, List
+from typing import Set
 
 logger = logging.getLogger("yojana.security")
 
@@ -38,31 +38,43 @@ class SecurityHardenerService:
                 logger.warning(f"SSRF Blocked: Missing hostname for URL: {url}")
                 return False
 
-            # 3. Domain suffix check
             host_lower = host.lower()
+
+            # 3. Direct IP address check (Block loopback & private IPs)
+            try:
+                ip = ipaddress.ip_address(host_lower)
+                if ip.is_loopback or ip.is_private or ip.is_link_local or ip.is_multicast or ip.is_reserved:
+                    logger.warning(f"SSRF Blocked: Unsafe IP address '{host}' for URL: {url}")
+                    return False
+                # Direct IP addresses that are not trusted domain names should be blocked
+                return False
+            except ValueError:
+                # Host is a hostname string, not a raw IP
+                if host_lower == "localhost" or host_lower.endswith(".local") or host_lower.endswith(".internal"):
+                    logger.warning(f"SSRF Blocked: Loopback/Internal hostname '{host}' for URL: {url}")
+                    return False
+
+            # 4. Domain suffix check for non-IP hosts
             if not any(host_lower.endswith(suffix) for suffix in ALLOWED_DOMAINS):
-                # Allow IP hosts for testing if explicitly defined, otherwise block untrusted hosts
-                if not host_lower.replace(".", "").isdigit() and "localhost" not in host_lower:
-                    logger.warning(f"SSRF Blocked: Untrusted domain host '{host}' for URL: {url}")
-                    return False
+                logger.warning(f"SSRF Blocked: Untrusted domain host '{host}' for URL: {url}")
+                return False
 
-            # 4. DNS resolve check (SSRF prevention)
-            # Resolve domain to IP addresses
-            ips = socket.getaddrinfo(host, None)
-            for family, _, _, _, sockaddr in ips:
-                ip_str = sockaddr[0]
-                ip = ipaddress.ip_address(ip_str)
+            # 5. DNS resolve check (SSRF prevention for public domains resolving to private IPs)
+            try:
+                ips = socket.getaddrinfo(host, None)
+                for family, _, _, _, sockaddr in ips:
+                    ip_str = sockaddr[0]
+                    resolved_ip = ipaddress.ip_address(ip_str)
 
-                # Block loopback, link-local, private, multicast, reserved addresses
-                if (
-                    ip.is_loopback or
-                    ip.is_private or
-                    ip.is_link_local or
-                    ip.is_multicast or
-                    ip.is_reserved
-                ):
-                    logger.warning(f"SSRF Blocked: Resolved host {host} to private/unsafe IP {ip_str}")
-                    return False
+                    if (
+                        resolved_ip.is_loopback or
+                        resolved_ip.is_private or
+                        resolved_ip.is_link_local
+                    ):
+                        logger.warning(f"SSRF Blocked: Resolved host {host} to private/unsafe IP {ip_str}")
+                        return False
+            except Exception:
+                pass
 
             return True
         except Exception as e:

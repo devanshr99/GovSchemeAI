@@ -69,14 +69,14 @@ def test_rate_limiting_middleware():
     """Verify RateLimitMiddleware blocks spam clients with HTTP 429."""
     blocked = False
     for _ in range(105):
-        resp = client.get("/api/health")
+        resp = client.get("/api/schemes")
         if resp.status_code == 429:
             blocked = True
             break
     assert blocked is True
 
     # Clean up rate limit state to not block subsequent test suites
-    reset_resp = client.get("/api/health", headers={"x-reset-ratelimit": "true"})
+    reset_resp = client.get("/api/schemes", headers={"x-reset-ratelimit": "true"})
     assert reset_resp.status_code == 200
 
 

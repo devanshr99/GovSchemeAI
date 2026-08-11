@@ -1,12 +1,17 @@
 import { EligibilityRequest, EligibilityResponse } from '../types/eligibility';
 import { SchemeListResponse, SchemeDetail, Category } from '../types/scheme';
 
-// API calls go through Next.js rewrites (proxied to backend)
-// No need for an absolute URL — all /api/* requests are proxied automatically
-const API_BASE_URL = '';
+// Central single source of truth for API base URL
+export const getApiBaseUrl = (): string => {
+  if (process.env.NEXT_PUBLIC_API_URL) {
+    return process.env.NEXT_PUBLIC_API_URL.replace(/\/+$/, '');
+  }
+  return '';
+};
 
 async function fetchJson<T>(endpoint: string, options?: RequestInit): Promise<T> {
-  const url = `${API_BASE_URL}${endpoint}`;
+  const baseUrl = getApiBaseUrl();
+  const url = `${baseUrl}${endpoint}`;
   const response = await fetch(url, {
     ...options,
     headers: {
@@ -30,6 +35,17 @@ async function fetchJson<T>(endpoint: string, options?: RequestInit): Promise<T>
 }
 
 export const api = {
+  // Primary Health Check
+  getHealth: async (): Promise<boolean> => {
+    try {
+      const baseUrl = getApiBaseUrl();
+      const res = await fetch(`${baseUrl}/api/health`, { method: 'GET' });
+      return res.ok;
+    } catch {
+      return false;
+    }
+  },
+
   // Eligibility check
   checkEligibility: (profile: EligibilityRequest): Promise<EligibilityResponse> => {
     return fetchJson<EligibilityResponse>('/api/eligibility/check', {
@@ -78,6 +94,26 @@ export const api = {
     return fetchJson<Array<{ id: number; name: string; name_hi?: string }>>(`/api/locations/districts/${stateCode}`);
   },
 
+  // Search Autocomplete
+  getAutocomplete: (prefix: string): Promise<string[]> => {
+    return fetchJson<string[]>(`/api/search/autocomplete?prefix=${encodeURIComponent(prefix.trim())}`);
+  },
+
+  // Scheme Status Toggle (Admin)
+  toggleSchemeStatus: (id: string, is_active: boolean): Promise<any> => {
+    return fetchJson(`/api/schemes/${id}/status`, {
+      method: 'PATCH',
+      body: JSON.stringify({ is_active }),
+    });
+  },
+
+  // Delete Scheme (Admin)
+  deleteScheme: (id: string): Promise<any> => {
+    return fetchJson(`/api/schemes/${id}`, {
+      method: 'DELETE',
+    });
+  },
+
   // AI Chat
   sendChatMessage: (params: {
     message: string;
@@ -114,7 +150,8 @@ export const api = {
     onError: (err: any) => void;
   }): Promise<void> => {
     try {
-      const response = await fetch('/api/chat/stream', {
+      const baseUrl = getApiBaseUrl();
+      const response = await fetch(`${baseUrl}/api/chat/stream`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
