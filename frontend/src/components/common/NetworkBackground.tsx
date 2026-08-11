@@ -9,7 +9,7 @@ interface Particle {
   vy: number;
   radius: number;
   color: string;
-  alpha: number;
+  glowColor: string;
 }
 
 export const NetworkBackground: React.FC = () => {
@@ -31,16 +31,16 @@ export const NetworkBackground: React.FC = () => {
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
     const isMobile = width < 768;
-    // Sparse, subtle cluster density with large whitespace
-    const particleCount = isMobile ? 14 : 24;
-    const maxDistance = isMobile ? 110 : 150;
+    // Balanced network density: 40 nodes desktop, 22 mobile
+    const particleCount = isMobile ? 22 : 40;
+    const maxDistance = isMobile ? 120 : 155;
 
-    // Muted cyan/teal colors with low opacity and subtle purple accent
+    // Palette: Soft cyan, muted teal, pale cyan, and subtle violet accent
     const nodePalette = [
-      { color: 'rgb(6, 182, 212)', alpha: 0.35 },    // Soft Cyan
-      { color: 'rgb(13, 148, 136)', alpha: 0.30 },   // Muted Teal
-      { color: 'rgb(34, 211, 238)', alpha: 0.25 },   // Pale Cyan
-      { color: 'rgb(139, 92, 246)', alpha: 0.20 },   // Muted Violet Accent
+      { color: 'rgba(6, 182, 212, 0.52)', glow: 'rgba(6, 182, 212, 0.16)' },   // Soft Cyan
+      { color: 'rgba(13, 148, 136, 0.48)', glow: 'rgba(13, 148, 136, 0.14)' },  // Muted Teal
+      { color: 'rgba(34, 211, 238, 0.42)', glow: 'rgba(34, 211, 238, 0.12)' },  // Pale Cyan
+      { color: 'rgba(139, 92, 246, 0.38)', glow: 'rgba(139, 92, 246, 0.10)' },  // Subtle Violet
     ];
 
     const initParticles = () => {
@@ -50,7 +50,8 @@ export const NetworkBackground: React.FC = () => {
 
       for (let i = 0; i < particleCount; i++) {
         const palette = nodePalette[Math.floor(Math.random() * nodePalette.length)];
-        const speed = prefersReducedMotion ? 0 : 0.04 + Math.random() * 0.06;
+        // Slow graceful motion
+        const speed = prefersReducedMotion ? 0 : 0.07 + Math.random() * 0.09;
         const angle = Math.random() * Math.PI * 2;
 
         particles.push({
@@ -58,9 +59,9 @@ export const NetworkBackground: React.FC = () => {
           y: Math.random() * height,
           vx: Math.cos(angle) * speed,
           vy: Math.sin(angle) * speed,
-          radius: Math.random() * 1.2 + 1.2, // 1.2px - 2.4px small subtle nodes
+          radius: Math.random() * 1.8 + 2.0, // 2.0px - 3.8px clearly visible nodes
           color: palette.color,
-          alpha: palette.alpha,
+          glowColor: palette.glow,
         });
       }
     };
@@ -70,7 +71,7 @@ export const NetworkBackground: React.FC = () => {
     const draw = () => {
       ctx.clearRect(0, 0, width, height);
 
-      // Dark subtle gradient base
+      // Deep dark background fill
       const gradient = ctx.createLinearGradient(0, 0, 0, height);
       gradient.addColorStop(0, '#08090D');
       gradient.addColorStop(0.5, '#07080C');
@@ -78,7 +79,7 @@ export const NetworkBackground: React.FC = () => {
       ctx.fillStyle = gradient;
       ctx.fillRect(0, 0, width, height);
 
-      // Draw subtle connecting geometric lines (5% to 10% opacity max)
+      // Draw clearly visible connecting geometric lines (10% to 16% opacity)
       for (let i = 0; i < particles.length; i++) {
         for (let j = i + 1; j < particles.length; j++) {
           const dx = particles[i].x - particles[j].x;
@@ -86,19 +87,19 @@ export const NetworkBackground: React.FC = () => {
           const dist = Math.sqrt(dx * dx + dy * dy);
 
           if (dist < maxDistance) {
-            // Line opacity range 0.03 to 0.09
-            const lineAlpha = (1 - dist / maxDistance) * 0.08;
+            // Line opacity range ~0.04 to 0.15
+            const lineAlpha = (1 - dist / maxDistance) * 0.15;
             ctx.beginPath();
             ctx.moveTo(particles[i].x, particles[i].y);
             ctx.lineTo(particles[j].x, particles[j].y);
             ctx.strokeStyle = `rgba(6, 182, 212, ${lineAlpha})`;
-            ctx.lineWidth = 0.6;
+            ctx.lineWidth = 0.85;
             ctx.stroke();
           }
         }
       }
 
-      // Draw small, low-contrast nodes
+      // Draw clearly visible nodes with soft low-radius glow
       for (let i = 0; i < particles.length; i++) {
         const p = particles[i];
 
@@ -112,9 +113,16 @@ export const NetworkBackground: React.FC = () => {
           if (p.y > height + 20) p.y = -20;
         }
 
+        // Soft outer halo ring
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.radius * 2.2, 0, Math.PI * 2);
+        ctx.fillStyle = p.glowColor;
+        ctx.fill();
+
+        // Visible node core
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
-        ctx.fillStyle = p.color.replace('rgb', 'rgba').replace(')', `, ${p.alpha})`);
+        ctx.fillStyle = p.color;
         ctx.fill();
       }
 
