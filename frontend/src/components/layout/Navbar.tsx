@@ -2,16 +2,33 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useApp } from '../../context/AppContext';
-import { Globe, Search, MessageSquare, ShieldAlert, Award, Menu, X, Settings, User } from 'lucide-react';
+import { Logo } from '../common/Logo';
 import { LanguagePicker } from './LanguagePicker';
+import { 
+  ShieldAlert, 
+  Search, 
+  Bot, 
+  Grid, 
+  LayoutDashboard, 
+  UserCheck, 
+  Menu, 
+  X, 
+  Settings, 
+  Bell, 
+  Sparkles,
+  ArrowRight
+} from 'lucide-react';
 
 export const Navbar: React.FC = () => {
   const pathname = usePathname();
-  const { language, setLanguage, t } = useApp();
+  const router = useRouter();
+  const { t } = useApp();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [backendOnline, setBackendOnline] = useState<boolean | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchFocused, setSearchFocused] = useState(false);
 
   // Check backend health on mount
   useEffect(() => {
@@ -24,50 +41,52 @@ export const Navbar: React.FC = () => {
       }
     };
     checkHealth();
-    // Re-check every 60 seconds
     const interval = setInterval(checkHealth, 60_000);
     return () => clearInterval(interval);
   }, []);
 
+  const handleSearchSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      router.push(`/schemes?search=${encodeURIComponent(searchQuery.trim())}`);
+      setSearchQuery('');
+    }
+  };
+
   const navItems = [
-    { href: '/', label: t('findSchemes'), icon: ShieldAlert },
-    { href: '/schemes', label: t('browseSchemes'), icon: Search },
-    { href: '/chat', label: t('chatAssistant'), icon: MessageSquare },
-    { href: '/about-developer', label: 'About Developer', icon: User },
+    { href: '/', label: 'Home', icon: ShieldAlert },
+    { href: '/schemes', label: 'Schemes', icon: Search },
+    { href: '/eligibility', label: 'Eligibility', icon: UserCheck },
+    { href: '/chat', label: 'Advisor AI', icon: Bot },
+    { href: '/hubs', label: 'Sector Hubs', icon: Grid },
+    { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
   ];
 
   return (
-    <nav className="sticky top-0 z-50 w-full border-b border-white/[0.08] bg-[#0f172a]/60 backdrop-blur-md">
+    <header className="sticky top-0 z-50 w-full glass-header">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="flex h-16 items-center justify-between">
-          {/* Logo */}
+        <div className="flex h-16 items-center justify-between gap-4">
+          
+          {/* Brand Logo */}
           <div className="flex items-center">
-            <Link href="/" className="flex items-center gap-2 group">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-tr from-orange-500 to-blue-600 p-0.5 shadow-lg shadow-blue-500/20 group-hover:scale-105 transition-transform duration-300">
-                <div className="flex h-full w-full items-center justify-center rounded-[10px] bg-[#0f172a]">
-                  <Award className="h-5 w-5 text-orange-400 group-hover:rotate-12 transition-transform duration-300" />
-                </div>
-              </div>
-              <span className="text-xl font-bold tracking-tight">
-                <span className="text-orange-400">GovScheme</span>
-                <span className="text-blue-400 font-extrabold">AI</span>
-              </span>
+            <Link href="/" className="group flex items-center">
+              <Logo variant="with-subtitle" size="md" />
             </Link>
           </div>
 
           {/* Desktop Nav Links */}
-          <div className="hidden md:flex items-center gap-6">
+          <nav className="hidden lg:flex items-center gap-1 xl:gap-2">
             {navItems.map((item) => {
               const Icon = item.icon;
-              const isActive = pathname === item.href;
+              const isActive = pathname === item.href || (item.href !== '/' && pathname?.startsWith(item.href));
               return (
                 <Link
                   key={item.href}
                   href={item.href}
-                  className={`flex items-center gap-2 text-sm font-medium px-3 py-2 rounded-lg transition-all duration-200 ${
+                  className={`flex items-center gap-2 text-xs font-semibold px-3 py-2 rounded-lg transition-all duration-200 ${
                     isActive
-                      ? 'bg-blue-600/10 text-blue-400 border border-blue-500/20'
-                      : 'text-slate-300 hover:text-white hover:bg-white/[0.03]'
+                      ? 'bg-[#8B5CF6]/15 text-[#A855F7] border border-[#8B5CF6]/30 shadow-[0_0_12px_rgba(139,92,246,0.15)]'
+                      : 'text-[#A1A1AA] hover:text-[#F5F5F7] hover:bg-white/[0.04]'
                   }`}
                 >
                   <Icon className="h-4 w-4" />
@@ -75,104 +94,142 @@ export const Navbar: React.FC = () => {
                 </Link>
               );
             })}
-          </div>
+          </nav>
 
-          {/* Actions */}
-          <div className="flex items-center gap-3">
-            {/* Backend Health Indicator */}
+          {/* Search & Actions */}
+          <div className="flex items-center gap-2.5">
+            {/* Quick Search Input */}
+            <form onSubmit={handleSearchSubmit} className="hidden sm:relative sm:block">
+              <div className="relative">
+                <Search className={`absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 transition-colors ${
+                  searchFocused ? 'text-[#A855F7]' : 'text-[#71717A]'
+                }`} />
+                <input
+                  type="text"
+                  placeholder="Search schemes, state..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onFocus={() => setSearchFocused(true)}
+                  onBlur={() => setSearchFocused(false)}
+                  className="w-40 md:w-56 pl-8 pr-3 py-1.5 text-xs rounded-lg bg-[#0D0F14] border border-[#242832] text-[#F5F5F7] placeholder-[#71717A] focus:border-[#8B5CF6] focus:w-64 transition-all duration-200"
+                />
+              </div>
+            </form>
+
+            {/* Backend Health Dot */}
             <div
-              className="hidden sm:flex items-center gap-1.5 px-2 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider"
-              title={backendOnline === null ? 'Checking backend...' : backendOnline ? 'Backend online' : 'Backend offline — start the server on port 8000'}
+              className="hidden xl:flex items-center gap-1.5 px-2 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider bg-[#101217] border border-[#242832]"
+              title={backendOnline === null ? 'Checking backend status...' : backendOnline ? 'API Engine Online' : 'API Engine Offline'}
             >
               <div
                 className={`h-2 w-2 rounded-full ${
                   backendOnline === null
                     ? 'bg-slate-500 animate-pulse'
                     : backendOnline
-                    ? 'bg-emerald-400 shadow-[0_0_6px_rgba(52,211,153,0.6)] animate-pulse'
-                    : 'bg-red-500 shadow-[0_0_6px_rgba(239,68,68,0.6)]'
+                    ? 'bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.8)]'
+                    : 'bg-rose-500 shadow-[0_0_8px_rgba(244,63,94,0.8)]'
                 }`}
               />
-              <span className={`${backendOnline ? 'text-emerald-500' : backendOnline === false ? 'text-red-400' : 'text-slate-500'}`}>
-                {backendOnline === null ? 'Checking' : backendOnline ? 'Online' : 'Offline'}
+              <span className={backendOnline ? 'text-emerald-400' : backendOnline === false ? 'text-rose-400' : 'text-slate-500'}>
+                {backendOnline === null ? 'Engine' : backendOnline ? 'Online' : 'Offline'}
               </span>
             </div>
 
-            {/* Admin link */}
+            {/* Language Selector */}
+            <LanguagePicker />
+
+            {/* Admin trigger */}
             <Link
               href="/admin"
               className={`hidden sm:flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border text-xs font-semibold transition-all ${
                 pathname === '/admin'
-                  ? 'bg-orange-500/10 border-orange-500/20 text-orange-400'
-                  : 'border-white/[0.08] hover:border-white/20 text-slate-400 hover:text-slate-200 bg-white/[0.02] hover:bg-white/[0.06]'
+                  ? 'bg-[#8B5CF6]/20 border-[#8B5CF6]/40 text-[#A855F7]'
+                  : 'border-[#242832] text-[#A1A1AA] hover:text-[#F5F5F7] bg-[#101217] hover:bg-[#141720]'
               }`}
+              title="Admin Portal"
             >
               <Settings className="h-3.5 w-3.5" />
-              Admin
+              <span className="hidden md:inline">Admin</span>
             </Link>
 
-            {/* Language Picker Dropdown */}
-            <LanguagePicker />
-
-            {/* Mobile Menu Toggle */}
+            {/* Mobile Menu Toggle Button */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="md:hidden flex items-center justify-center h-9 w-9 rounded-lg border border-white/[0.08] hover:border-white/20 bg-white/[0.02] hover:bg-white/[0.06] transition-all cursor-pointer"
-              aria-label="Toggle menu"
+              className="lg:hidden flex items-center justify-center h-9 w-9 rounded-lg border border-[#242832] bg-[#101217] text-[#A1A1AA] hover:text-white transition-all cursor-pointer"
+              aria-label="Toggle Navigation Menu"
             >
-              {mobileMenuOpen ? (
-                <X className="h-4 w-4 text-slate-300" />
-              ) : (
-                <Menu className="h-4 w-4 text-slate-300" />
-              )}
+              {mobileMenuOpen ? <X className="h-4 w-4 text-white" /> : <Menu className="h-4 w-4" />}
             </button>
           </div>
         </div>
 
-        {/* Mobile Navigation Menu */}
+        {/* Mobile Navigation Drawer */}
         {mobileMenuOpen && (
-          <div className="md:hidden border-t border-white/[0.08] py-3 animate-slide-down">
-            <div className="space-y-1">
+          <div className="lg:hidden border-t border-[#242832] py-4 bg-[#08090D]/95 backdrop-blur-xl animate-slide-down">
+            <div className="space-y-1 px-1">
+              {/* Mobile Search Form */}
+              <form onSubmit={handleSearchSubmit} className="mb-3 px-2">
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#71717A]" />
+                  <input
+                    type="text"
+                    placeholder="Search schemes..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="w-full pl-9 pr-3 py-2 text-xs rounded-xl bg-[#0D0F14] border border-[#242832] text-[#F5F5F7]"
+                  />
+                </div>
+              </form>
+
               {navItems.map((item) => {
                 const Icon = item.icon;
-                const isActive = pathname === item.href;
+                const isActive = pathname === item.href || (item.href !== '/' && pathname?.startsWith(item.href));
                 return (
                   <Link
                     key={item.href}
                     href={item.href}
                     onClick={() => setMobileMenuOpen(false)}
-                    className={`flex items-center gap-3 text-sm font-medium px-4 py-3 rounded-xl transition-all duration-200 ${
+                    className={`flex items-center gap-3 text-sm font-semibold px-4 py-3 rounded-xl transition-all duration-200 ${
                       isActive
-                        ? 'bg-blue-600/10 text-blue-400 border border-blue-500/20'
-                        : 'text-slate-300 hover:text-white hover:bg-white/[0.03]'
+                        ? 'bg-[#8B5CF6]/20 text-[#A855F7] border border-[#8B5CF6]/30'
+                        : 'text-[#A1A1AA] hover:text-white hover:bg-white/[0.04]'
                     }`}
                   >
-                    <Icon className="h-4 w-4" />
+                    <Icon className="h-4 w-4 text-[#A855F7]" />
                     {item.label}
                   </Link>
                 );
               })}
 
-              {/* Mobile Admin Link */}
+              <Link
+                href="/about-developer"
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex items-center gap-3 text-sm font-medium px-4 py-3 rounded-xl text-[#A1A1AA] hover:text-white hover:bg-white/[0.04]"
+              >
+                Developer Info
+              </Link>
+
               <Link
                 href="/admin"
                 onClick={() => setMobileMenuOpen(false)}
-                className="flex items-center gap-3 text-sm font-medium px-4 py-3 rounded-xl text-slate-400 hover:text-white hover:bg-white/[0.03] transition-all"
+                className="flex items-center gap-3 text-sm font-medium px-4 py-3 rounded-xl text-[#A1A1AA] hover:text-white hover:bg-white/[0.04]"
               >
-                <Settings className="h-4 w-4" />
-                Admin Panel
+                <Settings className="h-4 w-4 text-amber-400" />
+                Admin Staging Portal
               </Link>
 
-              {/* Mobile Backend Status */}
-              <div className="flex items-center gap-2 px-4 py-2 text-xs text-slate-500">
-                <div className={`h-2 w-2 rounded-full ${backendOnline ? 'bg-emerald-400' : backendOnline === false ? 'bg-red-500' : 'bg-slate-600'}`} />
-                Backend: {backendOnline === null ? 'Checking...' : backendOnline ? 'Online ✓' : 'Offline — start server on :8000'}
+              <div className="pt-2 px-4 flex items-center justify-between text-xs text-[#71717A] border-t border-[#242832]/60 mt-2">
+                <span>System Status</span>
+                <span className={`font-semibold ${backendOnline ? 'text-emerald-400' : 'text-rose-400'}`}>
+                  {backendOnline ? '● Engine Active' : '○ Engine Offline'}
+                </span>
               </div>
             </div>
           </div>
         )}
       </div>
-    </nav>
+    </header>
   );
 };
+
 export default Navbar;

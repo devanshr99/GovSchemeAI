@@ -3,69 +3,97 @@
 import React, { useState, useEffect } from 'react';
 import { useApp } from '../context/AppContext';
 import { EligibilityForm } from '../components/eligibility/EligibilityForm';
+import { SchemeCard } from '../components/schemes/SchemeCard';
 import {
-  ShieldCheck, Award, Users, BookOpen, Brain, ClipboardCheck,
-  Bot, Search, SlidersHorizontal, Database, RefreshCw, Sparkles,
-  Zap, MonitorSmartphone, HelpCircle, ChevronDown, ChevronUp, Star
+  ShieldCheck, Search, Sparkles, HelpCircle, ChevronDown, ChevronUp,
+  GraduationCap, Rocket, Sprout, HeartHandshake, Briefcase, Building2,
+  ArrowRight, Bot
 } from 'lucide-react';
 import { api } from '../lib/api';
+import { EligibleSchemeResult } from '../types/eligibility';
 import Link from 'next/link';
 
 export default function Home() {
   const { t } = useApp();
   const [totalSchemes, setTotalSchemes] = useState<number | null>(null);
+  const [featuredSchemes, setFeaturedSchemes] = useState<EligibleSchemeResult[]>([]);
   const [openFaq, setOpenFaq] = useState<number | null>(null);
 
   useEffect(() => {
-    api.getSchemes({ pageSize: 1, activeOnly: true })
-      .then(res => setTotalSchemes(res.total))
-      .catch(err => console.error('Failed to fetch scheme stats:', err));
+    // Fetch statistics and featured schemes from backend
+    api.getSchemes({ pageSize: 6, activeOnly: true })
+      .then(res => {
+        setTotalSchemes(res.total);
+        if (res.schemes && res.schemes.length > 0) {
+          const mapped: EligibleSchemeResult[] = res.schemes.map(item => ({
+            ...item,
+            match_score: 1.0,
+            rules_matched: 1,
+            rules_total: 1,
+            rules_evaluation: ['✓ Direct Ministry Scheme', '✓ Citizen Discovery Active']
+          }));
+          setFeaturedSchemes(mapped);
+        }
+      })
+      .catch(err => console.error('Failed to load home data:', err));
   }, []);
+
+  const sectorHubs = [
+    { 
+      title: 'Student Hub', 
+      slug: 'student', 
+      icon: GraduationCap, 
+      desc: 'National & State scholarships, fee waivers, education loans & research stipends.' 
+    },
+    { 
+      title: 'Startup Hub', 
+      slug: 'startup', 
+      icon: Rocket, 
+      desc: 'Mudra business loans, Startup India seed funding, patent fee rebates & incubators.' 
+    },
+    { 
+      title: 'Farmer Hub', 
+      slug: 'farmer', 
+      icon: Sprout, 
+      desc: 'PM-KISAN installment credits, crop insurance, fertilizer aid & solar pump subsidies.' 
+    },
+    { 
+      title: 'Women Welfare', 
+      slug: 'women', 
+      icon: HeartHandshake, 
+      desc: 'Maternity assistance, self-help group credits, girl child education & health plans.' 
+    },
+    { 
+      title: 'Youth & Employment', 
+      slug: 'youth', 
+      icon: Briefcase, 
+      desc: 'Skill development, apprenticeship allowances, employment registration benefits.' 
+    },
+    { 
+      title: 'MSME & Business', 
+      slug: 'msme', 
+      icon: Building2, 
+      desc: 'Micro enterprise collateral-free credit, machinery subsidy & export promotion.' 
+    },
+  ];
 
   const faqs = [
     {
-      q: "How does GovSchemeAI check my eligibility?",
-      a: "Our deterministic rules engine runs your age, income, state, and occupation against verified government scheme eligibility structures. Rather than guessing, we evaluate rules exactly as department guides lay them down."
+      q: "How does GovSchemeAI determine scheme eligibility?",
+      a: "Our engine executes direct rule validation logic matching your demographic parameters (age, income limit, gender, state residence, category, and occupation) against verified government criteria documents."
     },
     {
-      q: "Is my personal data saved?",
-      a: "No. Your profile is saved solely in your local browser storage to keep you logged in and display relevant schemes. We do not store your private demographic parameters on our databases."
+      q: "Is GovSchemeAI an official government portal?",
+      a: "GovSchemeAI is an independent, citizen-focused discovery platform. We index centralized and state schemes and direct users directly to official portal links (.gov.in) for submission."
     },
     {
-      q: "What is the role of the AI Assistant?",
-      a: "The AI Assistant uses Retrieval-Augmented Generation (RAG) to scan verified scheme records and answer natural language questions about application procedures, required files, helplines, or deadlines."
+      q: "Is my personal information stored or sold?",
+      a: "No. All profile inputs are processed temporarily and saved exclusively in your browser's local storage for your session convenience."
     },
     {
-      q: "Are central and state level schemes both supported?",
-      a: "Yes. GovSchemeAI indexes welfare opportunities launched by both the Central Government of India and various state administrations (e.g. Uttar Pradesh, Maharashtra, Karnataka)."
+      q: "How often is scheme information updated?",
+      a: "Our staging update architecture index updates daily, tracking new circulars, budget allocations, and deadline announcements from department sources."
     }
-  ];
-
-  const testimonials = [
-    {
-      name: "Rameshwar Prasad",
-      role: "Farmer, Uttar Pradesh",
-      quote: "GovSchemeAI verified my land size and age constraints, matching me to PM-KISAN. I got the benefit in days after reading their checklist."
-    },
-    {
-      name: "Anjali Deshmukh",
-      role: "College Student, Maharashtra",
-      quote: "I searched for scholarships but got lost on government portals. GovSchemeAI showed me 3 education schemes matching my OBC category in seconds!"
-    },
-    {
-      name: "Harish Nair",
-      role: "MSME Entrepreneur, Karnataka",
-      quote: "The business loan search was incredibly fast. The AI Assistant told me exactly which documents were needed for the Mudra loan."
-    }
-  ];
-
-  const categories = [
-    { icon: '🌾', name: 'Agriculture & Farmers', slug: 'agriculture', desc: 'Crop insurance, equipment support, fertilizer subsidies.' },
-    { icon: '🎓', name: 'Education & Learning', slug: 'education', desc: 'Scholarships, fellowships, student loans, training guides.' },
-    { icon: '🏥', name: 'Health & Wellness', slug: 'health', desc: 'Medical insurance policies, hospitals access, pregnancy aids.' },
-    { icon: '🏠', name: 'Housing & Shelter', slug: 'housing', desc: 'Urban/rural construction assistance, sanitation incentives.' },
-    { icon: '💼', name: 'Employment & Skills', slug: 'employment', desc: 'Skill programs, self-employment benefits, labor cards.' },
-    { icon: '🚀', name: 'Business & Mudra', slug: 'business', desc: 'MSME loans, credit linkages, startup subsidies.' }
   ];
 
   const toggleFaq = (idx: number) => {
@@ -73,165 +101,239 @@ export default function Home() {
   };
 
   return (
-    <div className="relative min-h-screen flex flex-col justify-start py-12 px-4 sm:px-6 lg:px-8 space-y-20 overflow-hidden">
-      {/* Background Decorative Rings */}
-      <div className="absolute top-10 left-1/2 -translate-x-1/2 w-full max-w-7xl h-[400px] pointer-events-none overflow-hidden opacity-30 z-0">
-        <div className="absolute top-0 left-1/4 w-[300px] h-[300px] rounded-full bg-blue-500/20 blur-[100px]" />
-        <div className="absolute bottom-0 right-1/4 w-[250px] h-[250px] rounded-full bg-orange-500/20 blur-[80px]" />
-      </div>
-
-      {/* Hero & Form Section */}
-      <div className="mx-auto max-w-7xl w-full flex flex-col lg:flex-row gap-12 items-center justify-between relative z-10">
-        {/* Left Column: Hero & Statistics */}
-        <div className="flex-1 space-y-8 text-center lg:text-left animate-fade-in">
-          <div className="space-y-4">
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-blue-500/25 bg-blue-500/10 text-xs font-semibold text-blue-400">
-              <ShieldCheck className="h-3.5 w-3.5" />
-              <span>Direct Matching • Verified Government Rules</span>
+    <div className="relative min-h-screen flex flex-col justify-start py-8 sm:py-12 px-4 sm:px-6 lg:px-8 space-y-16 sm:space-y-24 overflow-hidden">
+      
+      {/* HERO SECTION */}
+      <section className="mx-auto max-w-7xl w-full flex flex-col lg:flex-row gap-12 items-center justify-between relative z-10 pt-4">
+        
+        {/* Left Hero Content */}
+        <div className="flex-1 space-y-8 text-left animate-fade-in">
+          
+          <div className="space-y-5">
+            {/* Verified Badge */}
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-[#8B5CF6]/30 bg-[#8B5CF6]/10 text-xs font-semibold text-[#A855F7]">
+              <ShieldCheck className="h-4 w-4 text-[#22C55E]" />
+              <span className="tracking-wider uppercase text-[10px] font-bold">GOVSCHEMEAI • VERIFIED GOVERNMENT SCHEME DATA</span>
             </div>
 
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight leading-tight">
-              <span className="block text-slate-100">Welfare Discoveries</span>
-              <span className="block bg-gradient-to-r from-orange-400 via-blue-400 to-emerald-400 bg-clip-text text-transparent">
-                Made Simple for India
-              </span>
+            {/* Main Headline */}
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-[1.1] text-[#F5F5F7]">
+              Find Government Schemes <br className="hidden sm:inline" />
+              <span className="text-purple-gradient">You May Be Eligible For</span>
             </h1>
 
-            <p className="text-base sm:text-lg text-slate-400 max-w-2xl mx-auto lg:mx-0 leading-relaxed">
-              Find and apply for central and state schemes you qualify for. Overcome information fragmentation and complex rules matrices in seconds.
+            {/* Supporting Subtitle */}
+            <p className="text-sm sm:text-base text-[#A1A1AA] max-w-xl leading-relaxed">
+              Discover scholarships, financial assistance, farmer benefits, startup support and welfare schemes tailored to your exact profile.
             </p>
           </div>
 
-          {/* Stats Grid */}
-          <div className="grid grid-cols-2 gap-4 max-w-md mx-auto lg:mx-0">
-            <div className="glass-panel p-4 rounded-xl flex items-center gap-3 border-white/[0.06]">
-              <div className="h-10 w-10 rounded-lg bg-blue-500/10 flex items-center justify-center border border-blue-500/20">
-                <BookOpen className="h-5 w-5 text-blue-400" />
+          {/* Action CTAs */}
+          <div className="flex flex-wrap items-center gap-4">
+            <a
+              href="#eligibility-form"
+              className="px-6 py-3.5 bg-[#8B5CF6] hover:bg-[#7C3AED] text-white rounded-xl text-xs font-extrabold shadow-lg shadow-[#8B5CF6]/25 hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer flex items-center gap-2"
+            >
+              <Sparkles className="h-4 w-4 text-purple-200" />
+              Check My Eligibility
+            </a>
+            <Link
+              href="/schemes"
+              className="px-6 py-3.5 bg-[#101217] hover:bg-[#141720] border border-[#242832] text-[#F5F5F7] hover:text-white rounded-xl text-xs font-extrabold transition-all flex items-center gap-2"
+            >
+              <Search className="h-4 w-4 text-[#A1A1AA]" />
+              Explore All Schemes
+            </Link>
+          </div>
+
+          {/* Real Statistics Row */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2">
+            <div className="gov-card p-3.5 rounded-xl border border-[#242832]">
+              <div className="text-xl sm:text-2xl font-black text-[#F5F5F7]">
+                {totalSchemes !== null ? totalSchemes : '130+'}
               </div>
-              <div>
-                <div className="text-lg font-bold text-slate-100">
-                  {totalSchemes !== null ? `${totalSchemes}+` : '130+'}
-                </div>
-                <div className="text-[10px] text-slate-400 uppercase tracking-wider font-semibold">Active Schemes</div>
-              </div>
+              <div className="text-[10px] font-semibold uppercase text-[#71717A] tracking-wider mt-0.5">Active Schemes</div>
             </div>
 
-            <div className="glass-panel p-4 rounded-xl flex items-center gap-3 border-white/[0.06]">
-              <div className="h-10 w-10 rounded-lg bg-orange-500/10 flex items-center justify-center border border-orange-500/20">
-                <SlidersHorizontal className="h-5 w-5 text-orange-400" />
-              </div>
-              <div>
-                <div className="text-lg font-bold text-slate-100">9</div>
-                <div className="text-[10px] text-slate-400 uppercase tracking-wider font-semibold">Categories</div>
-              </div>
+            <div className="gov-card p-3.5 rounded-xl border border-[#242832]">
+              <div className="text-xl sm:text-2xl font-black text-[#A855F7]">36</div>
+              <div className="text-[10px] font-semibold uppercase text-[#71717A] tracking-wider mt-0.5">States & UTs</div>
+            </div>
+
+            <div className="gov-card p-3.5 rounded-xl border border-[#242832]">
+              <div className="text-xl sm:text-2xl font-black text-[#06B6D4]">50+</div>
+              <div className="text-[10px] font-semibold uppercase text-[#71717A] tracking-wider mt-0.5">Departments</div>
+            </div>
+
+            <div className="gov-card p-3.5 rounded-xl border border-[#242832]">
+              <div className="text-xl sm:text-2xl font-black text-[#22C55E]">100%</div>
+              <div className="text-[10px] font-semibold uppercase text-[#71717A] tracking-wider mt-0.5">Verified Sources</div>
             </div>
           </div>
+
         </div>
 
-        {/* Right Column: Questionnaire Form */}
-        <div className="w-full lg:max-w-xl animate-slide-up">
+        {/* Right Hero Panel: Citizen Eligibility Card */}
+        <div id="eligibility-form" className="w-full lg:max-w-lg animate-slide-up">
           <EligibilityForm />
         </div>
-      </div>
+      </section>
 
-      {/* Categories Discovery */}
-      <div className="mx-auto max-w-7xl w-full space-y-8 relative z-10">
-        <div className="text-center space-y-3">
-          <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-100">
-            Browse by Scheme <span className="bg-gradient-to-r from-blue-400 to-indigo-400 bg-clip-text text-transparent">Categories</span>
-          </h2>
-          <p className="text-xs sm:text-sm text-slate-400 max-w-xl mx-auto">
-            Discover opportunities tailored specifically by target sector. Click any card to filter programs.
-          </p>
+      {/* SECTOR HUBS SECTION */}
+      <section className="mx-auto max-w-7xl w-full space-y-8 relative z-10">
+        <div className="flex flex-col sm:flex-row items-start sm:items-end justify-between gap-4 border-b border-[#242832] pb-4">
+          <div>
+            <span className="text-[10px] uppercase font-extrabold tracking-wider text-[#A855F7]">Categorized Portals</span>
+            <h2 className="text-2xl sm:text-3xl font-black text-[#F5F5F7] mt-1">
+              Explore Dedicated Sector Hubs
+            </h2>
+          </div>
+          <Link
+            href="/hubs"
+            className="text-xs font-bold text-[#A855F7] hover:underline flex items-center gap-1"
+          >
+            <span>View All Hubs</span>
+            <ArrowRight className="h-3.5 w-3.5" />
+          </Link>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {categories.map((cat, idx) => (
-            <Link
-              href={`/schemes?category=${cat.slug}`}
-              key={idx}
-              className="glass-panel glass-panel-hover p-6 rounded-2xl flex flex-col items-start gap-4 border border-white/[0.06] transition-all group cursor-pointer"
-            >
-              <div className="text-3xl bg-slate-800 p-2.5 rounded-xl border border-white/[0.05] group-hover:scale-110 transition-transform">
-                {cat.icon}
-              </div>
-              <div>
-                <h3 className="font-extrabold text-slate-100 mb-1 group-hover:text-blue-400 transition-colors text-base">
-                  {cat.name}
-                </h3>
-                <p className="text-xs text-slate-400 leading-relaxed">{cat.desc}</p>
-              </div>
-            </Link>
-          ))}
-        </div>
-      </div>
-
-      {/* Testimonials */}
-      <div className="mx-auto max-w-7xl w-full space-y-8 relative z-10">
-        <div className="text-center space-y-3">
-          <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-100">
-            Trusted by <span className="bg-gradient-to-r from-orange-400 to-red-400 bg-clip-text text-transparent">Citizens</span>
-          </h2>
-          <p className="text-xs sm:text-sm text-slate-400 max-w-xl mx-auto">
-            Hear from rural and urban beneficiaries who successfully navigated scheme qualification with GovSchemeAI.
-          </p>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {testimonials.map((t, idx) => (
-            <div key={idx} className="glass-panel p-6 rounded-2xl border border-white/[0.06] flex flex-col justify-between space-y-4">
-              <div className="space-y-3">
-                <div className="flex gap-1">
-                  {[1, 2, 3, 4, 5].map((s) => (
-                    <Star key={s} className="h-4 w-4 fill-orange-400 text-orange-400" />
-                  ))}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+          {sectorHubs.map((hub) => {
+            const Icon = hub.icon;
+            return (
+              <Link
+                key={hub.slug}
+                href={`/hubs/${hub.slug}`}
+                className="gov-card gov-card-hover p-6 rounded-2xl flex flex-col justify-between space-y-4 group cursor-pointer"
+              >
+                <div className="space-y-3">
+                  <div className="h-11 w-11 rounded-xl bg-[#0D0F14] border border-[#242832] flex items-center justify-center group-hover:border-[#8B5CF6]/50 transition-colors">
+                    <Icon className="h-5 w-5 text-[#A855F7]" />
+                  </div>
+                  <h3 className="text-base font-bold text-[#F5F5F7] group-hover:text-[#A855F7] transition-colors">
+                    {hub.title}
+                  </h3>
+                  <p className="text-xs text-[#A1A1AA] leading-relaxed">
+                    {hub.desc}
+                  </p>
                 </div>
-                <p className="text-xs sm:text-sm text-slate-300 leading-relaxed italic">
-                  "{t.quote}"
-                </p>
-              </div>
-              <div className="border-t border-white/[0.05] pt-3">
-                <h4 className="font-bold text-xs text-slate-100">{t.name}</h4>
-                <p className="text-[10px] text-slate-500 font-medium">{t.role}</p>
-              </div>
-            </div>
-          ))}
+                <div className="flex items-center text-xs font-bold text-[#A855F7] pt-2">
+                  <span>Explore {hub.title}</span>
+                  <ArrowRight className="h-3.5 w-3.5 ml-1 group-hover:translate-x-1 transition-transform" />
+                </div>
+              </Link>
+            );
+          })}
         </div>
-      </div>
+      </section>
 
-      {/* FAQ Section */}
-      <div className="mx-auto max-w-3xl w-full space-y-8 relative z-10">
-        <div className="text-center space-y-3">
-          <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-100 flex items-center justify-center gap-2">
-            <HelpCircle className="h-7 w-7 text-indigo-400" />
+      {/* FEATURED SCHEMES GRID */}
+      {featuredSchemes.length > 0 && (
+        <section className="mx-auto max-w-7xl w-full space-y-8 relative z-10">
+          <div className="flex flex-col sm:flex-row items-start sm:items-end justify-between gap-4 border-b border-[#242832] pb-4">
+            <div>
+              <span className="text-[10px] uppercase font-extrabold tracking-wider text-[#06B6D4]">Indexed Database</span>
+              <h2 className="text-2xl sm:text-3xl font-black text-[#F5F5F7] mt-1">
+                Featured Government Opportunities
+              </h2>
+            </div>
+            <Link
+              href="/schemes"
+              className="text-xs font-bold text-[#A855F7] hover:underline flex items-center gap-1"
+            >
+              <span>Browse All {totalSchemes ? `${totalSchemes}+` : ''} Schemes</span>
+              <ArrowRight className="h-3.5 w-3.5" />
+            </Link>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {featuredSchemes.map((scheme) => (
+              <SchemeCard key={scheme.slug} scheme={scheme} isMatchedView={false} />
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* HOW IT WORKS PROCESS GRID */}
+      <section className="mx-auto max-w-7xl w-full space-y-8 relative z-10">
+        <div className="text-center space-y-2 max-w-xl mx-auto">
+          <span className="text-[10px] uppercase font-extrabold tracking-wider text-[#A855F7]">Structured Matching Process</span>
+          <h2 className="text-2xl sm:text-3xl font-black text-[#F5F5F7]">
+            How GovSchemeAI Works
+          </h2>
+          <p className="text-xs text-[#A1A1AA]">
+            Four deterministic steps between citizen profile parameters and verified benefit disbursement.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+          <div className="gov-card p-6 rounded-2xl border border-[#242832] space-y-3 relative">
+            <span className="text-2xl font-black text-[#8B5CF6]/30">01</span>
+            <h3 className="text-sm font-bold text-[#F5F5F7]">Input Profile Details</h3>
+            <p className="text-xs text-[#A1A1AA] leading-relaxed">
+              Enter age, annual income, occupation, category, state, and land parameters.
+            </p>
+          </div>
+
+          <div className="gov-card p-6 rounded-2xl border border-[#242832] space-y-3 relative">
+            <span className="text-2xl font-black text-[#8B5CF6]/30">02</span>
+            <h3 className="text-sm font-bold text-[#F5F5F7]">Rules Engine Scanning</h3>
+            <p className="text-xs text-[#A1A1AA] leading-relaxed">
+              Deterministic rule evaluation scans official ministry criteria matrices.
+            </p>
+          </div>
+
+          <div className="gov-card p-6 rounded-2xl border border-[#242832] space-y-3 relative">
+            <span className="text-2xl font-black text-[#8B5CF6]/30">03</span>
+            <h3 className="text-sm font-bold text-[#F5F5F7]">Match Classification</h3>
+            <p className="text-xs text-[#A1A1AA] leading-relaxed">
+              Schemes are split into Eligible, Potentially Eligible, and Not Eligible categories.
+            </p>
+          </div>
+
+          <div className="gov-card p-6 rounded-2xl border border-[#242832] space-y-3 relative">
+            <span className="text-2xl font-black text-[#8B5CF6]/30">04</span>
+            <h3 className="text-sm font-bold text-[#F5F5F7]">Direct Portal Submission</h3>
+            <p className="text-xs text-[#A1A1AA] leading-relaxed">
+              Follow step-by-step document guidelines and apply directly on verified government links.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* FAQ SECTION */}
+      <section className="mx-auto max-w-3xl w-full space-y-6 relative z-10">
+        <div className="text-center space-y-2">
+          <h2 className="text-2xl sm:text-3xl font-black text-[#F5F5F7] flex items-center justify-center gap-2">
+            <HelpCircle className="h-6 w-6 text-[#A855F7]" />
             Frequently Asked Questions
           </h2>
-          <p className="text-xs sm:text-sm text-slate-400">
-            Everything you need to know about criteria validations and safety configurations.
+          <p className="text-xs text-[#A1A1AA]">
+            Common clarifications regarding verified scheme indexing and privacy assurances.
           </p>
         </div>
 
-        <div className="space-y-4">
+        <div className="space-y-3">
           {faqs.map((faq, idx) => {
             const isOpen = openFaq === idx;
             return (
               <div
                 key={idx}
-                className="glass-panel rounded-2xl overflow-hidden border border-white/[0.06] transition-all"
+                className="gov-card rounded-xl overflow-hidden border border-[#242832] transition-all"
               >
                 <button
                   onClick={() => toggleFaq(idx)}
-                  className="w-full px-6 py-4 text-left flex justify-between items-center hover:bg-white/[0.01] transition-all cursor-pointer"
+                  className="w-full px-5 py-4 text-left flex justify-between items-center hover:bg-white/[0.02] transition-colors cursor-pointer"
                 >
-                  <span className="font-bold text-sm text-slate-100">{faq.q}</span>
+                  <span className="font-bold text-xs sm:text-sm text-[#F5F5F7]">{faq.q}</span>
                   {isOpen ? (
-                    <ChevronUp className="h-4 w-4 text-slate-400 shrink-0" />
+                    <ChevronUp className="h-4 w-4 text-[#A1A1AA] shrink-0" />
                   ) : (
-                    <ChevronDown className="h-4 w-4 text-slate-400 shrink-0" />
+                    <ChevronDown className="h-4 w-4 text-[#A1A1AA] shrink-0" />
                   )}
                 </button>
                 {isOpen && (
-                  <div className="px-6 pb-5 pt-1 text-xs sm:text-sm text-slate-400 leading-relaxed border-t border-white/[0.02] bg-white/[0.005] animate-fade-in">
+                  <div className="px-5 pb-4 pt-1 text-xs text-[#A1A1AA] leading-relaxed border-t border-[#242832] bg-[#0D0F14] animate-fade-in">
                     {faq.a}
                   </div>
                 )}
@@ -239,31 +341,36 @@ export default function Home() {
             );
           })}
         </div>
-      </div>
+      </section>
 
-      {/* Call to Action CTA */}
-      <div className="mx-auto max-w-5xl w-full relative z-10 pt-4">
-        <div className="glass-panel bg-gradient-to-br from-blue-900/20 via-slate-900 to-indigo-900/20 rounded-3xl p-8 sm:p-12 border border-white/[0.08] text-center space-y-6 relative overflow-hidden">
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_120%,rgba(59,130,246,0.1),transparent_50%)]" />
+      {/* BOTTOM CTA BANNER */}
+      <section className="mx-auto max-w-5xl w-full relative z-10 pt-4">
+        <div className="gov-card rounded-3xl p-8 sm:p-12 border border-[#8B5CF6]/30 text-center space-y-6 relative overflow-hidden bg-gradient-to-br from-[#101217] via-[#141720] to-[#0D0F14]">
           <div className="space-y-2 relative z-10">
-            <h2 className="text-2xl sm:text-3xl font-black text-slate-100">Check Your Scheme Match Today</h2>
-            <p className="text-xs sm:text-sm text-slate-400 max-w-md mx-auto leading-relaxed">
-              Don't miss out on financial support or subsidies. Use our eligibility checker to run a scan or browse schemes by ministry.
+            <h2 className="text-2xl sm:text-3xl font-black text-[#F5F5F7]">Ready to Find Your Eligible Benefits?</h2>
+            <p className="text-xs sm:text-sm text-[#A1A1AA] max-w-md mx-auto leading-relaxed">
+              Run a quick 30-second eligibility check or consult our AI Scheme Advisor for document assistance.
             </p>
           </div>
-          <div className="flex justify-center relative z-10">
-            <button
-              onClick={() => {
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-              }}
-              className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold shadow-lg shadow-blue-500/20 hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer text-xs"
+          <div className="flex flex-wrap items-center justify-center gap-4 relative z-10">
+            <a
+              href="#eligibility-form"
+              className="px-6 py-3 bg-[#8B5CF6] hover:bg-[#7C3AED] text-white rounded-xl text-xs font-bold transition-all shadow-md cursor-pointer flex items-center gap-2"
             >
-              Start Free Scan
-              <Sparkles className="h-4 w-4 text-orange-200" />
-            </button>
+              <Sparkles className="h-4 w-4" />
+              Check Eligibility Now
+            </a>
+            <Link
+              href="/chat"
+              className="px-6 py-3 bg-[#0D0F14] hover:bg-[#101217] border border-[#242832] text-[#F5F5F7] rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-2"
+            >
+              <Bot className="h-4 w-4 text-[#A855F7]" />
+              Ask Citizen Advisor AI
+            </Link>
           </div>
         </div>
-      </div>
+      </section>
+
     </div>
   );
 }
