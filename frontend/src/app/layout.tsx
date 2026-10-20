@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { AppProvider } from '../context/AppContext';
 import { Navbar } from '../components/layout/Navbar';
+import { Footer } from '../components/layout/Footer';
 import { NetworkBackground } from '../components/common/NetworkBackground';
 import './globals.css';
 
@@ -27,9 +28,10 @@ export default function RootLayout({
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+Devanagari:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+        {/* eslint-disable-next-line @next/next/no-page-custom-font */}
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@500;600;700;800;900&family=Noto+Sans+Devanagari:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
       </head>
-      <body className="min-h-full flex flex-col antialiased bg-[#08090D] text-[#F5F5F7] selection:bg-purple-600/40 selection:text-purple-100 relative overflow-x-hidden">
+      <body className="min-h-full flex flex-col antialiased bg-[#090A0F] text-[#F8FAFC] selection:bg-purple-600/40 selection:text-purple-100 relative overflow-x-hidden">
         <AppProvider>
           {/* Subtle Constellation Network Background */}
           <NetworkBackground />
@@ -40,6 +42,7 @@ export default function RootLayout({
             <main className="flex-1 flex flex-col justify-start">
               {children}
             </main>
+            <Footer />
           </div>
         </AppProvider>
       </body>

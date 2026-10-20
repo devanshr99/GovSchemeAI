@@ -100,7 +100,7 @@ export const api = {
   },
 
   // Scheme Status Toggle (Admin)
-  toggleSchemeStatus: (id: string, is_active: boolean): Promise<any> => {
+  toggleSchemeStatus: (id: string, is_active: boolean): Promise<Record<string, unknown>> => {
     return fetchJson(`/api/schemes/${id}/status`, {
       method: 'PATCH',
       body: JSON.stringify({ is_active }),
@@ -108,7 +108,7 @@ export const api = {
   },
 
   // Delete Scheme (Admin)
-  deleteScheme: (id: string): Promise<any> => {
+  deleteScheme: (id: string): Promise<Record<string, unknown>> => {
     return fetchJson(`/api/schemes/${id}`, {
       method: 'DELETE',
     });
@@ -147,7 +147,7 @@ export const api = {
     language: 'en' | 'hi';
     onChunk: (text: string) => void;
     onDone: (data: { session_id: string }) => void;
-    onError: (err: any) => void;
+    onError: (err: unknown) => void;
   }): Promise<void> => {
     try {
       const baseUrl = getApiBaseUrl();
@@ -252,26 +252,26 @@ export const api = {
     return fetchJson('/api/admin/updates/runs/trigger', { method: 'POST' });
   },
 
-  getUpdateRuns: (): Promise<any[]> => {
+  getUpdateRuns: (): Promise<Array<Record<string, unknown>>> => {
     return fetchJson('/api/admin/updates/runs');
   },
 
-  getStagedEntries: (status: string = 'pending'): Promise<any[]> => {
+  getStagedEntries: (status: string = 'pending'): Promise<Array<Record<string, unknown>>> => {
     return fetchJson(`/api/admin/updates/staging?status=${status}`);
   },
 
-  getStagedEntryDetail: (id: string): Promise<any> => {
+  getStagedEntryDetail: (id: string): Promise<Record<string, unknown>> => {
     return fetchJson(`/api/admin/updates/staging/${id}`);
   },
 
-  approveStagedEntry: (id: string, notes?: string): Promise<any> => {
+  approveStagedEntry: (id: string, notes?: string): Promise<Record<string, unknown>> => {
     return fetchJson(`/api/admin/updates/staging/${id}/approve`, {
       method: 'POST',
       body: JSON.stringify({ notes }),
     });
   },
 
-  rejectStagedEntry: (id: string, notes?: string): Promise<any> => {
+  rejectStagedEntry: (id: string, notes?: string): Promise<Record<string, unknown>> => {
     return fetchJson(`/api/admin/updates/staging/${id}/reject`, {
       method: 'POST',
       body: JSON.stringify({ notes }),

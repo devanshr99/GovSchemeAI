@@ -1,9 +1,9 @@
 'use client';
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import { api } from '../../lib/api';
-import { SchemeCard, Category } from '../../types/scheme';
-import { Plus, Settings, BarChart2, Eye, Trash2, AlertCircle, CheckCircle2, Loader2 } from 'lucide-react';
+import { SchemeCard } from '../../types/scheme';
+import { Plus, Settings, BarChart2, Eye, Trash2, AlertCircle, CheckCircle2, Loader2, Database } from 'lucide-react';
 import Link from 'next/link';
 
 interface ActionFeedback {
@@ -13,7 +13,6 @@ interface ActionFeedback {
 
 export default function AdminPanel() {
   const [schemes, setSchemes] = useState<SchemeCard[]>([]);
-  const [categories, setCategories] = useState<Category[]>([]);
   const [total, setTotal] = useState<number>(0);
   const [loading, setLoading] = useState<boolean>(true);
   const [feedback, setFeedback] = useState<ActionFeedback | null>(null);
@@ -28,28 +27,30 @@ export default function AdminPanel() {
     setTimeout(() => setFeedback(null), 4000);
   };
 
-  const loadData = useCallback(() => {
-    setLoading(true);
-    Promise.all([
-      api.getSchemes({ page: 1, pageSize: 1000, activeOnly: false }),
-      api.getCategories()
-    ])
-      .then(([schemesRes, cats]) => {
+  useEffect(() => {
+    let isCurrent = true;
+    api.getSchemes({ page: 1, pageSize: 1000, activeOnly: false })
+      .then(schemesRes => {
+        if (!isCurrent) return;
         setSchemes(schemesRes.schemes);
         setTotal(schemesRes.total);
-        setCategories(cats);
         setActiveCount(schemesRes.schemes.filter(s => s.is_active).length);
         setCentralCount(schemesRes.schemes.filter(s => s.level === 'central').length);
         setStateCount(schemesRes.schemes.filter(s => s.level === 'state').length);
       })
       .catch(err => {
+        if (!isCurrent) return;
         console.error(err);
         showFeedback('error', 'Failed to load schemes. Is the backend running?');
       })
-      .finally(() => setLoading(false));
-  }, []);
+      .finally(() => {
+        if (isCurrent) setLoading(false);
+      });
 
-  useEffect(() => { loadData(); }, [loadData]);
+    return () => {
+      isCurrent = false;
+    };
+  }, []);
 
   const toggleSchemeStatus = async (id: string, currentStatus: boolean) => {
     setActionLoading(prev => ({ ...prev, [id]: true }));
@@ -92,34 +93,37 @@ export default function AdminPanel() {
   };
 
   return (
-    <div className="mx-auto max-w-6xl w-full py-10 px-4 sm:px-6 lg:px-8 space-y-8 relative z-10 animate-fade-in">
+    <div className="mx-auto max-w-7xl w-full py-8 sm:py-10 px-4 sm:px-6 lg:px-8 space-y-8 relative z-10 animate-fade-in">
       
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-[#242832] pb-6">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-white/[0.08] pb-6">
         <div className="space-y-1">
-          <h1 className="text-3xl font-black text-[#F5F5F7] flex items-center gap-2">
-            <Settings className="h-7 w-7 text-[#A855F7]" />
-            GovSchemeAI Admin Panel
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-500/15 border border-purple-500/30 text-purple-300 text-xs font-bold uppercase tracking-wider">
+            <Settings className="h-3.5 w-3.5" />
+            <span>System Operations</span>
+          </div>
+          <h1 className="font-heading text-3xl sm:text-4xl font-black text-slate-100 flex items-center gap-2.5">
+            <span>GovSchemeAI Registry Admin</span>
           </h1>
-          <p className="text-xs text-[#A1A1AA]">
-            System administration, health monitoring, and scheme status toggles.
+          <p className="text-xs sm:text-sm text-slate-400">
+            System administration, live scheme status toggles, and metadata health monitoring.
           </p>
         </div>
 
-        <div className="flex gap-2">
+        <div className="flex flex-wrap items-center gap-2.5">
           <Link
             href="/admin/updates"
-            className="flex items-center gap-2 px-4 py-2 bg-[#8B5CF6] hover:bg-[#7C3AED] text-white rounded-xl text-xs font-bold transition-all"
+            className="flex items-center gap-2 px-4 py-2.5 bg-purple-600 hover:bg-purple-500 text-white rounded-xl text-xs font-bold transition-all shadow-md shadow-purple-600/20"
           >
-            <Settings className="h-4 w-4" />
-            Staging Pipeline
+            <Database className="h-4 w-4" />
+            <span>Staging Pipeline</span>
           </Link>
           <Link
             href="/schemes"
-            className="flex items-center gap-2 px-4 py-2 bg-[#101217] hover:bg-[#141720] border border-[#242832] text-[#F5F5F7] rounded-xl text-xs font-bold transition-all"
+            className="flex items-center gap-2 px-4 py-2.5 bg-[#0E1017] hover:bg-[#161926] border border-white/[0.08] text-slate-200 rounded-xl text-xs font-bold transition-all"
           >
-            <Plus className="h-4 w-4" />
-            Browse All Schemes
+            <Plus className="h-4 w-4 text-purple-400" />
+            <span>Browse All Schemes</span>
           </Link>
         </div>
       </div>
@@ -129,56 +133,56 @@ export default function AdminPanel() {
         <div
           className={`flex items-center gap-3 p-4 rounded-xl border text-xs font-semibold animate-fade-in ${
             feedback.type === 'success'
-              ? 'bg-[#22C55E]/10 border-[#22C55E]/30 text-[#22C55E]'
+              ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-300'
               : 'bg-rose-500/10 border-rose-500/30 text-rose-300'
           }`}
         >
           {feedback.type === 'success'
-            ? <CheckCircle2 className="h-4 w-4 shrink-0 text-[#22C55E]" />
+            ? <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-400" />
             : <AlertCircle className="h-4 w-4 shrink-0 text-rose-400" />
           }
-          {feedback.message}
+          <span>{feedback.message}</span>
         </div>
       )}
 
       {/* Metrics Row */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-        <div className="gov-card p-5 rounded-2xl border-[#242832] space-y-1">
-          <div className="text-[9px] uppercase font-extrabold tracking-wider text-[#71717A]">Total Registry</div>
-          <div className="text-3xl font-black text-[#F5F5F7]">{total}</div>
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-5">
+        <div className="gov-card p-5 rounded-2xl border border-white/[0.08] space-y-1">
+          <div className="text-[10px] uppercase font-extrabold tracking-wider text-slate-400">Total Registry</div>
+          <div className="font-heading text-3xl font-black text-slate-100">{total}</div>
         </div>
 
-        <div className="gov-card p-5 rounded-2xl border-[#242832] space-y-1">
-          <div className="text-[9px] uppercase font-extrabold tracking-wider text-[#71717A]">Active Matching</div>
-          <div className="text-3xl font-black text-[#22C55E]">{activeCount}</div>
+        <div className="gov-card p-5 rounded-2xl border border-white/[0.08] space-y-1">
+          <div className="text-[10px] uppercase font-extrabold tracking-wider text-slate-400">Active Matching</div>
+          <div className="font-heading text-3xl font-black text-emerald-400">{activeCount}</div>
         </div>
 
-        <div className="gov-card p-5 rounded-2xl border-[#242832] space-y-1">
-          <div className="text-[9px] uppercase font-extrabold tracking-wider text-[#71717A]">Central Level</div>
-          <div className="text-3xl font-black text-[#A855F7]">{centralCount}</div>
+        <div className="gov-card p-5 rounded-2xl border border-white/[0.08] space-y-1">
+          <div className="text-[10px] uppercase font-extrabold tracking-wider text-slate-400">Central Level</div>
+          <div className="font-heading text-3xl font-black text-purple-400">{centralCount}</div>
         </div>
 
-        <div className="gov-card p-5 rounded-2xl border-[#242832] space-y-1">
-          <div className="text-[9px] uppercase font-extrabold tracking-wider text-[#71717A]">State Level</div>
-          <div className="text-3xl font-black text-[#06B6D4]">{stateCount}</div>
+        <div className="gov-card p-5 rounded-2xl border border-white/[0.08] space-y-1">
+          <div className="text-[10px] uppercase font-extrabold tracking-wider text-slate-400">State Level</div>
+          <div className="font-heading text-3xl font-black text-cyan-400">{stateCount}</div>
         </div>
       </div>
 
       {/* Database Listing Panel */}
-      <div className="gov-card rounded-2xl overflow-hidden border-[#242832]">
-        <div className="p-4 border-b border-[#242832] flex items-center justify-between bg-[#0D0F14]">
-          <h2 className="text-sm font-bold text-[#F5F5F7] flex items-center gap-2">
-            <BarChart2 className="h-4 w-4 text-[#A855F7]" />
-            Schemes Registry Table
+      <div className="gov-card rounded-2xl overflow-hidden border border-white/[0.08]">
+        <div className="p-4 sm:p-5 border-b border-white/[0.08] flex items-center justify-between bg-[#0E1017]">
+          <h2 className="font-heading text-sm font-bold text-slate-100 flex items-center gap-2">
+            <BarChart2 className="h-4 w-4 text-purple-400" />
+            <span>Government Schemes Registry</span>
           </h2>
-          <span className="text-[10px] bg-[#101217] text-[#A1A1AA] px-2.5 py-1 rounded-lg border border-[#242832] font-bold">
-            {schemes.length} records
+          <span className="text-[10px] bg-[#12141D] text-slate-400 px-3 py-1 rounded-lg border border-white/[0.08] font-bold">
+            {schemes.length} records loaded
           </span>
         </div>
 
         <div className="overflow-x-auto">
-          <table className="w-full text-left text-xs text-[#A1A1AA]">
-            <thead className="text-[10px] uppercase bg-[#0D0F14] text-[#71717A] font-extrabold border-b border-[#242832]">
+          <table className="w-full text-left text-xs text-slate-300">
+            <thead className="text-[10px] uppercase bg-[#0E1017] text-slate-400 font-extrabold border-b border-white/[0.08]">
               <tr>
                 <th className="px-5 py-3">Scheme Name</th>
                 <th className="px-5 py-3">Level</th>
@@ -187,53 +191,61 @@ export default function AdminPanel() {
                 <th className="px-5 py-3 text-right">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-[#242832]">
+            <tbody className="divide-y divide-white/[0.06]">
               {loading ? (
                 <tr>
-                  <td colSpan={5} className="text-center py-8 text-[#71717A]">
-                    <div className="flex items-center justify-center gap-2">
-                      <Loader2 className="h-4 w-4 animate-spin text-[#A855F7]" />
-                      Loading database records...
+                  <td colSpan={5} className="text-center py-12 text-slate-400">
+                    <div className="flex items-center justify-center gap-2 text-xs">
+                      <Loader2 className="h-4 w-4 animate-spin text-purple-400" />
+                      <span>Loading registry records from backend...</span>
                     </div>
                   </td>
                 </tr>
               ) : schemes.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="text-center py-8 text-[#71717A]">
-                    No scheme records found.
+                  <td colSpan={5} className="text-center py-12 text-slate-400">
+                    No scheme records found in database.
                   </td>
                 </tr>
               ) : (
                 schemes.map((scheme) => (
-                  <tr key={scheme.id} className="hover:bg-white/[0.01] transition-colors">
+                  <tr key={scheme.id} className="hover:bg-white/[0.02] transition-colors">
                     <td className="px-5 py-3.5">
-                      <div className="font-bold text-[#F5F5F7]">{scheme.name}</div>
+                      <div className="font-heading font-bold text-slate-100 text-xs sm:text-sm">{scheme.name}</div>
                       {scheme.ministry && (
-                        <div className="text-[10px] text-[#71717A]">{scheme.ministry}</div>
+                        <div className="text-[10px] text-slate-400">{scheme.ministry}</div>
                       )}
                     </td>
-                    <td className="px-5 py-3.5 capitalize font-semibold text-[#A1A1AA]">
-                      {scheme.level || 'Central'}
+                    <td className="px-5 py-3.5 capitalize font-semibold text-slate-300">
+                      <span className={`text-[10px] px-2 py-0.5 rounded font-bold uppercase tracking-wider ${
+                        scheme.level === 'central'
+                          ? 'bg-purple-500/10 text-purple-300 border border-purple-500/20'
+                          : 'bg-cyan-500/10 text-cyan-300 border border-cyan-500/20'
+                      }`}>
+                        {scheme.level || 'Central'}
+                      </span>
                     </td>
                     <td className="px-5 py-3.5">
-                      <span className="text-[10px] px-2 py-0.5 rounded bg-[#101217] border border-[#242832] font-semibold text-[#A855F7]">
+                      <span className="text-[10px] px-2 py-0.5 rounded bg-[#0E1017] border border-white/[0.08] font-semibold text-slate-300">
                         {scheme.category_icon} {scheme.category_name || 'General'}
                       </span>
                     </td>
                     <td className="px-5 py-3.5 text-center">
                       <button
+                        type="button"
                         onClick={() => toggleSchemeStatus(scheme.id, scheme.is_active)}
                         disabled={actionLoading[scheme.id]}
-                        className="inline-flex cursor-pointer text-[#A1A1AA] hover:text-white disabled:opacity-50"
+                        className="inline-flex cursor-pointer disabled:opacity-50"
+                        title={scheme.is_active ? 'Click to disable' : 'Click to activate'}
                       >
                         {actionLoading[scheme.id] ? (
-                          <Loader2 className="h-4 w-4 animate-spin text-[#A855F7]" />
+                          <Loader2 className="h-4 w-4 animate-spin text-purple-400" />
                         ) : scheme.is_active ? (
-                          <span className="text-[10px] font-bold text-[#22C55E] bg-[#22C55E]/10 px-2 py-0.5 rounded border border-[#22C55E]/20">
+                          <span className="text-[10px] font-bold text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-md border border-emerald-500/20">
                             Active
                           </span>
                         ) : (
-                          <span className="text-[10px] font-bold text-[#71717A] bg-[#101217] px-2 py-0.5 rounded border border-[#242832]">
+                          <span className="text-[10px] font-bold text-slate-400 bg-[#0E1017] px-2.5 py-1 rounded-md border border-white/[0.08]">
                             Disabled
                           </span>
                         )}
@@ -242,15 +254,16 @@ export default function AdminPanel() {
                     <td className="px-5 py-3.5 text-right space-x-2">
                       <Link
                         href={`/schemes/${scheme.slug}`}
-                        className="p-1.5 rounded-lg bg-[#101217] border border-[#242832] text-[#A855F7] hover:bg-[#141720] inline-flex items-center"
+                        className="p-1.5 rounded-lg bg-[#0E1017] border border-white/[0.08] text-purple-400 hover:text-white hover:border-purple-500/40 inline-flex items-center transition-colors"
                         title="View detail"
                       >
                         <Eye className="h-3.5 w-3.5" />
                       </Link>
                       <button
+                        type="button"
                         onClick={() => deleteScheme(scheme.id, scheme.name)}
                         disabled={actionLoading[`del_${scheme.id}`]}
-                        className="p-1.5 rounded-lg bg-rose-500/10 border border-rose-500/20 text-rose-400 hover:bg-rose-500/20 inline-flex items-center disabled:opacity-50 cursor-pointer"
+                        className="p-1.5 rounded-lg bg-rose-500/10 border border-rose-500/20 text-rose-400 hover:bg-rose-500/20 inline-flex items-center disabled:opacity-50 cursor-pointer transition-colors"
                         title="Delete scheme permanently"
                       >
                         {actionLoading[`del_${scheme.id}`]

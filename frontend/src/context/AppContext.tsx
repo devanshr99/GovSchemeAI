@@ -22,8 +22,23 @@ interface AppContextType {
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [language, setLanguageState] = useState<Language>('en');
-  const [profile, setProfileState] = useState<EligibilityRequest | null>(null);
+  const [language, setLanguageState] = useState<Language>(() => {
+    if (typeof window !== 'undefined') {
+      const storedLang = (localStorage.getItem('govscheme_lang') || localStorage.getItem('yojana_lang')) as Language;
+      if (storedLang && translations[storedLang]) {
+        return storedLang;
+      }
+    }
+    return 'en';
+  });
+
+  const [profile, setProfileState] = useState<EligibilityRequest | null>(() => {
+    if (typeof window !== 'undefined') {
+      return api.getProfileFromStorage();
+    }
+    return null;
+  });
+
   const [results, setResultsState] = useState<EligibilityResponse | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [announcement, setAnnouncement] = useState<string>('');
@@ -35,21 +50,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   };
 
   useEffect(() => {
-    // Only runs on client — restore saved language and profile
-    if (typeof window === 'undefined') return;
-    let storedLang = localStorage.getItem('govscheme_lang') as Language;
-    if (!storedLang) {
-      storedLang = localStorage.getItem('yojana_lang') as Language;
+    if (typeof window !== 'undefined') {
+      document.documentElement.lang = language;
     }
-    if (storedLang && translations[storedLang]) {
-      setLanguageState(storedLang);
-      document.documentElement.lang = storedLang;
-    }
-    const storedProfile = api.getProfileFromStorage();
-    if (storedProfile) {
-      setProfileState(storedProfile);
-    }
-  }, []);
+  }, [language]);
 
   const setLanguage = (lang: Language) => {
     setLanguageState(lang);

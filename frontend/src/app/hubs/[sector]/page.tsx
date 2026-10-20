@@ -1,20 +1,27 @@
 'use client';
 
 import React, { useState, useEffect, use } from 'react';
-import { useApp } from '../../../context/AppContext';
 import { api } from '../../../lib/api';
 import { SchemeCard } from '../../../components/schemes/SchemeCard';
 import { SchemeCard as SchemeCardType } from '../../../types/scheme';
 import Link from 'next/link';
 import { 
-  GraduationCap, Rocket, Sprout, HeartHandshake, Briefcase, Building2, 
-  ArrowLeft, Search, ShieldCheck 
+  GraduationCap, 
+  Rocket, 
+  Sprout, 
+  HeartHandshake, 
+  Briefcase, 
+  Building2, 
+  ArrowLeft, 
+  Search, 
+  ShieldCheck,
+  LucideIcon
 } from 'lucide-react';
 
 interface SectorConfig {
   title: string;
   categorySlug: string;
-  icon: any;
+  icon: LucideIcon;
   badge: string;
   subtitle: string;
   description: string;
@@ -104,7 +111,6 @@ const SECTOR_MAP: Record<string, SectorConfig> = {
 
 export default function DynamicSectorHubPage({ params }: { params: Promise<{ sector: string }> }) {
   const { sector } = use(params);
-  const { t } = useApp();
 
   const sectorKey = sector?.toLowerCase() || 'student';
   const config = SECTOR_MAP[sectorKey] || SECTOR_MAP['student'];
@@ -115,17 +121,22 @@ export default function DynamicSectorHubPage({ params }: { params: Promise<{ sec
   const [searchQuery, setSearchQuery] = useState<string>('');
 
   useEffect(() => {
-    setLoading(true);
+    let isCurrent = true;
     api.getSchemes({
       category: config.categorySlug,
       pageSize: 20,
       activeOnly: true,
     })
       .then((res) => {
+        if (!isCurrent) return;
         setSchemes(res.schemes || []);
       })
       .catch(err => console.error('Sector load error:', err))
-      .finally(() => setLoading(false));
+      .finally(() => {
+        if (isCurrent) setLoading(false);
+      });
+
+    return () => { isCurrent = false; };
   }, [config.categorySlug]);
 
   const filteredSchemes = schemes.filter(s => 
@@ -136,43 +147,43 @@ export default function DynamicSectorHubPage({ params }: { params: Promise<{ sec
   );
 
   return (
-    <div className="mx-auto max-w-6xl w-full py-10 px-4 sm:px-6 lg:px-8 space-y-8 relative z-10 animate-fade-in">
+    <div className="mx-auto max-w-7xl w-full py-8 sm:py-10 px-4 sm:px-6 lg:px-8 space-y-8 relative z-10 animate-fade-in">
       
       {/* Top Breadcrumb */}
-      <Link href="/hubs" className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#A855F7] hover:underline">
+      <Link href="/hubs" className="inline-flex items-center gap-1.5 text-xs font-semibold text-purple-400 hover:text-purple-300 hover:underline">
         <ArrowLeft className="h-3.5 w-3.5" />
-        All Sector Hubs
+        <span>All Sector Hubs</span>
       </Link>
 
       {/* Sector Hero Header */}
-      <div className="gov-card p-6 sm:p-10 rounded-3xl border-[#242832] relative overflow-hidden bg-gradient-to-br from-[#101217] via-[#141720] to-[#0D0F14]">
+      <div className="gov-card p-6 sm:p-10 rounded-3xl border border-white/[0.08] relative overflow-hidden bg-gradient-to-br from-[#11131C] via-[#161926] to-[#0E1017]">
         <div className="space-y-4 max-w-3xl">
           
           <div className="flex flex-wrap items-center gap-2">
-            <span className="text-[10px] uppercase font-extrabold tracking-wider px-3 py-1 rounded-lg bg-[#8B5CF6]/15 text-[#A855F7] border border-[#8B5CF6]/30 flex items-center gap-1.5">
+            <span className="text-[10px] uppercase font-extrabold tracking-wider px-3 py-1 rounded-lg bg-purple-500/15 text-purple-300 border border-purple-500/30 flex items-center gap-1.5">
               <Icon className="h-3.5 w-3.5" />
-              {config.badge}
+              <span>{config.badge}</span>
             </span>
-            <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-[#22C55E] bg-[#22C55E]/10 px-2.5 py-1 rounded-lg border border-[#22C55E]/20">
+            <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-lg border border-emerald-500/20">
               <ShieldCheck className="h-3.5 w-3.5" />
-              Verified Schemes
+              <span>Verified Government Matrix</span>
             </span>
           </div>
 
-          <h1 className="text-3xl sm:text-4xl font-black text-[#F5F5F7]">
+          <h1 className="font-heading text-3xl sm:text-4xl font-black text-slate-100">
             {config.title}
           </h1>
 
-          <p className="text-xs sm:text-sm text-[#A1A1AA] leading-relaxed">
+          <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
             {config.description}
           </p>
 
           {/* Quick Metrics */}
           <div className="grid grid-cols-3 gap-3 pt-2 max-w-md">
             {config.stats.map((st, idx) => (
-              <div key={idx} className="p-3 rounded-xl bg-[#0D0F14] border border-[#242832]">
-                <div className="text-sm sm:text-base font-bold text-[#F5F5F7]">{st.value}</div>
-                <div className="text-[9px] uppercase font-extrabold text-[#71717A] tracking-wider mt-0.5">{st.label}</div>
+              <div key={idx} className="p-3 rounded-xl bg-[#0E1017] border border-white/[0.08]">
+                <div className="font-heading text-sm sm:text-base font-bold text-slate-100">{st.value}</div>
+                <div className="text-[9px] uppercase font-extrabold text-slate-400 tracking-wider mt-0.5">{st.label}</div>
               </div>
             ))}
           </div>
@@ -180,19 +191,19 @@ export default function DynamicSectorHubPage({ params }: { params: Promise<{ sec
       </div>
 
       {/* Search Bar */}
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 border-b border-[#242832] pb-4">
-        <h2 className="text-xl font-bold text-[#F5F5F7]">
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 border-b border-white/[0.08] pb-4">
+        <h2 className="font-heading text-xl font-bold text-slate-100">
           Sector Opportunities ({filteredSchemes.length})
         </h2>
 
         <div className="relative w-full sm:w-72">
-          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-[#71717A]" />
+          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-400" />
           <input
             type="text"
             placeholder={`Search ${config.title.toLowerCase()}...`}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-9 pr-3 py-2 text-xs rounded-xl bg-[#0D0F14] border border-[#242832] text-[#F5F5F7] placeholder-[#71717A]"
+            className="w-full pl-9 pr-3 py-2 text-xs rounded-xl bg-[#0E1017] border border-white/[0.08] text-slate-100 placeholder-slate-500 focus:border-purple-500"
           />
         </div>
       </div>
@@ -200,23 +211,27 @@ export default function DynamicSectorHubPage({ params }: { params: Promise<{ sec
       {/* Schemes Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {filteredSchemes.map((scheme) => (
-          <SchemeCard key={scheme.id} scheme={{ ...scheme, match_score: 1.0 } as any} isMatchedView={false} />
+          <SchemeCard 
+            key={scheme.id} 
+            scheme={{ ...scheme, match_score: 1.0, rules_matched: 0, rules_total: 0 }} 
+            isMatchedView={false} 
+          />
         ))}
       </div>
 
       {loading && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {[1, 2, 3, 4].map(n => (
-            <div key={n} className="gov-card h-44 rounded-2xl skeleton-shimmer opacity-40" />
+            <div key={n} className="gov-card h-44 rounded-2xl skeleton-shimmer opacity-40 border border-white/[0.08]" />
           ))}
         </div>
       )}
 
       {!loading && filteredSchemes.length === 0 && (
-        <div className="gov-card p-12 text-center space-y-3 rounded-2xl border-[#242832]">
-          <p className="text-sm font-bold text-[#F5F5F7]">No schemes found matching search in this hub.</p>
-          <p className="text-xs text-[#A1A1AA]">Try clearing search or browse all central schemes.</p>
-          <Link href="/schemes" className="inline-block px-4 py-2 bg-[#8B5CF6] text-white rounded-xl text-xs font-bold mt-2">
+        <div className="gov-card p-12 text-center space-y-3 rounded-3xl border border-white/[0.08] max-w-md mx-auto">
+          <p className="text-sm font-bold text-slate-100">No schemes found matching search in this hub.</p>
+          <p className="text-xs text-slate-400">Try clearing search or browse all central schemes.</p>
+          <Link href="/schemes" className="inline-block px-4 py-2 bg-purple-600 hover:bg-purple-500 text-white rounded-xl text-xs font-bold mt-2 shadow-xs transition-all">
             Browse All Schemes
           </Link>
         </div>

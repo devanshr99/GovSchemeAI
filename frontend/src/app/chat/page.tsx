@@ -3,7 +3,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useApp } from '../../context/AppContext';
 import { api } from '../../lib/api';
-import { Send, Sparkles, RefreshCw, Bot, User as UserIcon, WifiOff, ArrowRight } from 'lucide-react';
+import { Send, RefreshCw, Bot, User as UserIcon, WifiOff, ArrowRight } from 'lucide-react';
 
 interface ChatMessage {
   role: 'user' | 'assistant';
@@ -17,13 +17,13 @@ function renderInline(text: string) {
   const parts = text.split(/(\*\*.*?\*\*|\*.*?\*|`.*?`)/g);
   return parts.map((part, i) => {
     if (part.startsWith('**') && part.endsWith('**')) {
-      return <strong key={i} className="font-extrabold text-[#F5F5F7]">{part.slice(2, -2)}</strong>;
+      return <strong key={i} className="font-extrabold text-slate-100">{part.slice(2, -2)}</strong>;
     }
     if (part.startsWith('*') && part.endsWith('*')) {
-      return <em key={i} className="italic text-[#A1A1AA]">{part.slice(1, -1)}</em>;
+      return <em key={i} className="italic text-slate-300">{part.slice(1, -1)}</em>;
     }
     if (part.startsWith('`') && part.endsWith('`')) {
-      return <code key={i} className="px-1.5 py-0.5 rounded bg-[#0D0F14] border border-[#242832] text-[#A855F7] font-mono text-xs">{part.slice(1, -1)}</code>;
+      return <code key={i} className="px-1.5 py-0.5 rounded bg-[#0E1017] border border-white/[0.08] text-purple-300 font-mono text-xs">{part.slice(1, -1)}</code>;
     }
     return <span key={i}>{part}</span>;
   });
@@ -42,7 +42,7 @@ function renderMarkdown(text: string) {
   const flushParagraph = (key: string) => {
     if (currentParagraphLines.length > 0) {
       renderedElements.push(
-        <p key={key} className="text-xs sm:text-sm leading-relaxed mb-2.5 last:mb-0 text-[#F5F5F7]">
+        <p key={key} className="text-xs sm:text-sm leading-relaxed mb-2.5 last:mb-0 text-slate-200">
           {currentParagraphLines.map((line, lIdx) => (
             <React.Fragment key={lIdx}>
               {renderInline(line)}
@@ -58,7 +58,7 @@ function renderMarkdown(text: string) {
   const flushTable = (key: string) => {
     if (tableHeaders.length > 0 || tableRows.length > 0) {
       renderedElements.push(
-        <div key={key} className="markdown-table-wrapper my-3">
+        <div key={key} className="markdown-table-wrapper my-3 border border-white/[0.08] rounded-xl overflow-hidden">
           <table className="markdown-table">
             {tableHeaders.length > 0 && (
               <thead>
@@ -118,7 +118,7 @@ function renderMarkdown(text: string) {
         const content = trimmed.replace(/^[-•*]\s*/, '');
         renderedElements.push(
           <ul key={`ul-${i}`} className="list-disc list-inside space-y-1 my-1">
-            <li className="text-xs sm:text-sm leading-relaxed text-[#A1A1AA]">
+            <li className="text-xs sm:text-sm leading-relaxed text-slate-300">
               {renderInline(content)}
             </li>
           </ul>
@@ -138,11 +138,11 @@ function renderMarkdown(text: string) {
 }
 
 export default function ChatAssistant() {
-  const { language, t } = useApp();
+  const { language } = useApp();
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
       role: 'assistant',
-      content: "Welcome to Citizen Scheme Advisor AI. Ask me about central and state government schemes, eligibility requirements, required documents, or application guidelines.",
+      content: "Welcome to Citizen Scheme Advisor AI. Ask me about central and state government schemes, eligibility requirements, required documents, or official application procedures.",
     },
   ]);
   const [input, setInput] = useState<string>('');
@@ -260,7 +260,7 @@ export default function ChatAssistant() {
     setMessages([
       {
         role: 'assistant',
-        content: "Welcome to Citizen Scheme Advisor AI. Ask me about central and state government schemes, eligibility requirements, required documents, or application guidelines.",
+        content: "Welcome to Citizen Scheme Advisor AI. Ask me about central and state government schemes, eligibility requirements, required documents, or official application procedures.",
       },
     ]);
     setSessionId(undefined);
@@ -271,15 +271,15 @@ export default function ChatAssistant() {
     <div className="mx-auto max-w-4xl w-full py-8 px-4 sm:px-6 lg:px-8 flex-1 flex flex-col relative z-10" style={{ height: 'calc(100vh - 120px)' }}>
       
       {/* Header Bar */}
-      <div className="flex items-center justify-between border-b border-[#242832] pb-4 mb-4 shrink-0">
+      <div className="flex items-center justify-between border-b border-white/[0.08] pb-4 mb-4 shrink-0">
         <div className="flex items-center gap-3">
-          <div className="h-9 w-9 rounded-xl bg-[#8B5CF6]/15 border border-[#8B5CF6]/30 flex items-center justify-center text-[#A855F7]">
+          <div className="h-9 w-9 rounded-xl bg-purple-500/15 border border-purple-500/30 flex items-center justify-center text-purple-400">
             <Bot className="h-5 w-5" />
           </div>
           <div>
-            <h1 className="text-lg font-bold text-[#F5F5F7]">Citizen Scheme Advisor AI</h1>
-            <p className="text-[10px] text-[#71717A] font-semibold uppercase tracking-wider">
-              {sessionId ? `Session ID: ${sessionId.slice(0, 8)}...` : 'RAG Verification Active'}
+            <h1 className="font-heading text-lg font-bold text-slate-100">Citizen Scheme Advisor AI</h1>
+            <p className="text-[10px] text-slate-400 font-semibold uppercase tracking-wider">
+              {sessionId ? `Session: ${sessionId.slice(0, 8)}...` : 'Verified Scheme Knowledge Base'}
             </p>
           </div>
         </div>
@@ -288,15 +288,16 @@ export default function ChatAssistant() {
           {connectionError && (
             <div className="flex items-center gap-1.5 text-xs text-rose-400 bg-rose-500/10 border border-rose-500/20 px-2.5 py-1 rounded-lg">
               <WifiOff className="h-3.5 w-3.5" />
-              Offline
+              <span>Offline</span>
             </div>
           )}
 
           <button
+            type="button"
             onClick={resetChat}
-            className="p-2 rounded-xl bg-[#101217] border border-[#242832] text-xs text-[#A1A1AA] hover:text-white transition-all cursor-pointer flex items-center gap-1.5"
+            className="p-2 rounded-xl bg-[#0E1017] border border-white/[0.08] text-xs text-slate-400 hover:text-white transition-all cursor-pointer flex items-center gap-1.5"
           >
-            <RefreshCw className="h-3.5 w-3.5 text-[#A855F7]" />
+            <RefreshCw className="h-3.5 w-3.5 text-purple-400" />
             <span>Reset Chat</span>
           </button>
         </div>
@@ -312,8 +313,8 @@ export default function ChatAssistant() {
             <div
               className={`h-8 w-8 rounded-xl flex items-center justify-center shrink-0 mt-1 ${
                 msg.role === 'user'
-                  ? 'bg-[#8B5CF6] text-white'
-                  : 'bg-[#101217] border border-[#8B5CF6]/30 text-[#A855F7]'
+                  ? 'bg-purple-600 text-white'
+                  : 'bg-[#0E1017] border border-purple-500/30 text-purple-400'
               }`}
             >
               {msg.role === 'user' ? <UserIcon className="h-4 w-4" /> : <Bot className="h-4 w-4" />}
@@ -323,8 +324,8 @@ export default function ChatAssistant() {
               <div
                 className={`p-4 rounded-2xl border ${
                   msg.role === 'user'
-                    ? 'bg-[#8B5CF6] border-[#8B5CF6] text-white rounded-tr-none'
-                    : 'gov-card text-[#F5F5F7] rounded-tl-none border-[#242832]'
+                    ? 'bg-purple-600 border-purple-500 text-white rounded-tr-none'
+                    : 'gov-card text-slate-200 rounded-tl-none border-white/[0.08] bg-[#0E1017]'
                 } ${msg.isStreaming ? 'typewriter-cursor' : ''}`}
               >
                 {msg.role === 'assistant'
@@ -342,16 +343,17 @@ export default function ChatAssistant() {
       {/* Suggested Questions */}
       {!loading && (
         <div className="mb-3 shrink-0 animate-fade-in">
-          <p className="text-[9px] text-[#71717A] font-extrabold uppercase tracking-wider mb-2">Suggested Prompt Topics:</p>
+          <p className="text-[9px] text-slate-400 font-extrabold uppercase tracking-wider mb-2">Suggested Prompt Topics:</p>
           <div className="flex flex-wrap gap-2">
             {getSuggestedQuestions().map((q, idx) => (
               <button
                 key={idx}
+                type="button"
                 onClick={() => handleSendMessage(q)}
-                className="text-xs px-3 py-2 rounded-xl bg-[#101217] border border-[#242832] hover:border-[#8B5CF6]/40 text-[#A1A1AA] hover:text-white flex items-center gap-1.5 transition-all text-left cursor-pointer"
+                className="text-xs px-3 py-2 rounded-xl bg-[#0E1017] border border-white/[0.08] hover:border-purple-500/40 text-slate-300 hover:text-white flex items-center gap-1.5 transition-all text-left cursor-pointer"
               >
                 <span>{q}</span>
-                <ArrowRight className="h-3 w-3 text-[#A855F7] shrink-0" />
+                <ArrowRight className="h-3 w-3 text-purple-400 shrink-0" />
               </button>
             ))}
           </div>
@@ -369,13 +371,15 @@ export default function ChatAssistant() {
           onKeyDown={handleKeyDown}
           disabled={loading}
           maxLength={500}
-          className="w-full pl-4 pr-14 py-3.5 rounded-2xl text-xs bg-[#0D0F14] border border-[#242832] text-[#F5F5F7] placeholder-[#71717A] focus:border-[#8B5CF6]"
+          className="w-full pl-4 pr-14 py-3.5 rounded-2xl text-xs sm:text-sm bg-[#0E1017] border border-white/[0.08] text-slate-100 placeholder-slate-500 focus:border-purple-500"
         />
         <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
           <button
+            type="button"
             onClick={() => handleSendMessage(input)}
             disabled={loading || !input.trim()}
-            className="p-2 rounded-xl bg-[#8B5CF6] hover:bg-[#7C3AED] text-white transition-all disabled:opacity-40 cursor-pointer"
+            className="p-2 rounded-xl bg-purple-600 hover:bg-purple-500 text-white transition-all disabled:opacity-40 cursor-pointer shadow-xs"
+            aria-label="Send message"
           >
             <Send className="h-4 w-4" />
           </button>
