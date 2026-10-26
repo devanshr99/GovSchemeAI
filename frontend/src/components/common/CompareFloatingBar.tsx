@@ -48,16 +48,16 @@ export const CompareFloatingBar: React.FC = () => {
 
   return (
     <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 max-w-xl w-[92%] sm:w-auto animate-slide-up">
-      <div className="gov-card px-4 py-3 rounded-2xl bg-[#0E1422]/95 border border-blue-500/30 shadow-2xl backdrop-blur-xl flex flex-wrap sm:flex-nowrap items-center justify-between gap-3">
-        <div className="flex items-center gap-2">
-          <div className="h-8 w-8 rounded-lg bg-blue-600/20 text-blue-400 flex items-center justify-center shrink-0">
+      <div className="px-4 py-3 rounded-2xl bg-white/95 border border-[#E5E9E3] shadow-lg shadow-black/10 backdrop-blur-md flex flex-wrap sm:flex-nowrap items-center justify-between gap-3">
+        <div className="flex items-center gap-2.5">
+          <div className="h-8 w-8 rounded-lg bg-[#E7F3EC] text-[#176B52] flex items-center justify-center shrink-0">
             <Scale className="h-4 w-4" />
           </div>
           <div>
-            <div className="text-xs font-bold text-slate-100 flex items-center gap-1.5">
+            <div className="text-xs font-semibold text-[#202820] flex items-center gap-1.5">
               <span>{comparedSlugs.length} / 3 Schemes Selected</span>
             </div>
-            <div className="text-[10px] text-slate-400">Ready for side-by-side comparison</div>
+            <div className="text-[11px] text-[#687368]">Ready for side-by-side comparison</div>
           </div>
         </div>
 
@@ -66,12 +66,12 @@ export const CompareFloatingBar: React.FC = () => {
             {comparedSlugs.map(slug => (
               <span 
                 key={slug} 
-                className="inline-flex items-center gap-1 text-[10px] font-semibold bg-white/[0.05] border border-white/[0.08] px-2 py-0.5 rounded-md text-slate-300 truncate"
+                className="inline-flex items-center gap-1 text-[11px] font-medium bg-[#F7F8F5] border border-[#E5E9E3] px-2 py-0.5 rounded-md text-[#202820] truncate"
               >
                 <span className="truncate max-w-[70px]">{slug}</span>
                 <button 
                   onClick={() => removeSlug(slug)}
-                  className="hover:text-red-400 text-slate-500 cursor-pointer"
+                  className="hover:text-red-500 text-[#8A968A] cursor-pointer"
                   aria-label={`Remove ${slug}`}
                 >
                   <X className="h-2.5 w-2.5" />
@@ -83,14 +83,14 @@ export const CompareFloatingBar: React.FC = () => {
           <button
             type="button"
             onClick={clearCompare}
-            className="text-[11px] text-slate-400 hover:text-white px-2 py-1 rounded hover:bg-white/[0.05] transition-colors cursor-pointer"
+            className="text-xs font-medium text-[#687368] hover:text-[#202820] px-2 py-1 rounded hover:bg-[#F7F8F5] transition-colors cursor-pointer"
           >
             Clear
           </button>
 
           <Link
             href="/compare"
-            className="px-3.5 py-1.5 rounded-lg text-xs font-bold bg-blue-600 hover:bg-blue-500 text-white transition-colors flex items-center gap-1 shadow-sm shrink-0"
+            className="px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-[#176B52] hover:bg-[#124C3D] text-white transition-colors flex items-center gap-1 shadow-xs shrink-0"
           >
             <span>Compare</span>
             <ArrowRight className="h-3 w-3" />

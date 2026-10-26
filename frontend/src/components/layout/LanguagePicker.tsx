@@ -94,9 +94,9 @@ export const LanguagePicker: React.FC = () => {
         aria-haspopup="listbox"
         aria-expanded={isOpen}
         aria-label={t('langPickerLabel')}
-        className="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-slate-700/80 hover:border-blue-500/50 text-xs font-semibold bg-[#111827] hover:bg-[#1e293b] text-slate-100 transition-all cursor-pointer focus-visible:outline-none"
+        className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-[#E5E9E3] hover:border-[#176B52]/40 text-xs font-medium bg-white hover:bg-[#F7F8F5] text-[#202820] transition-all cursor-pointer focus-visible:outline-none"
       >
-        <Globe className="h-3.5 w-3.5 text-blue-400" />
+        <Globe className="h-3.5 w-3.5 text-[#176B52]" />
         <span>{LANGUAGE_NAMES[language]?.nativeName || "English"}</span>
       </button>
 
@@ -107,7 +107,7 @@ export const LanguagePicker: React.FC = () => {
           role="listbox"
           aria-labelledby="language-picker-button"
           tabIndex={-1}
-          className="absolute right-0 mt-2 w-64 origin-top-right rounded-xl border border-slate-700/80 bg-[#0e1726]/95 shadow-2xl backdrop-blur-md focus:outline-none py-1.5 z-[100] max-h-80 overflow-y-auto"
+          className="absolute right-0 mt-2 w-64 origin-top-right rounded-2xl border border-[#E5E9E3] bg-white shadow-xl shadow-black/5 focus:outline-none py-1.5 z-[100] max-h-80 overflow-y-auto"
         >
           {languages.map(([langKey, langInfo], index) => {
             const isSelected = language === langKey;
@@ -129,25 +129,25 @@ export const LanguagePicker: React.FC = () => {
                   }
                 }}
                 onMouseEnter={() => setActiveIndex(index)}
-                className={`flex items-center justify-between px-4 py-2 text-xs font-medium cursor-pointer transition-colors focus:outline-none ${
+                className={`flex items-center justify-between px-3.5 py-2 text-xs font-medium cursor-pointer transition-colors focus:outline-none rounded-xl mx-1.5 ${
                   !isActive 
-                    ? 'text-slate-500 cursor-not-allowed bg-transparent'
+                    ? 'text-[#8A968A] cursor-not-allowed bg-transparent'
                     : isSelected
-                    ? 'bg-blue-600/20 text-blue-300 font-semibold'
+                    ? 'bg-[#E7F3EC] text-[#176B52] font-semibold'
                     : isFocused
-                    ? 'bg-white/[0.04] text-slate-100'
-                    : 'text-slate-300 hover:bg-white/[0.04]'
+                    ? 'bg-[#F7F8F5] text-[#202820]'
+                    : 'text-[#202820] hover:bg-[#F7F8F5]'
                 }`}
               >
                 <div className="flex flex-col">
                   <span>{langInfo.nativeName}</span>
-                  <span className="text-[10px] text-slate-400">{langInfo.name}</span>
+                  <span className="text-[10px] text-[#687368]">{langInfo.name}</span>
                 </div>
 
                 <div className="flex items-center gap-1.5">
-                  {isSelected && <Check className="h-3.5 w-3.5 text-blue-400" aria-hidden="true" />}
+                  {isSelected && <Check className="h-3.5 w-3.5 text-[#176B52]" aria-hidden="true" />}
                   {!isActive && (
-                    <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[8px] font-bold bg-amber-500/10 text-amber-400 border border-amber-500/20">
+                    <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-semibold bg-[#FAF5E9] text-[#E8A126] border border-[#F3E7CA]">
                       <AlertCircle className="h-2 w-2" />
                       {t('comingSoon')}
                     </span>

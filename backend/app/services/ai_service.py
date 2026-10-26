@@ -217,8 +217,8 @@ class OpenAIProvider(AIProvider):
                             content = delta.get("content", "")
                             if content:
                                 yield content
-                    except Exception:
-                        pass
+                    except Exception as exc:
+                        logger.debug("Failed parsing Anthropic SSE chunk: %s", exc)
 
     async def check_availability(self) -> bool:
         return bool(self.api_key)
@@ -334,8 +334,8 @@ class OpenRouterProvider(AIProvider):
                             content = delta.get("content", "")
                             if content:
                                 yield content
-                    except Exception:
-                        pass
+                    except Exception as exc:
+                        logger.debug("Failed parsing OpenAI SSE chunk: %s", exc)
 
     async def check_availability(self) -> bool:
         return bool(self.api_key)

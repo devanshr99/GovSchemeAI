@@ -10,15 +10,10 @@ import Link from 'next/link';
 import {
   ArrowLeft, 
   ArrowRight,
-  Phone, 
-  Calendar, 
-  Award, 
   ShieldCheck,
   FileText, 
-  MapPin, 
   Sparkles, 
   ExternalLink, 
-  Clock, 
   Building2,
   ChevronRight, 
   Share2, 
@@ -29,11 +24,9 @@ import {
   AlertTriangle, 
   Info,
   Scale,
-  Coins,
   Check,
   Bot,
-  HelpCircle,
-  Download
+  Award
 } from 'lucide-react';
 
 export default function SchemeDetailPage({ params }: { params: Promise<{ slug: string }> }) {
@@ -198,10 +191,10 @@ export default function SchemeDetailPage({ params }: { params: Promise<{ slug: s
   if (loading) {
     return (
       <div className="mx-auto max-w-5xl w-full py-12 px-4 sm:px-6 lg:px-8 space-y-6">
-        <div className="h-4 w-32 rounded skeleton-shimmer" />
-        <div className="h-10 w-2/3 rounded-xl skeleton-shimmer" />
-        <div className="h-48 w-full rounded-2xl skeleton-shimmer" />
-        <div className="h-96 w-full rounded-2xl skeleton-shimmer" />
+        <div className="h-4 w-32 rounded bg-white animate-pulse" />
+        <div className="h-10 w-2/3 rounded-xl bg-white animate-pulse" />
+        <div className="h-48 w-full rounded-2xl bg-white animate-pulse" />
+        <div className="h-96 w-full rounded-2xl bg-white animate-pulse" />
       </div>
     );
   }
@@ -209,12 +202,12 @@ export default function SchemeDetailPage({ params }: { params: Promise<{ slug: s
   if (error || !scheme) {
     return (
       <div className="mx-auto max-w-md w-full py-20 px-4 text-center space-y-4">
-        <AlertTriangle className="h-12 w-12 text-amber-400 mx-auto" />
-        <h2 className="font-heading text-xl font-bold text-slate-100">Scheme Record Unavailable</h2>
-        <p className="text-xs text-slate-400">{error || 'This scheme could not be located in our directory.'}</p>
+        <AlertTriangle className="h-12 w-12 text-[#E8A126] mx-auto" />
+        <h2 className="font-heading text-xl font-bold text-[#202820]">Scheme Record Unavailable</h2>
+        <p className="text-xs text-[#687368]">{error || 'This scheme could not be located in our directory.'}</p>
         <Link
           href="/schemes"
-          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold transition-colors"
+          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#176B52] hover:bg-[#124C3D] text-white text-xs font-semibold transition-colors shadow-xs"
         >
           <ArrowLeft className="h-4 w-4" />
           <span>Return to Schemes Directory</span>
@@ -233,31 +226,31 @@ export default function SchemeDetailPage({ params }: { params: Promise<{ slug: s
       <CompareFloatingBar />
 
       {/* Breadcrumbs Navigation */}
-      <nav className="flex items-center gap-2 text-xs text-slate-400" aria-label="Breadcrumb">
-        <Link href="/" className="hover:text-white transition-colors">Home</Link>
-        <ChevronRight className="h-3 w-3 text-slate-600" />
-        <Link href="/schemes" className="hover:text-white transition-colors">Schemes</Link>
-        <ChevronRight className="h-3 w-3 text-slate-600" />
-        <span className="text-slate-200 truncate max-w-xs">{scheme.name}</span>
+      <nav className="flex items-center gap-2 text-xs text-[#687368]" aria-label="Breadcrumb">
+        <Link href="/" className="hover:text-[#176B52] transition-colors">Home</Link>
+        <ChevronRight className="h-3 w-3 text-[#8A968A]" />
+        <Link href="/schemes" className="hover:text-[#176B52] transition-colors">Schemes</Link>
+        <ChevronRight className="h-3 w-3 text-[#8A968A]" />
+        <span className="text-[#202820] font-medium truncate max-w-xs">{scheme.name}</span>
       </nav>
 
       {/* Main Header Card */}
-      <div className="gov-card p-6 sm:p-8 rounded-3xl border border-white/[0.08] bg-[#0E1422] space-y-5">
+      <div className="bg-white p-6 sm:p-8 rounded-3xl border border-[#E5E9E3] shadow-xs space-y-5">
         
         {/* Badges Strip */}
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="flex flex-wrap items-center gap-2">
-            <span className="text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-md bg-blue-500/15 text-blue-300 border border-blue-500/30">
+            <span className="text-[11px] font-semibold px-3 py-1 rounded-full bg-[#E7F3EC] text-[#176B52] border border-[#176B52]/20">
               {scheme.category_name || 'General Welfare'}
             </span>
-            <span className={`text-xs font-bold uppercase tracking-wider px-2.5 py-1 rounded-md border ${
+            <span className={`text-[11px] font-semibold px-3 py-1 rounded-full border ${
               isCentral 
-                ? 'bg-amber-500/15 text-amber-300 border-amber-500/30' 
-                : 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30'
+                ? 'bg-[#FAF5E9] text-[#8C6212] border-[#F3E7CA]' 
+                : 'bg-[#F7F8F5] text-[#4F594F] border-[#E5E9E3]'
             }`}>
               {isCentral ? 'Central Ministry Scheme' : `State Scheme (${scheme.state_name || 'State'})`}
             </span>
-            <span className="inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-1 rounded-md bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+            <span className="inline-flex items-center gap-1 text-[11px] font-semibold px-2.5 py-1 rounded-full bg-[#E7F3EC] text-[#176B52] border border-[#176B52]/20">
               <ShieldCheck className="h-3.5 w-3.5" />
               <span>Verified Government Record</span>
             </span>
@@ -270,12 +263,12 @@ export default function SchemeDetailPage({ params }: { params: Promise<{ slug: s
               onClick={toggleBookmark}
               className={`p-2 rounded-xl border text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer ${
                 isBookmarked
-                  ? 'bg-amber-500/20 text-amber-300 border-amber-500/40'
-                  : 'bg-[#111827] text-slate-300 hover:text-white border-white/[0.08]'
+                  ? 'bg-[#FAF5E9] text-[#E8A126] border-[#F3E7CA]'
+                  : 'bg-white text-[#202820] hover:text-[#176B52] border-[#E5E9E3] hover:bg-[#F7F8F5]'
               }`}
               title={isBookmarked ? 'Saved to Dashboard' : 'Save Scheme'}
             >
-              {isBookmarked ? <BookmarkCheck className="h-4 w-4 text-amber-400" /> : <Bookmark className="h-4 w-4" />}
+              {isBookmarked ? <BookmarkCheck className="h-4 w-4 text-[#E8A126]" /> : <Bookmark className="h-4 w-4" />}
               <span className="hidden sm:inline">{isBookmarked ? 'Saved' : 'Save'}</span>
             </button>
 
@@ -284,19 +277,19 @@ export default function SchemeDetailPage({ params }: { params: Promise<{ slug: s
               onClick={toggleCompare}
               className={`p-2 rounded-xl border text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer ${
                 isCompared
-                  ? 'bg-blue-600/25 text-blue-300 border-blue-500/40'
-                  : 'bg-[#111827] text-slate-300 hover:text-white border-white/[0.08]'
+                  ? 'bg-[#E7F3EC] text-[#176B52] border-[#176B52]/40'
+                  : 'bg-white text-[#202820] hover:text-[#176B52] border-[#E5E9E3] hover:bg-[#F7F8F5]'
               }`}
               title={isCompared ? 'In Compare List' : 'Add to Compare'}
             >
-              <Scale className="h-4 w-4 text-blue-400" />
+              <Scale className="h-4 w-4 text-[#176B52]" />
               <span className="hidden sm:inline">{isCompared ? 'Compared' : 'Compare'}</span>
             </button>
 
             <button
               type="button"
               onClick={() => setShareModalOpen(true)}
-              className="p-2 rounded-xl bg-[#111827] border border-white/[0.08] text-slate-300 hover:text-white text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer"
+              className="p-2 rounded-xl bg-white border border-[#E5E9E3] text-[#202820] hover:text-[#176B52] text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer hover:bg-[#F7F8F5]"
               title="Share Scheme"
             >
               <Share2 className="h-4 w-4" />
@@ -307,36 +300,36 @@ export default function SchemeDetailPage({ params }: { params: Promise<{ slug: s
 
         {/* Title & Ministry */}
         <div className="space-y-2">
-          <h1 className="font-heading text-2xl sm:text-3xl lg:text-4xl font-black text-slate-100 leading-tight">
+          <h1 className="font-heading text-2xl sm:text-3xl lg:text-4xl font-bold text-[#202820] leading-tight">
             {displayName}
           </h1>
           {(scheme.ministry_name || scheme.ministry) && (
-            <div className="flex items-center gap-2 text-xs sm:text-sm text-slate-400">
-              <Building2 className="h-4 w-4 text-slate-500 shrink-0" />
+            <div className="flex items-center gap-2 text-xs sm:text-sm text-[#687368]">
+              <Building2 className="h-4 w-4 text-[#8A968A] shrink-0" />
               <span>{scheme.ministry_name || scheme.ministry}</span>
             </div>
           )}
         </div>
 
         {/* Top Summary Stats Bar */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-3 border-t border-white/[0.06]">
-          <div className="p-3.5 rounded-xl bg-[#111827] border border-white/[0.06]">
-            <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider block">Benefit Quantum</span>
-            <span className="text-base font-bold text-emerald-400 font-heading block mt-0.5">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-3 border-t border-[#E5E9E3]">
+          <div className="p-3.5 rounded-2xl bg-[#F7F8F5] border border-[#E5E9E3]">
+            <span className="text-[10px] uppercase font-bold text-[#687368] tracking-wider block">Benefit Quantum</span>
+            <span className="text-base font-bold text-[#176B52] font-heading block mt-0.5">
               {scheme.benefits_amount || 'Financial Assistance / Subsidy'}
             </span>
           </div>
 
-          <div className="p-3.5 rounded-xl bg-[#111827] border border-white/[0.06]">
-            <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider block">Jurisdiction Coverage</span>
-            <span className="text-base font-bold text-slate-200 font-heading block mt-0.5">
+          <div className="p-3.5 rounded-2xl bg-[#F7F8F5] border border-[#E5E9E3]">
+            <span className="text-[10px] uppercase font-bold text-[#687368] tracking-wider block">Jurisdiction Coverage</span>
+            <span className="text-base font-bold text-[#202820] font-heading block mt-0.5">
               {scheme.state_name || 'Pan-India (Central)'}
             </span>
           </div>
 
-          <div className="p-3.5 rounded-xl bg-[#111827] border border-white/[0.06]">
-            <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider block">Application Mode</span>
-            <span className="text-base font-bold text-blue-400 font-heading block mt-0.5">
+          <div className="p-3.5 rounded-2xl bg-[#F7F8F5] border border-[#E5E9E3]">
+            <span className="text-[10px] uppercase font-bold text-[#687368] tracking-wider block">Application Mode</span>
+            <span className="text-base font-bold text-[#176B52] font-heading block mt-0.5">
               {scheme.application_url || scheme.official_website || scheme.portal_url ? 'Online Portal Submission' : 'Direct Departmental Channel'}
             </span>
           </div>
@@ -344,15 +337,15 @@ export default function SchemeDetailPage({ params }: { params: Promise<{ slug: s
 
         {/* Instant Citizen Qualifier Notice (If user scanned profile) */}
         {userProfileCheck.status !== 'not_scanned' && (
-          <div className={`p-4 rounded-xl border flex items-start gap-3 ${
+          <div className={`p-4 rounded-2xl border flex items-start gap-3 ${
             userProfileCheck.status === 'eligible'
-              ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-200'
-              : 'bg-amber-500/10 border-amber-500/30 text-amber-200'
+              ? 'bg-[#E7F3EC] border-[#176B52]/30 text-[#124C3D]'
+              : 'bg-[#FAF5E9] border-[#F3E7CA] text-[#8C6212]'
           }`}>
             {userProfileCheck.status === 'eligible' ? (
-              <CheckCircle2 className="h-5 w-5 text-emerald-400 shrink-0 mt-0.5" />
+              <CheckCircle2 className="h-5 w-5 text-[#176B52] shrink-0 mt-0.5" />
             ) : (
-              <Info className="h-5 w-5 text-amber-400 shrink-0 mt-0.5" />
+              <Info className="h-5 w-5 text-[#E8A126] shrink-0 mt-0.5" />
             )}
             <div className="space-y-1">
               <span className="text-xs font-bold block">
@@ -360,7 +353,7 @@ export default function SchemeDetailPage({ params }: { params: Promise<{ slug: s
                   ? 'Your Saved Demographic Profile Matches This Scheme!'
                   : 'Profile Evaluation Notice'}
               </span>
-              <p className="text-[11px] text-slate-300 leading-relaxed">
+              <p className="text-xs leading-relaxed opacity-90">
                 {userProfileCheck.status === 'eligible'
                   ? 'You satisfy the basic demographic criteria on record. Please review required documents below to prepare your submission.'
                   : 'Some criteria require verification. Check the eligibility requirements tab below.'}
@@ -372,7 +365,7 @@ export default function SchemeDetailPage({ params }: { params: Promise<{ slug: s
       </div>
 
       {/* Tabs Navigation */}
-      <div className="flex items-center gap-2 border-b border-white/[0.08] overflow-x-auto pb-2 scrollbar-none">
+      <div className="flex items-center gap-2 border-b border-[#E5E9E3] overflow-x-auto pb-2 scrollbar-none">
         {[
           { id: 'overview', label: 'Overview & Benefits', icon: FileText },
           { id: 'eligibility', label: 'Eligibility Criteria', icon: CheckCircle2 },
@@ -386,10 +379,10 @@ export default function SchemeDetailPage({ params }: { params: Promise<{ slug: s
               key={tab.id}
               type="button"
               onClick={() => setActiveTab(tab.id as 'overview' | 'eligibility' | 'documents' | 'process')}
-              className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap cursor-pointer ${
+              className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-semibold transition-all whitespace-nowrap cursor-pointer ${
                 isActive
-                  ? 'bg-blue-600 text-white shadow-sm'
-                  : 'text-slate-400 hover:text-white hover:bg-white/[0.04]'
+                  ? 'bg-[#176B52] text-white shadow-xs'
+                  : 'text-[#687368] hover:text-[#202820] hover:bg-white'
               }`}
             >
               <Icon className="h-4 w-4" />
@@ -400,27 +393,27 @@ export default function SchemeDetailPage({ params }: { params: Promise<{ slug: s
       </div>
 
       {/* Tab Panels */}
-      <div className="gov-card p-6 sm:p-8 rounded-3xl border border-white/[0.08] bg-[#0E1422]">
+      <div className="bg-white p-6 sm:p-8 rounded-3xl border border-[#E5E9E3] shadow-xs">
         
         {/* Tab 1: Overview & Benefits */}
         {activeTab === 'overview' && (
           <div className="space-y-6 animate-fade-in">
             <div className="space-y-3">
-              <h2 className="font-heading text-lg font-bold text-slate-100 flex items-center gap-2">
-                <FileText className="h-5 w-5 text-blue-400" />
+              <h2 className="font-heading text-lg font-bold text-[#202820] flex items-center gap-2">
+                <FileText className="h-5 w-5 text-[#176B52]" />
                 <span>Scheme Description & Purpose</span>
               </h2>
-              <p className="text-xs sm:text-sm text-slate-300 leading-relaxed whitespace-pre-line">
+              <p className="text-xs sm:text-sm text-[#4F594F] leading-relaxed whitespace-pre-line">
                 {scheme.description || 'Official scheme details describing beneficiary entitlement, scope, and objectives.'}
               </p>
             </div>
 
             {(scheme.benefits_description || scheme.benefits) && (
-              <div className="p-5 rounded-2xl bg-[#111827] border border-white/[0.06] space-y-2">
-                <span className="text-xs font-bold text-emerald-400 uppercase tracking-wider block">
+              <div className="p-5 rounded-2xl bg-[#F7F8F5] border border-[#E5E9E3] space-y-2">
+                <span className="text-xs font-bold text-[#176B52] uppercase tracking-wider block">
                   Detailed Benefits & Assistance Structure
                 </span>
-                <p className="text-xs sm:text-sm text-slate-300 leading-relaxed whitespace-pre-line">
+                <p className="text-xs sm:text-sm text-[#4F594F] leading-relaxed whitespace-pre-line">
                   {scheme.benefits_description || scheme.benefits}
                 </p>
               </div>
@@ -432,25 +425,25 @@ export default function SchemeDetailPage({ params }: { params: Promise<{ slug: s
         {activeTab === 'eligibility' && (
           <div className="space-y-6 animate-fade-in">
             <div className="space-y-3">
-              <h2 className="font-heading text-lg font-bold text-slate-100 flex items-center gap-2">
-                <CheckCircle2 className="h-5 w-5 text-emerald-400" />
+              <h2 className="font-heading text-lg font-bold text-[#202820] flex items-center gap-2">
+                <CheckCircle2 className="h-5 w-5 text-[#176B52]" />
                 <span>Who is Eligible?</span>
               </h2>
-              <p className="text-xs text-slate-400">
+              <p className="text-xs text-[#687368]">
                 Review the mandatory eligibility standards defined by the governing ministry.
               </p>
             </div>
 
-            <div className="p-5 rounded-2xl bg-[#111827] border border-white/[0.06] space-y-3">
-              <p className="text-xs sm:text-sm text-slate-300 leading-relaxed whitespace-pre-line">
+            <div className="p-5 rounded-2xl bg-[#F7F8F5] border border-[#E5E9E3] space-y-3">
+              <p className="text-xs sm:text-sm text-[#4F594F] leading-relaxed whitespace-pre-line">
                 {scheme.eligibility_criteria || 'General citizen eligibility as mandated by the published departmental guidelines.'}
               </p>
             </div>
 
-            <div className="p-4 rounded-xl bg-blue-500/10 border border-blue-500/20 text-xs text-blue-300 flex items-start gap-2.5">
-              <Sparkles className="h-4 w-4 text-blue-400 shrink-0 mt-0.5" />
+            <div className="p-4 rounded-xl bg-[#E7F3EC] border border-[#176B52]/20 text-xs text-[#124C3D] flex items-start gap-2.5">
+              <Sparkles className="h-4 w-4 text-[#176B52] shrink-0 mt-0.5" />
               <span>
-                Want to double check? Run our <Link href="/eligibility" className="underline font-bold text-white">Eligibility Quick-Scan</Link> to automatically compare your profile against all 130+ schemes.
+                Want to double check? Run our <Link href="/eligibility" className="underline font-semibold text-[#176B52]">Eligibility Quick-Scan</Link> to automatically compare your profile against all 130+ schemes.
               </span>
             </div>
           </div>
@@ -460,17 +453,17 @@ export default function SchemeDetailPage({ params }: { params: Promise<{ slug: s
         {activeTab === 'documents' && (
           <div className="space-y-6 animate-fade-in">
             <div className="space-y-3">
-              <h2 className="font-heading text-lg font-bold text-slate-100 flex items-center gap-2">
-                <Award className="h-5 w-5 text-amber-400" />
+              <h2 className="font-heading text-lg font-bold text-[#202820] flex items-center gap-2">
+                <Award className="h-5 w-5 text-[#E8A126]" />
                 <span>Documents Checklist</span>
               </h2>
-              <p className="text-xs text-slate-400">
+              <p className="text-xs text-[#687368]">
                 Keep scanned copies or self-attested physical photocopies ready before commencing application.
               </p>
             </div>
 
-            <div className="p-5 rounded-2xl bg-[#111827] border border-white/[0.06] space-y-3">
-              <p className="text-xs sm:text-sm text-slate-300 leading-relaxed whitespace-pre-line">
+            <div className="p-5 rounded-2xl bg-[#F7F8F5] border border-[#E5E9E3] space-y-3">
+              <p className="text-xs sm:text-sm text-[#4F594F] leading-relaxed whitespace-pre-line">
                 {scheme.documents_required || 'Standard citizen identification documents: Aadhaar card, residence proof, income certificate, and active bank passbook.'}
               </p>
             </div>
@@ -481,17 +474,17 @@ export default function SchemeDetailPage({ params }: { params: Promise<{ slug: s
         {activeTab === 'process' && (
           <div className="space-y-6 animate-fade-in">
             <div className="space-y-3">
-              <h2 className="font-heading text-lg font-bold text-slate-100 flex items-center gap-2">
-                <ArrowRight className="h-5 w-5 text-blue-400" />
+              <h2 className="font-heading text-lg font-bold text-[#202820] flex items-center gap-2">
+                <ArrowRight className="h-5 w-5 text-[#176B52]" />
                 <span>How to Apply</span>
               </h2>
-              <p className="text-xs text-slate-400">
+              <p className="text-xs text-[#687368]">
                 Follow these official steps to submit your application on the designated government domain.
               </p>
             </div>
 
-            <div className="p-5 rounded-2xl bg-[#111827] border border-white/[0.06] space-y-3">
-              <p className="text-xs sm:text-sm text-slate-300 leading-relaxed whitespace-pre-line">
+            <div className="p-5 rounded-2xl bg-[#F7F8F5] border border-[#E5E9E3] space-y-3">
+              <p className="text-xs sm:text-sm text-[#4F594F] leading-relaxed whitespace-pre-line">
                 {scheme.application_process || 'Applications are submitted online via the official ministry portal or through local Common Service Centers (CSC) / district collectorate counters.'}
               </p>
             </div>
@@ -501,16 +494,16 @@ export default function SchemeDetailPage({ params }: { params: Promise<{ slug: s
       </div>
 
       {/* Official Government Direct Application Action Card */}
-      <div className="gov-card p-6 sm:p-8 rounded-3xl border border-blue-500/30 bg-gradient-to-r from-[#0E1422] via-[#111827] to-[#0E1422] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
+      <div className="p-6 sm:p-8 rounded-3xl border border-[#176B52]/20 bg-[#E7F3EC] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 shadow-xs">
         <div className="space-y-1.5 max-w-xl">
-          <div className="flex items-center gap-2 text-xs font-bold text-emerald-400">
+          <div className="flex items-center gap-2 text-xs font-semibold text-[#176B52]">
             <ShieldCheck className="h-4 w-4" />
             <span>Direct Government Portal Submission</span>
           </div>
-          <h3 className="font-heading text-lg font-bold text-slate-100">
+          <h3 className="font-heading text-lg font-bold text-[#124C3D]">
             Ready to Submit Your Application?
           </h3>
-          <p className="text-xs text-slate-400 leading-relaxed">
+          <p className="text-xs text-[#4F594F] leading-relaxed">
             GovSchemeAI connects you directly to the official government portal. Verify details on the authorized .gov.in domain.
           </p>
         </div>
@@ -518,9 +511,9 @@ export default function SchemeDetailPage({ params }: { params: Promise<{ slug: s
         <div className="flex flex-wrap items-center gap-3 shrink-0">
           <Link
             href={`/chat?q=${encodeURIComponent(`Help me apply for ${scheme.name}. What documents are needed and what are the exact steps?`)}`}
-            className="px-4 py-2.5 rounded-xl bg-white/[0.06] hover:bg-white/[0.1] text-slate-200 text-xs font-bold flex items-center gap-1.5 transition-colors"
+            className="px-4 py-2.5 rounded-xl bg-white hover:bg-[#F7F8F5] text-[#202820] text-xs font-semibold flex items-center gap-1.5 transition-colors border border-[#E5E9E3] shadow-xs"
           >
-            <Bot className="h-4 w-4 text-blue-400" />
+            <Bot className="h-4 w-4 text-[#176B52]" />
             <span>Ask Advisor AI</span>
           </Link>
 
@@ -529,7 +522,7 @@ export default function SchemeDetailPage({ params }: { params: Promise<{ slug: s
               href={scheme.application_url || scheme.official_website || scheme.portal_url}
               target="_blank"
               rel="noopener noreferrer"
-              className="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold flex items-center gap-2 shadow-md transition-colors"
+              className="px-5 py-2.5 rounded-xl bg-[#176B52] hover:bg-[#124C3D] text-white text-xs font-semibold flex items-center gap-2 shadow-xs transition-colors"
             >
               <span>Visit Official Portal</span>
               <ExternalLink className="h-4 w-4" />
@@ -537,7 +530,7 @@ export default function SchemeDetailPage({ params }: { params: Promise<{ slug: s
           ) : (
             <button
               disabled
-              className="px-5 py-2.5 rounded-xl bg-white/[0.05] text-slate-500 text-xs font-bold cursor-not-allowed"
+              className="px-5 py-2.5 rounded-xl bg-white/70 text-[#8A968A] text-xs font-semibold cursor-not-allowed border border-[#E5E9E3]"
             >
               Portal Link Updating
             </button>
@@ -553,24 +546,24 @@ export default function SchemeDetailPage({ params }: { params: Promise<{ slug: s
         description="Share official scheme details with fellow citizens via direct link."
       >
         <div className="space-y-4">
-          <div className="p-3 rounded-xl bg-[#080C15] border border-white/[0.08]">
-            <div className="text-xs font-bold text-slate-200 line-clamp-1">{scheme.name}</div>
-            <div className="text-[11px] text-slate-400 mt-0.5">{scheme.ministry_name || 'Government of India'}</div>
+          <div className="p-3.5 rounded-xl bg-[#F7F8F5] border border-[#E5E9E3]">
+            <div className="text-xs font-bold text-[#202820] line-clamp-1">{scheme.name}</div>
+            <div className="text-[11px] text-[#687368] mt-0.5">{scheme.ministry_name || 'Government of India'}</div>
           </div>
 
           <div className="space-y-2">
-            <span className="text-[11px] text-slate-400 font-medium">Scheme Page Link</span>
+            <span className="text-xs text-[#687368] font-medium">Scheme Page Link</span>
             <div className="flex items-center gap-2">
               <input
                 type="text"
                 readOnly
                 value={typeof window !== 'undefined' ? window.location.href : ''}
-                className="w-full text-xs px-3 py-2 rounded-lg bg-[#080C15] border border-white/[0.1] text-slate-300"
+                className="w-full text-xs px-3.5 py-2 rounded-xl bg-white border border-[#E5E9E3] text-[#202820]"
               />
               <button
                 type="button"
                 onClick={handleCopyLink}
-                className="px-3.5 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold flex items-center gap-1.5 shrink-0 transition-colors cursor-pointer"
+                className="px-4 py-2 rounded-xl bg-[#176B52] hover:bg-[#124C3D] text-white text-xs font-semibold flex items-center gap-1.5 shrink-0 transition-colors cursor-pointer"
               >
                 {copied ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
                 <span>{copied ? 'Copied' : 'Copy'}</span>

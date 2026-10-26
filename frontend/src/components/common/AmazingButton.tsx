@@ -25,7 +25,6 @@ export const AmazingButton: React.FC<AmazingButtonProps> = ({
   iconPosition = 'right',
   loading = false,
   className = '',
-  glow = false,
   disabled,
   onClick,
   type = 'button',
@@ -33,30 +32,30 @@ export const AmazingButton: React.FC<AmazingButtonProps> = ({
 }) => {
   const sizeClasses = {
     sm: 'px-3.5 py-1.5 text-xs rounded-lg gap-1.5',
-    md: 'px-5 py-2.5 text-xs sm:text-sm rounded-xl gap-2',
-    lg: 'px-6 py-3 text-sm sm:text-base rounded-xl gap-2.5',
+    md: 'px-4.5 py-2.5 text-xs sm:text-sm rounded-xl gap-2 font-medium',
+    lg: 'px-6 py-3 text-sm sm:text-base rounded-xl gap-2.5 font-medium',
   };
 
   const variantClasses = {
     primary:
-      'bg-blue-600 hover:bg-blue-500 text-white font-semibold shadow-sm hover:shadow-md border border-blue-400/20 active:bg-blue-700',
+      'bg-[#176B52] hover:bg-[#124C3D] text-white font-semibold shadow-xs hover:shadow-sm border border-[#176B52]/30 active:bg-[#0E3E31]',
     saffron:
-      'bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold shadow-sm hover:shadow-md border border-amber-300/30 active:bg-amber-600',
+      'bg-[#E8A126] hover:bg-[#D38E16] text-[#202820] font-semibold shadow-xs hover:shadow-sm border border-[#E8A126]/30 active:bg-[#B87A0E]',
     gradient:
-      'bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-semibold shadow-sm hover:shadow-md border border-white/10',
+      'bg-gradient-to-r from-[#176B52] to-[#1F8766] hover:from-[#124C3D] hover:to-[#176B52] text-white font-semibold shadow-xs hover:shadow-sm',
     emerald:
-      'bg-emerald-600 hover:bg-emerald-500 text-white font-semibold shadow-sm hover:shadow-md border border-emerald-400/20 active:bg-emerald-700',
+      'bg-[#176B52] hover:bg-[#124C3D] text-white font-semibold shadow-xs hover:shadow-sm',
     secondary:
-      'bg-[#0E1422] hover:bg-[#162035] text-slate-200 hover:text-white border border-white/[0.08] hover:border-blue-500/30 shadow-xs',
+      'bg-white hover:bg-[#F7F8F5] text-[#202820] hover:text-[#176B52] border border-[#E5E9E3] hover:border-[#176B52]/30 shadow-xs active:bg-[#EEF1EB]',
     ghost:
-      'bg-transparent hover:bg-white/[0.06] text-slate-300 hover:text-white',
+      'bg-transparent hover:bg-[#E7F3EC]/70 text-[#202820] hover:text-[#176B52]',
     outline:
-      'bg-transparent border border-blue-500/30 hover:border-blue-400 text-blue-400 hover:text-white hover:bg-blue-600/10',
+      'bg-white border border-[#176B52]/40 hover:border-[#176B52] text-[#176B52] hover:bg-[#E7F3EC]/50 active:bg-[#E7F3EC]',
   };
 
   const baseClasses = `
-    inline-flex items-center justify-center font-heading transition-all duration-200
-    active:scale-[0.98] select-none cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/50 focus-visible:ring-offset-2 focus-visible:ring-offset-[#080C15]
+    inline-flex items-center justify-center font-heading transition-all duration-150
+    active:scale-[0.98] select-none cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[#176B52]/40 focus-visible:ring-offset-2 focus-visible:ring-offset-white
     disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none disabled:active:scale-100
     ${sizeClasses[size]}
     ${variantClasses[variant]}

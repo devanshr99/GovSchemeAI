@@ -225,38 +225,38 @@ async def lifespan(app: FastAPI):
     try:
         from app.scheduler import stop_scheduler
         stop_scheduler()
-    except Exception:
-        pass
+    except Exception as exc:
+        logger.debug("Failed to stop scheduler: %s", exc)
 
     try:
         from app.services.worker_manager import worker_manager
         worker_manager.stop_worker_pool()
-    except Exception:
-        pass
+    except Exception as exc:
+        logger.debug("Failed to stop worker manager: %s", exc)
 
     try:
         from app.services.failover_manager import failover_manager
         await failover_manager.stop_monitoring_daemon()
-    except Exception:
-        pass
+    except Exception as exc:
+        logger.debug("Failed to stop failover monitoring daemon: %s", exc)
 
     try:
         from app.utils.observability import telemetry_collector
         telemetry_collector.stop()
-    except Exception:
-        pass
+    except Exception as exc:
+        logger.debug("Failed to stop telemetry collector: %s", exc)
 
     try:
         from app.services.ai_service import ai_service
         await ai_service.close()
-    except Exception:
-        pass
+    except Exception as exc:
+        logger.debug("Failed to close ai service: %s", exc)
 
     try:
         from app.services.cache import cache
         await cache.clear()
-    except Exception:
-        pass
+    except Exception as exc:
+        logger.debug("Failed to clear cache: %s", exc)
 
     await close_db()
 
@@ -357,7 +357,7 @@ if __name__ == "__main__":
     port = int(os.getenv("PORT", settings.port))
     uvicorn.run(
         "app.main:app",
-        host="0.0.0.0",
+        host="0.0.0.0",  # nosec B104
         port=port,
         reload=settings.debug,
         log_level="info",

@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { api } from '../../lib/api';
 import { SchemeCard } from '../../types/scheme';
-import { Plus, Settings, BarChart2, Eye, Trash2, AlertCircle, CheckCircle2, Loader2, Database, ShieldCheck } from 'lucide-react';
+import { Plus, Settings, BarChart2, Eye, Trash2, AlertCircle, CheckCircle2, Loader2, Database } from 'lucide-react';
 import Link from 'next/link';
 
 interface ActionFeedback {
@@ -96,16 +96,16 @@ export default function AdminPanel() {
     <div className="mx-auto max-w-7xl w-full py-8 sm:py-10 px-4 sm:px-6 lg:px-8 space-y-8 relative z-10 animate-fade-in">
       
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-slate-800/80 pb-6">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-[#E5E9E3] pb-6">
         <div className="space-y-1">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs font-bold uppercase tracking-wider">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#E7F3EC] text-[#176B52] text-xs font-semibold uppercase tracking-wider">
             <Settings className="h-3.5 w-3.5" />
             <span>System Operations</span>
           </div>
-          <h1 className="font-heading text-3xl sm:text-4xl font-black text-slate-100 flex items-center gap-2.5">
+          <h1 className="font-heading text-3xl sm:text-4xl font-bold text-[#202820] flex items-center gap-2.5">
             <span>GovSchemeAI Registry Admin</span>
           </h1>
-          <p className="text-xs sm:text-sm text-slate-400">
+          <p className="text-xs sm:text-sm text-[#687368]">
             System administration, live scheme status toggles, and metadata health monitoring.
           </p>
         </div>
@@ -113,16 +113,16 @@ export default function AdminPanel() {
         <div className="flex flex-wrap items-center gap-2.5">
           <Link
             href="/admin/updates"
-            className="flex items-center gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-xs font-bold transition-all shadow-md shadow-blue-600/20"
+            className="flex items-center gap-2 px-4 py-2.5 bg-[#176B52] hover:bg-[#124C3D] text-white rounded-xl text-xs font-semibold transition-all shadow-xs"
           >
             <Database className="h-4 w-4" />
             <span>Staging Pipeline</span>
           </Link>
           <Link
             href="/schemes"
-            className="flex items-center gap-2 px-4 py-2.5 bg-[#111827] hover:bg-[#1a2333] border border-slate-800 text-slate-200 rounded-xl text-xs font-bold transition-all"
+            className="flex items-center gap-2 px-4 py-2.5 bg-white hover:bg-[#F7F8F5] border border-[#E5E9E3] text-[#202820] rounded-xl text-xs font-semibold transition-all shadow-xs"
           >
-            <Plus className="h-4 w-4 text-blue-400" />
+            <Plus className="h-4 w-4 text-[#176B52]" />
             <span>Browse All Schemes</span>
           </Link>
         </div>
@@ -133,13 +133,13 @@ export default function AdminPanel() {
         <div
           className={`flex items-center gap-3 p-4 rounded-xl border text-xs font-semibold animate-fade-in ${
             feedback.type === 'success'
-              ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-300'
-              : 'bg-rose-500/10 border-rose-500/30 text-rose-300'
+              ? 'bg-[#E7F3EC] border-[#176B52]/30 text-[#124C3D]'
+              : 'bg-rose-50 border-rose-200 text-rose-700'
           }`}
         >
           {feedback.type === 'success'
-            ? <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-400" />
-            : <AlertCircle className="h-4 w-4 shrink-0 text-rose-400" />
+            ? <CheckCircle2 className="h-4 w-4 shrink-0 text-[#176B52]" />
+            : <AlertCircle className="h-4 w-4 shrink-0 text-rose-600" />
           }
           <span>{feedback.message}</span>
         </div>
@@ -147,42 +147,42 @@ export default function AdminPanel() {
 
       {/* Metrics Row */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-5">
-        <div className="p-5 rounded-2xl border border-slate-800 bg-[#111827] space-y-1">
-          <div className="text-[10px] uppercase font-bold tracking-wider text-slate-400">Total Registry</div>
-          <div className="font-heading text-3xl font-black text-slate-100">{total}</div>
+        <div className="p-5 rounded-2xl border border-[#E5E9E3] bg-white space-y-1 shadow-xs">
+          <div className="text-[10px] uppercase font-bold tracking-wider text-[#687368]">Total Registry</div>
+          <div className="font-heading text-3xl font-bold text-[#202820]">{total}</div>
         </div>
 
-        <div className="p-5 rounded-2xl border border-slate-800 bg-[#111827] space-y-1">
-          <div className="text-[10px] uppercase font-bold tracking-wider text-slate-400">Active Matching</div>
-          <div className="font-heading text-3xl font-black text-emerald-400">{activeCount}</div>
+        <div className="p-5 rounded-2xl border border-[#E5E9E3] bg-white space-y-1 shadow-xs">
+          <div className="text-[10px] uppercase font-bold tracking-wider text-[#687368]">Active Matching</div>
+          <div className="font-heading text-3xl font-bold text-[#176B52]">{activeCount}</div>
         </div>
 
-        <div className="p-5 rounded-2xl border border-slate-800 bg-[#111827] space-y-1">
-          <div className="text-[10px] uppercase font-bold tracking-wider text-slate-400">Central Level</div>
-          <div className="font-heading text-3xl font-black text-blue-400">{centralCount}</div>
+        <div className="p-5 rounded-2xl border border-[#E5E9E3] bg-white space-y-1 shadow-xs">
+          <div className="text-[10px] uppercase font-bold tracking-wider text-[#687368]">Central Level</div>
+          <div className="font-heading text-3xl font-bold text-[#176B52]">{centralCount}</div>
         </div>
 
-        <div className="p-5 rounded-2xl border border-slate-800 bg-[#111827] space-y-1">
-          <div className="text-[10px] uppercase font-bold tracking-wider text-slate-400">State Level</div>
-          <div className="font-heading text-3xl font-black text-cyan-400">{stateCount}</div>
+        <div className="p-5 rounded-2xl border border-[#E5E9E3] bg-white space-y-1 shadow-xs">
+          <div className="text-[10px] uppercase font-bold tracking-wider text-[#687368]">State Level</div>
+          <div className="font-heading text-3xl font-bold text-[#E8A126]">{stateCount}</div>
         </div>
       </div>
 
       {/* Database Listing Panel */}
-      <div className="rounded-2xl overflow-hidden border border-slate-800 bg-[#111827]">
-        <div className="p-4 sm:p-5 border-b border-slate-800 flex items-center justify-between bg-[#0e1726]">
-          <h2 className="font-heading text-sm font-bold text-slate-100 flex items-center gap-2">
-            <BarChart2 className="h-4 w-4 text-blue-400" />
+      <div className="rounded-2xl overflow-hidden border border-[#E5E9E3] bg-white shadow-xs">
+        <div className="p-4 sm:p-5 border-b border-[#E5E9E3] flex items-center justify-between bg-[#F7F8F5]">
+          <h2 className="font-heading text-sm font-bold text-[#202820] flex items-center gap-2">
+            <BarChart2 className="h-4 w-4 text-[#176B52]" />
             <span>Government Schemes Registry</span>
           </h2>
-          <span className="text-[10px] bg-[#0b0f19] text-slate-400 px-3 py-1 rounded-lg border border-slate-800 font-bold">
+          <span className="text-xs bg-white text-[#687368] px-3 py-1 rounded-xl border border-[#E5E9E3] font-semibold">
             {schemes.length} records loaded
           </span>
         </div>
 
         <div className="overflow-x-auto">
-          <table className="w-full text-left text-xs text-slate-300">
-            <thead className="text-[10px] uppercase bg-[#0b0f19] text-slate-400 font-bold border-b border-slate-800">
+          <table className="w-full text-left text-xs text-[#202820]">
+            <thead className="text-[10px] uppercase bg-[#F7F8F5] text-[#687368] font-bold border-b border-[#E5E9E3]">
               <tr>
                 <th className="px-5 py-3">Scheme Name</th>
                 <th className="px-5 py-3">Level</th>
@@ -191,42 +191,42 @@ export default function AdminPanel() {
                 <th className="px-5 py-3 text-right">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-800">
+            <tbody className="divide-y divide-[#E5E9E3]">
               {loading ? (
                 <tr>
-                  <td colSpan={5} className="text-center py-12 text-slate-400">
+                  <td colSpan={5} className="text-center py-12 text-[#687368]">
                     <div className="flex items-center justify-center gap-2 text-xs">
-                      <Loader2 className="h-4 w-4 animate-spin text-blue-400" />
+                      <Loader2 className="h-4 w-4 animate-spin text-[#176B52]" />
                       <span>Loading registry records from backend...</span>
                     </div>
                   </td>
                 </tr>
               ) : schemes.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="text-center py-12 text-slate-400">
+                  <td colSpan={5} className="text-center py-12 text-[#687368]">
                     No scheme records found in database.
                   </td>
                 </tr>
               ) : (
                 schemes.map((scheme) => (
-                  <tr key={scheme.id} className="hover:bg-white/[0.02] transition-colors">
+                  <tr key={scheme.id} className="hover:bg-[#F7F8F5] transition-colors">
                     <td className="px-5 py-3.5">
-                      <div className="font-heading font-bold text-slate-100 text-xs sm:text-sm">{scheme.name}</div>
+                      <div className="font-heading font-bold text-[#202820] text-xs sm:text-sm">{scheme.name}</div>
                       {scheme.ministry && (
-                        <div className="text-[10px] text-slate-400">{scheme.ministry}</div>
+                        <div className="text-[11px] text-[#687368]">{scheme.ministry}</div>
                       )}
                     </td>
-                    <td className="px-5 py-3.5 capitalize font-semibold text-slate-300">
-                      <span className={`text-[10px] px-2 py-0.5 rounded font-bold uppercase tracking-wider ${
+                    <td className="px-5 py-3.5 capitalize font-medium text-[#202820]">
+                      <span className={`text-[10px] px-2 py-0.5 rounded-full font-semibold uppercase tracking-wider ${
                         scheme.level === 'central'
-                          ? 'bg-blue-500/10 text-blue-300 border border-blue-500/20'
-                          : 'bg-emerald-500/10 text-emerald-300 border border-emerald-500/20'
+                          ? 'bg-[#FAF5E9] text-[#8C6212] border border-[#F3E7CA]'
+                          : 'bg-[#E7F3EC] text-[#176B52] border border-[#176B52]/20'
                       }`}>
                         {scheme.level || 'Central'}
                       </span>
                     </td>
                     <td className="px-5 py-3.5">
-                      <span className="text-[10px] px-2 py-0.5 rounded bg-[#0b0f19] border border-slate-800 font-semibold text-slate-300">
+                      <span className="text-[11px] px-2 py-0.5 rounded-full bg-[#F7F8F5] border border-[#E5E9E3] font-medium text-[#202820]">
                         {scheme.category_icon} {scheme.category_name || 'General'}
                       </span>
                     </td>
@@ -239,13 +239,13 @@ export default function AdminPanel() {
                         title={scheme.is_active ? 'Click to disable' : 'Click to activate'}
                       >
                         {actionLoading[scheme.id] ? (
-                          <Loader2 className="h-4 w-4 animate-spin text-blue-400" />
+                          <Loader2 className="h-4 w-4 animate-spin text-[#176B52]" />
                         ) : scheme.is_active ? (
-                          <span className="text-[10px] font-bold text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-md border border-emerald-500/20">
+                          <span className="text-[10px] font-semibold text-[#176B52] bg-[#E7F3EC] px-2.5 py-1 rounded-full border border-[#176B52]/20">
                             Active
                           </span>
                         ) : (
-                          <span className="text-[10px] font-bold text-slate-400 bg-[#0b0f19] px-2.5 py-1 rounded-md border border-slate-800">
+                          <span className="text-[10px] font-semibold text-[#687368] bg-[#F7F8F5] px-2.5 py-1 rounded-full border border-[#E5E9E3]">
                             Disabled
                           </span>
                         )}
@@ -254,7 +254,7 @@ export default function AdminPanel() {
                     <td className="px-5 py-3.5 text-right space-x-2">
                       <Link
                         href={`/schemes/${scheme.slug}`}
-                        className="p-1.5 rounded-lg bg-[#0b0f19] border border-slate-800 text-blue-400 hover:text-white hover:border-blue-500/40 inline-flex items-center transition-colors"
+                        className="p-1.5 rounded-lg bg-white border border-[#E5E9E3] text-[#176B52] hover:bg-[#E7F3EC] inline-flex items-center transition-colors shadow-xs"
                         title="View detail"
                       >
                         <Eye className="h-3.5 w-3.5" />
@@ -263,7 +263,7 @@ export default function AdminPanel() {
                         type="button"
                         onClick={() => deleteScheme(scheme.id, scheme.name)}
                         disabled={actionLoading[`del_${scheme.id}`]}
-                        className="p-1.5 rounded-lg bg-rose-500/10 border border-rose-500/20 text-rose-400 hover:bg-rose-500/20 inline-flex items-center disabled:opacity-50 cursor-pointer transition-colors"
+                        className="p-1.5 rounded-lg bg-rose-50 border border-rose-200 text-rose-600 hover:bg-rose-100 inline-flex items-center disabled:opacity-50 cursor-pointer transition-colors"
                         title="Delete scheme permanently"
                       >
                         {actionLoading[`del_${scheme.id}`]

@@ -73,8 +73,8 @@ class SecurityHardenerService:
                     ):
                         logger.warning(f"SSRF Blocked: Resolved host {host} to private/unsafe IP {ip_str}")
                         return False
-            except Exception:
-                pass
+            except Exception as exc:
+                logger.debug("DNS resolution error during SSRF validation: %s", exc)
 
             return True
         except Exception as e:

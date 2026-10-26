@@ -1,42 +1,57 @@
 @import "tailwindcss";
 
 :root {
-  /* GovSchemeAI Official Civic Tech Palette */
-  --background: #080C15;
-  --background-secondary: #0D1322;
-  --card-bg: #111827;
-  --card-hover: #162035;
-  --card-elevated: #1B263D;
-  --border: rgba(255, 255, 255, 0.08);
-  --border-subtle: rgba(255, 255, 255, 0.04);
-  --border-focus: rgba(59, 130, 246, 0.5);
+  /* GovSchemeAI Premium Light Civic Design Tokens */
+  --background: #F7F8F5;
+  --background-secondary: #FFFFFF;
+  --surface: #FFFFFF;
+  --surface-hover: #F9FAF8;
+  --surface-subtle: #F1F4EE;
+  
+  /* Borders */
+  --border: #E5E9E3;
+  --border-subtle: #EDF1EB;
+  --border-strong: #CBD5CA;
+  --border-focus: #176B52;
 
-  /* Primary Civic Trust Blue */
-  --primary: #2563EB;
-  --primary-hover: #1D4ED8;
-  --primary-subtle: rgba(37, 99, 235, 0.12);
-  --primary-border: rgba(37, 99, 235, 0.28);
+  /* Primary Brand: Forest Green */
+  --primary: #176B52;
+  --primary-hover: #124C3D;
+  --primary-light: #E7F3EC;
+  --primary-subtle: rgba(23, 107, 82, 0.08);
+  --primary-border: rgba(23, 107, 82, 0.25);
 
-  /* Indian Civic Saffron / Amber (National Welfare Brand) */
-  --saffron: #F59E0B;
-  --saffron-hover: #D97706;
-  --saffron-subtle: rgba(245, 158, 11, 0.12);
-  --saffron-border: rgba(245, 158, 11, 0.25);
+  /* Secondary Accents: Mint, Sage, Warm Cream, Saffron */
+  --pale-mint: #E7F3EC;
+  --soft-sage: #DDE9DF;
+  --warm-cream: #FAF5E9;
+  --warm-cream-border: #F3E7CA;
+  
+  --saffron: #E8A126;
+  --saffron-hover: #D48E17;
+  --saffron-light: #FFF8EB;
+  --saffron-border: rgba(232, 161, 38, 0.3);
 
-  /* Official Verification Emerald Green */
-  --emerald: #10B981;
-  --emerald-subtle: rgba(16, 185, 129, 0.12);
-  --emerald-border: rgba(16, 185, 129, 0.25);
+  --emerald: #16A34A;
+  --emerald-light: #DCFCE7;
+  --emerald-border: rgba(22, 163, 74, 0.25);
 
-  /* Text & Contrast Tokens (WCAG 2.1 AAA / AA) */
-  --text-primary: #F8FAFC;
-  --text-secondary: #94A3B8;
-  --text-muted: #64748B;
-  --text-dim: #475569;
+  /* Typography Colors (Dark Charcoal high contrast on light bg) */
+  --text-primary: #202820;
+  --text-secondary: #687368;
+  --text-muted: #8A968A;
+  --text-dim: #A8B4A8;
 
   /* Typography Scales */
   --font-heading: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
   --font-body: 'Inter', system-ui, -apple-system, sans-serif;
+
+  /* Shadows */
+  --shadow-xs: 0 1px 2px 0 rgba(16, 24, 40, 0.03);
+  --shadow-sm: 0 1px 3px 0 rgba(16, 24, 40, 0.05), 0 1px 2px -1px rgba(16, 24, 40, 0.03);
+  --shadow-md: 0 4px 6px -1px rgba(16, 24, 40, 0.06), 0 2px 4px -2px rgba(16, 24, 40, 0.04);
+  --shadow-lg: 0 10px 15px -3px rgba(16, 24, 40, 0.08), 0 4px 6px -4px rgba(16, 24, 40, 0.03);
+  --shadow-xl: 0 20px 25px -5px rgba(16, 24, 40, 0.08), 0 8px 10px -6px rgba(16, 24, 40, 0.04);
 }
 
 body {
@@ -54,207 +69,139 @@ body {
   font-family: var(--font-heading);
 }
 
-/* Government Civic Card Surfaces */
+/* Light Civic Card Surfaces */
 .gov-card {
-  background: var(--card-bg);
+  background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: 1rem;
-  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.02);
-  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.gov-card-hover {
-  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.gov-card-hover:hover {
-  background: var(--card-hover);
-  border-color: rgba(59, 130, 246, 0.35);
-  transform: translateY(-2px);
-  box-shadow: 0 16px 36px -6px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(59, 130, 246, 0.18);
-}
-
-.gov-card-active {
-  background: var(--card-hover);
-  border-color: rgba(59, 130, 246, 0.5);
-}
-
-/* Header & Glass Utilities */
-.glass-header {
-  background: rgba(8, 12, 21, 0.88);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border-bottom: 1px solid var(--border);
-}
-
-/* Restrained Civic Typography Gradients */
-.text-civic-gradient {
-  background: linear-gradient(135deg, #FFFFFF 30%, #E2E8F0 70%, #93C5FD 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-.text-saffron-gradient {
-  background: linear-gradient(135deg, #FFFFFF 20%, #FDE68A 60%, #F59E0B 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-/* Custom Scrollbar */
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-::-webkit-scrollbar-track {
-  background: #080C15;
-}
-::-webkit-scrollbar-thumb {
-  background: #1E293B;
-  border-radius: 3px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: #334155;
-}
-
-/* Inputs, Selects, and Textareas */
-input, select, textarea {
-  background-color: #0E1422 !important;
-  border: 1px solid rgba(255, 255, 255, 0.1) !important;
-  color: #F8FAFC !important;
-  border-radius: 0.75rem;
+  box-shadow: var(--shadow-sm);
   transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-input:focus, select:focus, textarea:focus {
-  border-color: #3B82F6 !important;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2) !important;
-  outline: none !important;
-  background-color: #121A2D !important;
+.gov-card-hover:hover {
+  border-color: var(--border-strong);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-1px);
 }
 
-select option {
-  background-color: #0E1422;
-  color: #F8FAFC;
+/* Civic Primary Action Button */
+.civic-btn-primary {
+  background-color: var(--primary);
+  color: #FFFFFF;
+  font-weight: 600;
+  border-radius: 0.75rem;
+  padding: 0.625rem 1.25rem;
+  min-height: 2.75rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  box-shadow: var(--shadow-sm);
+  transition: all 0.15s ease-in-out;
+  cursor: pointer;
+}
+.civic-btn-primary:hover {
+  background-color: var(--primary-hover);
+  box-shadow: var(--shadow-md);
 }
 
-/* Shimmer Loading Skeleton */
-@keyframes shimmer {
-  0% {
-    background-position: -200% 0;
-  }
-  100% {
-    background-position: 200% 0;
-  }
+/* Civic Secondary / Outline Button */
+.civic-btn-secondary {
+  background-color: #FFFFFF;
+  color: var(--text-primary);
+  border: 1px solid var(--border);
+  font-weight: 600;
+  border-radius: 0.75rem;
+  padding: 0.625rem 1.25rem;
+  min-height: 2.75rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  transition: all 0.15s ease-in-out;
+  cursor: pointer;
+}
+.civic-btn-secondary:hover {
+  background-color: var(--surface-hover);
+  border-color: var(--border-strong);
 }
 
-.skeleton-shimmer {
-  background: linear-gradient(90deg, #111827 25%, #1E293B 50%, #111827 75%);
-  background-size: 200% 100%;
-  animation: shimmer 1.8s infinite;
+/* Form inputs */
+input[type="text"],
+input[type="number"],
+input[type="search"],
+input[type="email"],
+select,
+textarea {
+  background-color: #FFFFFF;
+  color: var(--text-primary);
+  border: 1px solid var(--border);
+  border-radius: 0.75rem;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
-/* Animations */
+input:focus,
+select:focus,
+textarea:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(23, 107, 82, 0.12);
+}
+
+/* Micro-animations */
 @keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(6px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.animate-fade-in {
-  animation: fadeIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 @keyframes slideUp {
-  from {
-    opacity: 0;
-    transform: translateY(14px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 .animate-slide-up {
-  animation: slideUp 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: slideUp 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
-/* Slide in from right (Drawer) */
-@keyframes slideInRight {
-  from {
-    transform: translateX(100%);
-  }
-  to {
-    transform: translateX(0);
-  }
-}
-
-.animate-slide-in-right {
-  animation: slideInRight 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-}
-
-/* WCAG 2.1 AA Keyboard Focus Visibility */
-a:focus-visible, 
-button:focus-visible, 
-input:focus-visible, 
-select:focus-visible, 
-textarea:focus-visible, 
-[role="button"]:focus-visible {
-  outline: 2px solid #3B82F6 !important;
-  outline-offset: 2px !important;
-  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.25) !important;
-}
-
-/* Respect reduced motion */
-@media (prefers-reduced-motion: reduce) {
-  *, ::before, ::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-    scroll-behavior: auto !important;
-  }
-}
-
-/* Markdown Tables */
-.markdown-table-wrapper {
-  overflow-x: auto;
-  margin: 1.25rem 0;
-  border-radius: 0.75rem;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-}
-
+/* Markdown tables */
 .markdown-table {
   width: 100%;
   border-collapse: collapse;
-  text-align: left;
-  font-size: 0.875rem;
 }
 
 .markdown-table th {
-  background: rgba(255, 255, 255, 0.03);
-  color: #F8FAFC;
-  font-weight: 600;
+  background: var(--surface-subtle);
+  color: var(--text-primary);
+  font-weight: 700;
   padding: 0.75rem 1rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  border-bottom: 1px solid var(--border);
+  text-align: left;
 }
 
 .markdown-table td {
   padding: 0.75rem 1rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-  color: #94A3B8;
+  border-bottom: 1px solid var(--border-subtle);
+  color: var(--text-secondary);
 }
 
-.markdown-table tr:last-child td {
-  border-bottom: none;
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
 }
 
-.markdown-table tr:hover td {
-  background: rgba(255, 255, 255, 0.015);
+::-webkit-scrollbar-track {
+  background: #F7F8F5;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #CBD5CA;
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #A8B4A8;
 }

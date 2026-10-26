@@ -13,18 +13,11 @@ import {
   BookOpen, 
   RefreshCw, 
   X, 
-  History, 
-  Clock, 
-  Scale, 
   BookmarkCheck,
-  ArrowRight,
   AlertTriangle,
   SlidersHorizontal,
   ChevronLeft,
-  ChevronRight,
-  Building2,
-  MapPin,
-  Check
+  ChevronRight
 } from 'lucide-react';
 
 export default function SchemesBrowse() {
@@ -171,16 +164,16 @@ export default function SchemesBrowse() {
       <CompareFloatingBar />
 
       {/* Page Header */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4 border-b border-white/[0.08] pb-6">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4 border-b border-[#E5E9E3] pb-6">
         <div>
-          <div className="inline-flex items-center gap-1.5 text-xs font-bold text-blue-400 uppercase tracking-wider">
-            <BookOpen className="h-4 w-4" />
+          <div className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#176B52] bg-[#E7F3EC] px-2.5 py-0.5 rounded-full">
+            <BookOpen className="h-3.5 w-3.5" />
             <span>National Welfare Catalog</span>
           </div>
-          <h1 className="font-heading text-3xl sm:text-4xl font-black text-slate-100 mt-1">
+          <h1 className="font-heading text-3xl sm:text-4xl font-bold text-[#202820] mt-2">
             Government Schemes Directory
           </h1>
-          <p className="text-xs sm:text-sm text-slate-400 mt-1">
+          <p className="text-xs sm:text-sm text-[#687368] mt-1">
             Browse and filter verified welfare programs, scholarships, and financial grants across India.
           </p>
         </div>
@@ -192,11 +185,11 @@ export default function SchemesBrowse() {
             onClick={() => { setSavedOnly(!savedOnly); setPage(1); }}
             className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold border transition-all cursor-pointer ${
               savedOnly
-                ? 'bg-amber-500/20 text-amber-300 border-amber-500/40 shadow-xs'
-                : 'bg-[#0E1422] text-slate-300 border-white/[0.08] hover:border-white/[0.15]'
+                ? 'bg-[#FAF5E9] text-[#E8A126] border-[#F3E7CA] shadow-xs'
+                : 'bg-white text-[#202820] border-[#E5E9E3] hover:border-[#176B52]/40'
             }`}
           >
-            <BookmarkCheck className="h-4 w-4 text-amber-400" />
+            <BookmarkCheck className="h-4 w-4 text-[#E8A126]" />
             <span>Saved Schemes</span>
           </button>
 
@@ -204,12 +197,12 @@ export default function SchemesBrowse() {
           <button
             type="button"
             onClick={() => setFilterDrawerOpen(true)}
-            className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold bg-blue-600 hover:bg-blue-500 text-white shadow-xs transition-colors cursor-pointer"
+            className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold bg-[#176B52] hover:bg-[#124C3D] text-white shadow-xs transition-colors cursor-pointer"
           >
             <SlidersHorizontal className="h-4 w-4" />
             <span>Filter</span>
             {activeFilterCount > 0 && (
-              <span className="ml-0.5 px-1.5 py-0.2 rounded-full text-[10px] font-bold bg-white text-blue-900">
+              <span className="ml-0.5 px-1.5 py-0.2 rounded-full text-[10px] font-bold bg-white text-[#176B52]">
                 {activeFilterCount}
               </span>
             )}
@@ -221,19 +214,19 @@ export default function SchemesBrowse() {
       <div className="grid grid-cols-1 md:grid-cols-12 gap-3 items-center">
         {/* Search Bar */}
         <div className="md:col-span-8 relative">
-          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 pointer-events-none" />
+          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-[#8A968A] pointer-events-none" />
           <input
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search by scheme name, ministry, or benefit keywords (e.g., KISAN, scholarship)..."
-            className="w-full pl-10 pr-10 py-3 rounded-xl text-xs sm:text-sm bg-[#0E1422] border border-white/[0.1] text-slate-100 placeholder-slate-400 focus:border-blue-500"
+            className="w-full pl-10 pr-10 py-3 rounded-xl text-xs sm:text-sm bg-white border border-[#E5E9E3] text-[#202820] placeholder-[#8A968A] focus:border-[#176B52] focus:outline-none shadow-xs transition-all"
           />
           {search && (
             <button
               type="button"
               onClick={() => setSearch('')}
-              className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white"
+              className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[#8A968A] hover:text-[#202820]"
               aria-label="Clear search"
             >
               <X className="h-4 w-4" />
@@ -243,11 +236,11 @@ export default function SchemesBrowse() {
 
         {/* Sorting Dropdown */}
         <div className="md:col-span-4 flex items-center gap-2">
-          <span className="text-xs text-slate-400 shrink-0 font-medium">Sort by:</span>
+          <span className="text-xs text-[#687368] shrink-0 font-medium">Sort by:</span>
           <select
             value={sortBy}
             onChange={(e) => { setSortBy(e.target.value); setPage(1); }}
-            className="w-full py-2.5 px-3 rounded-xl text-xs bg-[#0E1422] border border-white/[0.1] text-slate-200"
+            className="w-full py-2.5 px-3 rounded-xl text-xs bg-white border border-[#E5E9E3] text-[#202820] focus:border-[#176B52] focus:outline-none shadow-xs"
           >
             <option value="name-asc">Name (A to Z)</option>
             <option value="name-desc">Name (Z to A)</option>
@@ -264,8 +257,8 @@ export default function SchemesBrowse() {
           onClick={() => { setCategory(''); setPage(1); }}
           className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-colors cursor-pointer ${
             category === ''
-              ? 'bg-blue-600 text-white shadow-xs'
-              : 'bg-[#0E1422] text-slate-300 hover:text-white border border-white/[0.08]'
+              ? 'bg-[#176B52] text-white shadow-xs'
+              : 'bg-white text-[#202820] hover:text-[#176B52] border border-[#E5E9E3]'
           }`}
         >
           All Schemes
@@ -279,8 +272,8 @@ export default function SchemesBrowse() {
               onClick={() => { setCategory(isSelected ? '' : cat.slug); setPage(1); }}
               className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-colors cursor-pointer ${
                 isSelected
-                  ? 'bg-blue-600 text-white shadow-xs'
-                  : 'bg-[#0E1422] text-slate-300 hover:text-white border border-white/[0.08] hover:border-blue-500/30'
+                  ? 'bg-[#176B52] text-white shadow-xs'
+                  : 'bg-white text-[#202820] hover:text-[#176B52] border border-[#E5E9E3] hover:border-[#176B52]/40'
               }`}
             >
               {cat.name}
@@ -291,38 +284,38 @@ export default function SchemesBrowse() {
 
       {/* Active Filter Indicators */}
       {activeFilterCount > 0 && (
-        <div className="flex items-center justify-between flex-wrap gap-2 py-2 px-3 bg-white/[0.02] border border-white/[0.04] rounded-xl text-xs">
+        <div className="flex items-center justify-between flex-wrap gap-2 py-2 px-3 bg-white border border-[#E5E9E3] rounded-xl text-xs">
           <div className="flex items-center gap-2 flex-wrap">
-            <span className="text-slate-400 font-medium">Active Filters:</span>
+            <span className="text-[#687368] font-medium">Active Filters:</span>
             {category && (
-              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md bg-blue-500/15 border border-blue-500/30 text-blue-300 text-[11px] font-semibold">
+              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-[#E7F3EC] border border-[#176B52]/20 text-[#176B52] text-[11px] font-semibold">
                 Category: {category}
-                <button onClick={() => setCategory('')} className="hover:text-white"><X className="h-3 w-3" /></button>
+                <button onClick={() => setCategory('')} className="hover:text-[#124C3D]"><X className="h-3 w-3" /></button>
               </span>
             )}
             {level && (
-              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md bg-amber-500/15 border border-amber-500/30 text-amber-300 text-[11px] font-semibold">
+              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-[#FAF5E9] border border-[#F3E7CA] text-[#E8A126] text-[11px] font-semibold">
                 Level: {level}
-                <button onClick={() => setLevel('')} className="hover:text-white"><X className="h-3 w-3" /></button>
+                <button onClick={() => setLevel('')} className="hover:text-[#8C6212]"><X className="h-3 w-3" /></button>
               </span>
             )}
             {selectedState && (
-              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 text-[11px] font-semibold">
+              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-[#E7F3EC] border border-[#176B52]/20 text-[#176B52] text-[11px] font-semibold">
                 State: {selectedState}
-                <button onClick={() => setSelectedState('')} className="hover:text-white"><X className="h-3 w-3" /></button>
+                <button onClick={() => setSelectedState('')} className="hover:text-[#124C3D]"><X className="h-3 w-3" /></button>
               </span>
             )}
             {savedOnly && (
-              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md bg-amber-500/15 border border-amber-500/30 text-amber-300 text-[11px] font-semibold">
+              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-[#FAF5E9] border border-[#F3E7CA] text-[#E8A126] text-[11px] font-semibold">
                 Saved Only
-                <button onClick={() => setSavedOnly(false)} className="hover:text-white"><X className="h-3 w-3" /></button>
+                <button onClick={() => setSavedOnly(false)} className="hover:text-[#8C6212]"><X className="h-3 w-3" /></button>
               </span>
             )}
           </div>
           <button
             type="button"
             onClick={resetAllFilters}
-            className="text-xs text-slate-400 hover:text-white font-semibold underline underline-offset-2 cursor-pointer"
+            className="text-xs text-[#687368] hover:text-[#176B52] font-semibold underline underline-offset-2 cursor-pointer"
           >
             Clear all
           </button>
@@ -330,7 +323,7 @@ export default function SchemesBrowse() {
       )}
 
       {/* Schemes Results Summary */}
-      <div className="flex items-center justify-between text-xs text-slate-400 font-medium pt-1">
+      <div className="flex items-center justify-between text-xs text-[#687368] font-medium pt-1">
         <span>
           Showing {schemes.length} of {total} verified government schemes
         </span>
@@ -343,39 +336,39 @@ export default function SchemesBrowse() {
       {loading ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {Array.from({ length: 6 }).map((_, idx) => (
-            <div key={idx} className="gov-card p-6 rounded-2xl border border-white/[0.08] space-y-4">
-              <div className="h-4 w-28 rounded skeleton-shimmer" />
-              <div className="h-6 w-3/4 rounded skeleton-shimmer" />
-              <div className="h-12 w-full rounded-xl skeleton-shimmer" />
-              <div className="h-4 w-1/2 rounded skeleton-shimmer" />
+            <div key={idx} className="bg-white p-6 rounded-2xl border border-[#E5E9E3] space-y-4 shadow-xs">
+              <div className="h-4 w-28 rounded bg-[#F7F8F5] animate-pulse" />
+              <div className="h-6 w-3/4 rounded bg-[#F7F8F5] animate-pulse" />
+              <div className="h-12 w-full rounded-xl bg-[#F7F8F5] animate-pulse" />
+              <div className="h-4 w-1/2 rounded bg-[#F7F8F5] animate-pulse" />
             </div>
           ))}
         </div>
       ) : error ? (
-        <div className="gov-card p-12 text-center rounded-2xl border border-red-500/30 space-y-4 max-w-lg mx-auto bg-[#0E1422]">
-          <AlertTriangle className="h-10 w-10 text-red-400 mx-auto" />
-          <h3 className="font-heading text-lg font-bold text-slate-100">Unable to Load Schemes</h3>
-          <p className="text-xs text-slate-400 leading-relaxed">{error}</p>
+        <div className="p-12 text-center rounded-2xl border border-red-200 space-y-4 max-w-lg mx-auto bg-white shadow-xs">
+          <AlertTriangle className="h-10 w-10 text-red-500 mx-auto" />
+          <h3 className="font-heading text-lg font-bold text-[#202820]">Unable to Load Schemes</h3>
+          <p className="text-xs text-[#687368] leading-relaxed">{error}</p>
           <button
             type="button"
             onClick={() => setRetryCount(prev => prev + 1)}
-            className="px-5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-xs font-bold transition-all cursor-pointer inline-flex items-center gap-2"
+            className="px-5 py-2.5 bg-[#176B52] hover:bg-[#124C3D] text-white rounded-xl text-xs font-semibold transition-all cursor-pointer inline-flex items-center gap-2"
           >
             <RefreshCw className="h-4 w-4" />
             <span>Retry Connection</span>
           </button>
         </div>
       ) : schemes.length === 0 ? (
-        <div className="gov-card p-12 text-center rounded-2xl border border-white/[0.08] space-y-4 max-w-lg mx-auto bg-[#0E1422]">
-          <BookOpen className="h-10 w-10 text-slate-500 mx-auto" />
-          <h3 className="font-heading text-lg font-bold text-slate-100">No Matching Schemes Found</h3>
-          <p className="text-xs text-slate-400 leading-relaxed">
+        <div className="p-12 text-center rounded-2xl border border-[#E5E9E3] space-y-4 max-w-lg mx-auto bg-white shadow-xs">
+          <BookOpen className="h-10 w-10 text-[#8A968A] mx-auto" />
+          <h3 className="font-heading text-lg font-bold text-[#202820]">No Matching Schemes Found</h3>
+          <p className="text-xs text-[#687368] leading-relaxed">
             We couldn&apos;t find any government schemes matching your active criteria. Try broadening your search or resetting filters.
           </p>
           <button
             type="button"
             onClick={resetAllFilters}
-            className="px-5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-xs font-bold transition-all cursor-pointer"
+            className="px-5 py-2.5 bg-[#176B52] hover:bg-[#124C3D] text-white rounded-xl text-xs font-semibold transition-all cursor-pointer"
           >
             Reset All Filters
           </button>
@@ -404,13 +397,13 @@ export default function SchemesBrowse() {
             type="button"
             disabled={page <= 1}
             onClick={() => setPage(prev => Math.max(1, prev - 1))}
-            className="flex items-center gap-1 px-3 py-2 rounded-xl text-xs font-bold bg-[#0E1422] border border-white/[0.08] text-slate-300 hover:text-white disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+            className="flex items-center gap-1 px-3 py-2 rounded-xl text-xs font-semibold bg-white border border-[#E5E9E3] text-[#202820] hover:text-[#176B52] disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer shadow-xs"
           >
             <ChevronLeft className="h-4 w-4" />
             <span>Previous</span>
           </button>
 
-          <span className="text-xs font-bold text-slate-400 px-3">
+          <span className="text-xs font-semibold text-[#687368] px-3">
             {page} of {totalPages}
           </span>
 
@@ -418,7 +411,7 @@ export default function SchemesBrowse() {
             type="button"
             disabled={page >= totalPages}
             onClick={() => setPage(prev => Math.min(totalPages, prev + 1))}
-            className="flex items-center gap-1 px-3 py-2 rounded-xl text-xs font-bold bg-[#0E1422] border border-white/[0.08] text-slate-300 hover:text-white disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+            className="flex items-center gap-1 px-3 py-2 rounded-xl text-xs font-semibold bg-white border border-[#E5E9E3] text-[#202820] hover:text-[#176B52] disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer shadow-xs"
           >
             <span>Next</span>
             <ChevronRight className="h-4 w-4" />
@@ -436,17 +429,17 @@ export default function SchemesBrowse() {
         <div className="space-y-6">
           {/* Level Filter */}
           <div className="space-y-2">
-            <span className="text-xs font-bold uppercase tracking-wider text-slate-300 block">
+            <span className="text-xs font-bold uppercase tracking-wider text-[#202820] block">
               Jurisdiction Level
             </span>
             <div className="grid grid-cols-3 gap-2">
               <button
                 type="button"
                 onClick={() => setLevel('')}
-                className={`py-2 px-3 rounded-lg text-xs font-semibold border text-center transition-colors cursor-pointer ${
+                className={`py-2 px-3 rounded-xl text-xs font-semibold border text-center transition-colors cursor-pointer ${
                   level === ''
-                    ? 'bg-blue-600 text-white border-blue-500'
-                    : 'bg-[#080C15] text-slate-300 border-white/[0.08] hover:border-white/[0.15]'
+                    ? 'bg-[#176B52] text-white border-[#176B52]'
+                    : 'bg-[#F7F8F5] text-[#202820] border-[#E5E9E3] hover:border-[#176B52]/40'
                 }`}
               >
                 All
@@ -454,10 +447,10 @@ export default function SchemesBrowse() {
               <button
                 type="button"
                 onClick={() => setLevel('Central')}
-                className={`py-2 px-3 rounded-lg text-xs font-semibold border text-center transition-colors cursor-pointer ${
+                className={`py-2 px-3 rounded-xl text-xs font-semibold border text-center transition-colors cursor-pointer ${
                   level === 'Central'
-                    ? 'bg-blue-600 text-white border-blue-500'
-                    : 'bg-[#080C15] text-slate-300 border-white/[0.08] hover:border-white/[0.15]'
+                    ? 'bg-[#176B52] text-white border-[#176B52]'
+                    : 'bg-[#F7F8F5] text-[#202820] border-[#E5E9E3] hover:border-[#176B52]/40'
                 }`}
               >
                 Central
@@ -465,10 +458,10 @@ export default function SchemesBrowse() {
               <button
                 type="button"
                 onClick={() => setLevel('State')}
-                className={`py-2 px-3 rounded-lg text-xs font-semibold border text-center transition-colors cursor-pointer ${
+                className={`py-2 px-3 rounded-xl text-xs font-semibold border text-center transition-colors cursor-pointer ${
                   level === 'State'
-                    ? 'bg-blue-600 text-white border-blue-500'
-                    : 'bg-[#080C15] text-slate-300 border-white/[0.08] hover:border-white/[0.15]'
+                    ? 'bg-[#176B52] text-white border-[#176B52]'
+                    : 'bg-[#F7F8F5] text-[#202820] border-[#E5E9E3] hover:border-[#176B52]/40'
                 }`}
               >
                 State
@@ -478,13 +471,13 @@ export default function SchemesBrowse() {
 
           {/* State & Territory Selector */}
           <div className="space-y-2">
-            <span className="text-xs font-bold uppercase tracking-wider text-slate-300 block">
+            <span className="text-xs font-bold uppercase tracking-wider text-[#202820] block">
               State / Union Territory
             </span>
             <select
               value={selectedState}
               onChange={(e) => { setSelectedState(e.target.value); setPage(1); }}
-              className="w-full py-2.5 px-3 rounded-xl text-xs bg-[#080C15] border border-white/[0.1] text-slate-200"
+              className="w-full py-2.5 px-3 rounded-xl text-xs bg-[#F7F8F5] border border-[#E5E9E3] text-[#202820] focus:border-[#176B52] focus:outline-none"
             >
               <option value="">All States & UTs (Pan-India)</option>
               {statesList.map(st => (
@@ -495,13 +488,13 @@ export default function SchemesBrowse() {
 
           {/* Ministry / Category Selector */}
           <div className="space-y-2">
-            <span className="text-xs font-bold uppercase tracking-wider text-slate-300 block">
+            <span className="text-xs font-bold uppercase tracking-wider text-[#202820] block">
               Ministry Category
             </span>
             <select
               value={category}
               onChange={(e) => { setCategory(e.target.value); setPage(1); }}
-              className="w-full py-2.5 px-3 rounded-xl text-xs bg-[#080C15] border border-white/[0.1] text-slate-200"
+              className="w-full py-2.5 px-3 rounded-xl text-xs bg-[#F7F8F5] border border-[#E5E9E3] text-[#202820] focus:border-[#176B52] focus:outline-none"
             >
               <option value="">All Categories</option>
               {categories.map(cat => (
@@ -511,18 +504,18 @@ export default function SchemesBrowse() {
           </div>
 
           {/* Bottom Action inside drawer */}
-          <div className="pt-6 border-t border-white/[0.08] flex items-center justify-between gap-3">
+          <div className="pt-6 border-t border-[#E5E9E3] flex items-center justify-between gap-3">
             <button
               type="button"
               onClick={resetAllFilters}
-              className="px-4 py-2 text-xs font-semibold text-slate-400 hover:text-white transition-colors cursor-pointer"
+              className="px-4 py-2 text-xs font-semibold text-[#687368] hover:text-[#202820] transition-colors cursor-pointer"
             >
               Reset Filters
             </button>
             <button
               type="button"
               onClick={() => setFilterDrawerOpen(false)}
-              className="px-5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-xs font-bold transition-colors cursor-pointer"
+              className="px-5 py-2.5 bg-[#176B52] hover:bg-[#124C3D] text-white rounded-xl text-xs font-semibold transition-colors cursor-pointer"
             >
               Apply ({activeFilterCount})
             </button>

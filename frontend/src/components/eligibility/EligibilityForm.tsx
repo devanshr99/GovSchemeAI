@@ -17,7 +17,6 @@ import {
   Briefcase,
   ChevronRight,
   ChevronLeft,
-  CheckCircle2,
   ShieldCheck
 } from 'lucide-react';
 
@@ -173,38 +172,38 @@ export const EligibilityForm: React.FC = () => {
   };
 
   return (
-    <div className="gov-card p-6 sm:p-7 rounded-3xl border border-white/[0.1] bg-[#0E1422] shadow-2xl space-y-6">
+    <div className="bg-white p-6 sm:p-7 rounded-3xl border border-[#E5E9E3] shadow-lg shadow-black/5 space-y-6">
       
       {/* Form Header */}
-      <div className="space-y-1.5 pb-4 border-b border-white/[0.08]">
+      <div className="space-y-1.5 pb-4 border-b border-[#E5E9E3]">
         <div className="flex items-center justify-between">
-          <div className="inline-flex items-center gap-1.5 text-[11px] font-bold text-amber-400 uppercase tracking-wider">
-            <Sparkles className="h-3.5 w-3.5" />
+          <div className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#176B52] bg-[#E7F3EC] px-2.5 py-0.5 rounded-full">
+            <Sparkles className="h-3 w-3 text-[#E8A126]" />
             <span>Eligibility Quick-Scan</span>
           </div>
-          <span className="text-[11px] font-bold text-slate-400">
+          <span className="text-xs font-medium text-[#687368]">
             Step {currentStep} of 3
           </span>
         </div>
-        <h3 className="font-heading text-lg sm:text-xl font-bold text-slate-100">
+        <h3 className="font-heading text-lg sm:text-xl font-bold text-[#202820]">
           Find Your Eligible Welfare Schemes
         </h3>
-        <p className="text-xs text-slate-400">
-          Answer 3 brief questions to scan all 130+ central and state ministry benefits.
+        <p className="text-xs text-[#687368]">
+          Answer 3 brief questions to scan all central and state ministry benefits.
         </p>
 
         {/* Step Progress Bar */}
-        <div className="w-full bg-white/[0.06] h-1.5 rounded-full overflow-hidden mt-3">
+        <div className="w-full bg-[#E5E9E3] h-1.5 rounded-full overflow-hidden mt-3">
           <div 
-            className="bg-gradient-to-r from-blue-600 to-amber-500 h-full transition-all duration-300 rounded-full"
+            className="bg-[#176B52] h-full transition-all duration-300 rounded-full"
             style={{ width: `${(currentStep / 3) * 100}%` }}
           />
         </div>
       </div>
 
       {formError && (
-        <div className="p-3 rounded-xl bg-red-500/10 border border-red-500/30 text-xs text-red-300 flex items-center gap-2 animate-fade-in">
-          <AlertTriangle className="h-4 w-4 shrink-0 text-red-400" />
+        <div className="p-3 rounded-xl bg-red-50 border border-red-200 text-xs text-red-700 flex items-center gap-2 animate-fade-in">
+          <AlertTriangle className="h-4 w-4 shrink-0 text-red-500" />
           <span>{formError}</span>
         </div>
       )}
@@ -216,8 +215,8 @@ export const EligibilityForm: React.FC = () => {
           <div className="space-y-4 animate-fade-in">
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-slate-300 flex items-center gap-1">
-                  <Calendar className="h-3.5 w-3.5 text-blue-400" />
+                <label className="text-xs font-semibold text-[#202820] flex items-center gap-1">
+                  <Calendar className="h-3.5 w-3.5 text-[#176B52]" />
                   <span>Age (Years)</span>
                 </label>
                 <input
@@ -226,20 +225,20 @@ export const EligibilityForm: React.FC = () => {
                   max="120"
                   value={age}
                   onChange={(e) => setAge(parseInt(e.target.value) || 0)}
-                  className="w-full px-3 py-2 text-xs bg-[#080C15] border border-white/[0.1] text-slate-100"
+                  className="w-full px-3.5 py-2 text-xs bg-[#F7F8F5] border border-[#E5E9E3] rounded-xl text-[#202820] focus:bg-white focus:border-[#176B52] focus:outline-none transition-all"
                   required
                 />
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-slate-300 flex items-center gap-1">
-                  <User className="h-3.5 w-3.5 text-blue-400" />
+                <label className="text-xs font-semibold text-[#202820] flex items-center gap-1">
+                  <User className="h-3.5 w-3.5 text-[#176B52]" />
                   <span>Gender</span>
                 </label>
                 <select
                   value={gender}
                   onChange={(e) => handleGenderChange(e.target.value as 'male' | 'female' | 'other')}
-                  className="w-full px-3 py-2 text-xs bg-[#080C15] border border-white/[0.1] text-slate-100"
+                  className="w-full px-3.5 py-2 text-xs bg-[#F7F8F5] border border-[#E5E9E3] rounded-xl text-[#202820] focus:bg-white focus:border-[#176B52] focus:outline-none transition-all"
                 >
                   <option value="female">Female</option>
                   <option value="male">Male</option>
@@ -249,14 +248,14 @@ export const EligibilityForm: React.FC = () => {
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-slate-300 flex items-center gap-1">
-                <MapPin className="h-3.5 w-3.5 text-blue-400" />
+              <label className="text-xs font-semibold text-[#202820] flex items-center gap-1">
+                <MapPin className="h-3.5 w-3.5 text-[#176B52]" />
                 <span>State of Residence</span>
               </label>
               <select
                 value={state}
                 onChange={(e) => setState(e.target.value)}
-                className="w-full px-3 py-2 text-xs bg-[#080C15] border border-white/[0.1] text-slate-100"
+                className="w-full px-3.5 py-2 text-xs bg-[#F7F8F5] border border-[#E5E9E3] rounded-xl text-[#202820] focus:bg-white focus:border-[#176B52] focus:outline-none transition-all"
                 required
               >
                 {statesList.map(st => (
@@ -267,14 +266,14 @@ export const EligibilityForm: React.FC = () => {
 
             {districtsList.length > 0 && (
               <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-slate-300 flex items-center gap-1">
-                  <MapPin className="h-3.5 w-3.5 text-slate-400" />
+                <label className="text-xs font-semibold text-[#202820] flex items-center gap-1">
+                  <MapPin className="h-3.5 w-3.5 text-[#687368]" />
                   <span>District (Optional)</span>
                 </label>
                 <select
                   value={district}
                   onChange={(e) => setDistrict(e.target.value)}
-                  className="w-full px-3 py-2 text-xs bg-[#080C15] border border-white/[0.1] text-slate-100"
+                  className="w-full px-3.5 py-2 text-xs bg-[#F7F8F5] border border-[#E5E9E3] rounded-xl text-[#202820] focus:bg-white focus:border-[#176B52] focus:outline-none transition-all"
                 >
                   <option value="">All Districts in {state}</option>
                   {districtsList.map(d => (
@@ -290,8 +289,8 @@ export const EligibilityForm: React.FC = () => {
         {currentStep === 2 && (
           <div className="space-y-4 animate-fade-in">
             <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-slate-300 flex items-center gap-1">
-                <IndianRupee className="h-3.5 w-3.5 text-emerald-400" />
+              <label className="text-xs font-semibold text-[#202820] flex items-center gap-1">
+                <IndianRupee className="h-3.5 w-3.5 text-[#176B52]" />
                 <span>Annual Household Income (₹)</span>
               </label>
               <input
@@ -301,21 +300,21 @@ export const EligibilityForm: React.FC = () => {
                 value={annualIncome}
                 onChange={(e) => setAnnualIncome(parseInt(e.target.value) || 0)}
                 placeholder="e.g. 150000"
-                className="w-full px-3 py-2 text-xs bg-[#080C15] border border-white/[0.1] text-slate-100"
+                className="w-full px-3.5 py-2 text-xs bg-[#F7F8F5] border border-[#E5E9E3] rounded-xl text-[#202820] focus:bg-white focus:border-[#176B52] focus:outline-none transition-all"
                 required
               />
-              <span className="text-[10px] text-slate-400">Total yearly income of family from all sources</span>
+              <span className="text-[11px] text-[#687368]">Total yearly income of family from all sources</span>
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-slate-300 flex items-center gap-1">
-                <UserCheck className="h-3.5 w-3.5 text-blue-400" />
+              <label className="text-xs font-semibold text-[#202820] flex items-center gap-1">
+                <UserCheck className="h-3.5 w-3.5 text-[#176B52]" />
                 <span>Social Category</span>
               </label>
               <select
                 value={category}
                 onChange={(e) => setCategory(e.target.value as 'general' | 'obc' | 'sc' | 'st')}
-                className="w-full px-3 py-2 text-xs bg-[#080C15] border border-white/[0.1] text-slate-100"
+                className="w-full px-3.5 py-2 text-xs bg-[#F7F8F5] border border-[#E5E9E3] rounded-xl text-[#202820] focus:bg-white focus:border-[#176B52] focus:outline-none transition-all"
               >
                 <option value="general">General</option>
                 <option value="obc">OBC (Other Backward Class)</option>
@@ -325,24 +324,24 @@ export const EligibilityForm: React.FC = () => {
             </div>
 
             <div className="grid grid-cols-2 gap-3 pt-2">
-              <label className="flex items-center gap-2 p-2.5 rounded-xl bg-[#080C15] border border-white/[0.08] cursor-pointer hover:border-white/[0.15] transition-colors">
+              <label className="flex items-center gap-2 p-2.5 rounded-xl bg-[#F7F8F5] border border-[#E5E9E3] cursor-pointer hover:border-[#176B52]/40 transition-colors">
                 <input
                   type="checkbox"
                   checked={isBpl}
                   onChange={(e) => setIsBpl(e.target.checked)}
-                  className="rounded text-blue-600"
+                  className="rounded text-[#176B52] focus:ring-[#176B52]"
                 />
-                <span className="text-xs text-slate-200 font-medium">BPL / Ration Card</span>
+                <span className="text-xs text-[#202820] font-medium">BPL / Ration Card</span>
               </label>
 
-              <label className="flex items-center gap-2 p-2.5 rounded-xl bg-[#080C15] border border-white/[0.08] cursor-pointer hover:border-white/[0.15] transition-colors">
+              <label className="flex items-center gap-2 p-2.5 rounded-xl bg-[#F7F8F5] border border-[#E5E9E3] cursor-pointer hover:border-[#176B52]/40 transition-colors">
                 <input
                   type="checkbox"
                   checked={disability}
                   onChange={(e) => setDisability(e.target.checked)}
-                  className="rounded text-blue-600"
+                  className="rounded text-[#176B52] focus:ring-[#176B52]"
                 />
-                <span className="text-xs text-slate-200 font-medium">Persons with Disability</span>
+                <span className="text-xs text-[#202820] font-medium">Persons with Disability</span>
               </label>
             </div>
           </div>
@@ -352,14 +351,14 @@ export const EligibilityForm: React.FC = () => {
         {currentStep === 3 && (
           <div className="space-y-4 animate-fade-in">
             <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-slate-300 flex items-center gap-1">
-                <Briefcase className="h-3.5 w-3.5 text-amber-400" />
+              <label className="text-xs font-semibold text-[#202820] flex items-center gap-1">
+                <Briefcase className="h-3.5 w-3.5 text-[#176B52]" />
                 <span>Primary Occupation</span>
               </label>
               <select
                 value={occupation}
                 onChange={(e) => handleOccupationChange(e.target.value)}
-                className="w-full px-3 py-2 text-xs bg-[#080C15] border border-white/[0.1] text-slate-100"
+                className="w-full px-3.5 py-2 text-xs bg-[#F7F8F5] border border-[#E5E9E3] rounded-xl text-[#202820] focus:bg-white focus:border-[#176B52] focus:outline-none transition-all"
               >
                 <option value="farmer">Farmer / Agricultural Worker</option>
                 <option value="student">Student / Scholar</option>
@@ -372,8 +371,8 @@ export const EligibilityForm: React.FC = () => {
             </div>
 
             {occupation === 'farmer' && (
-              <div className="space-y-1.5 p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20 animate-fade-in">
-                <label className="text-xs font-semibold text-emerald-300">
+              <div className="space-y-1.5 p-3 rounded-xl bg-[#E7F3EC] border border-[#176B52]/20 animate-fade-in">
+                <label className="text-xs font-semibold text-[#176B52]">
                   Land Holding (Acres)
                 </label>
                 <input
@@ -382,14 +381,14 @@ export const EligibilityForm: React.FC = () => {
                   min="0"
                   value={landHolding}
                   onChange={(e) => setLandHolding(parseFloat(e.target.value) || 0)}
-                  className="w-full px-3 py-2 text-xs bg-[#080C15] border border-white/[0.1] text-slate-100"
+                  className="w-full px-3 py-2 text-xs bg-white border border-[#E5E9E3] rounded-lg text-[#202820] focus:border-[#176B52] focus:outline-none"
                 />
-                <span className="text-[10px] text-slate-400">PM-KISAN and crop insurance eligibility depends on landholding category</span>
+                <span className="text-[10px] text-[#687368]">PM-KISAN and crop insurance eligibility depends on landholding category</span>
               </div>
             )}
 
-            <div className="p-3 rounded-xl bg-blue-500/10 border border-blue-500/20 text-[11px] text-blue-300 flex items-start gap-2">
-              <ShieldCheck className="h-4 w-4 text-emerald-400 shrink-0 mt-0.5" />
+            <div className="p-3 rounded-xl bg-[#FAF5E9] border border-[#F3E7CA] text-xs text-[#687368] flex items-start gap-2">
+              <ShieldCheck className="h-4 w-4 text-[#176B52] shrink-0 mt-0.5" />
               <span>
                 Your demographic inputs remain strictly confidential on your local device.
               </span>
@@ -398,25 +397,25 @@ export const EligibilityForm: React.FC = () => {
         )}
 
         {/* Wizard Navigation Buttons */}
-        <div className="pt-4 border-t border-white/[0.08] flex items-center justify-between gap-3">
+        <div className="pt-4 border-t border-[#E5E9E3] flex items-center justify-between gap-3">
           {currentStep > 1 ? (
             <button
               type="button"
               onClick={handleBack}
-              className="px-4 py-2 rounded-xl text-xs font-semibold text-slate-300 hover:text-white bg-[#080C15] border border-white/[0.08] hover:border-white/[0.15] flex items-center gap-1 transition-colors cursor-pointer"
+              className="px-4 py-2 rounded-xl text-xs font-semibold text-[#687368] hover:text-[#202820] bg-[#F7F8F5] border border-[#E5E9E3] hover:border-[#176B52]/30 flex items-center gap-1 transition-colors cursor-pointer"
             >
               <ChevronLeft className="h-3.5 w-3.5" />
               <span>Back</span>
             </button>
           ) : (
-            <span className="text-[11px] text-slate-500">Free citizen service</span>
+            <span className="text-xs text-[#8A968A]">Free citizen service</span>
           )}
 
           {currentStep < 3 ? (
             <button
               type="button"
               onClick={handleNext}
-              className="px-5 py-2.5 rounded-xl text-xs font-bold text-white bg-blue-600 hover:bg-blue-500 transition-colors flex items-center gap-1.5 shadow-sm cursor-pointer ml-auto"
+              className="px-5 py-2.5 rounded-xl text-xs font-semibold text-white bg-[#176B52] hover:bg-[#124C3D] transition-colors flex items-center gap-1.5 shadow-xs cursor-pointer ml-auto"
             >
               <span>Continue</span>
               <ChevronRight className="h-3.5 w-3.5" />
@@ -425,16 +424,16 @@ export const EligibilityForm: React.FC = () => {
             <button
               type="submit"
               disabled={formLoading}
-              className="px-6 py-2.5 rounded-xl text-xs font-bold text-slate-950 bg-amber-500 hover:bg-amber-400 transition-all flex items-center gap-2 shadow-md cursor-pointer ml-auto disabled:opacity-50"
+              className="px-6 py-2.5 rounded-xl text-xs font-semibold text-white bg-[#176B52] hover:bg-[#124C3D] transition-all flex items-center gap-2 shadow-xs cursor-pointer ml-auto disabled:opacity-50"
             >
               {formLoading ? (
                 <>
-                  <Loader2 className="h-4 w-4 animate-spin text-slate-950" />
-                  <span>Scanning 130+ Schemes...</span>
+                  <Loader2 className="h-4 w-4 animate-spin text-white" />
+                  <span>Scanning Schemes...</span>
                 </>
               ) : (
                 <>
-                  <Sparkles className="h-4 w-4 text-slate-950" />
+                  <Sparkles className="h-4 w-4 text-[#E8A126]" />
                   <span>Reveal My Matches</span>
                 </>
               )}

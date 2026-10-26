@@ -52,7 +52,7 @@ export const Modal: React.FC<ModalProps> = ({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm animate-fade-in"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-xs animate-fade-in"
       aria-modal="true"
       role="dialog"
     >
@@ -62,17 +62,17 @@ export const Modal: React.FC<ModalProps> = ({
       {/* Modal Dialog Card */}
       <div
         ref={modalRef}
-        className={`relative w-full ${maxWidthClasses[maxWidth]} rounded-2xl bg-[#0E1422] border border-white/[0.1] shadow-2xl p-6 z-10 animate-slide-up overflow-hidden`}
+        className={`relative w-full ${maxWidthClasses[maxWidth]} rounded-2xl bg-white border border-[#E5E9E3] shadow-xl p-6 z-10 animate-slide-up overflow-hidden`}
       >
-        <div className="flex items-start justify-between gap-4 pb-4 border-b border-white/[0.08]">
+        <div className="flex items-start justify-between gap-4 pb-4 border-b border-[#E5E9E3]">
           <div>
             {title && (
-              <h2 className="font-heading text-lg font-bold text-slate-100">
+              <h2 className="font-heading text-lg font-bold text-[#202820]">
                 {title}
               </h2>
             )}
             {description && (
-              <p className="text-xs text-slate-400 mt-1">
+              <p className="text-xs text-[#687368] mt-1">
                 {description}
               </p>
             )}
@@ -80,14 +80,14 @@ export const Modal: React.FC<ModalProps> = ({
           <button
             type="button"
             onClick={onClose}
-            className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-white/[0.06] transition-colors cursor-pointer"
+            className="p-1.5 rounded-lg text-[#687368] hover:text-[#202820] hover:bg-[#F7F8F5] transition-colors cursor-pointer"
             aria-label="Close dialog"
           >
             <X className="h-4 w-4" />
           </button>
         </div>
 
-        <div className="pt-4">{children}</div>
+        <div className="pt-4 text-[#202820]">{children}</div>
       </div>
     </div>
   );
