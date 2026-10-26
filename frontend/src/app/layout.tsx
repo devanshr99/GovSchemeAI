@@ -31,7 +31,7 @@ export default function RootLayout({
         {/* eslint-disable-next-line @next/next/no-page-custom-font */}
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@500;600;700;800;900&family=Noto+Sans+Devanagari:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
       </head>
-      <body className="min-h-full flex flex-col antialiased bg-[#090A0F] text-[#F8FAFC] selection:bg-purple-600/40 selection:text-purple-100 relative overflow-x-hidden">
+      <body className="min-h-full flex flex-col antialiased bg-[#080C15] text-[#F8FAFC] selection:bg-blue-600/40 selection:text-blue-100 relative overflow-x-hidden">
         <AppProvider>
           {/* Subtle Constellation Network Background */}
           <NetworkBackground />

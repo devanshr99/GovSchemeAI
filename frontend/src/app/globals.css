@@ -1,31 +1,48 @@
 @import "tailwindcss";
 
 :root {
-  --background: #090A0F;
-  --background-secondary: #0E1017;
-  --card-bg: #11131C;
-  --card-hover: #161926;
-  --card-elevated: #1A1E2E;
+  /* GovSchemeAI Official Civic Tech Palette */
+  --background: #080C15;
+  --background-secondary: #0D1322;
+  --card-bg: #111827;
+  --card-hover: #162035;
+  --card-elevated: #1B263D;
   --border: rgba(255, 255, 255, 0.08);
-  --border-subtle: rgba(255, 255, 255, 0.05);
-  --border-focus: rgba(168, 85, 247, 0.45);
-  --primary-purple: #8B5CF6;
-  --accent-purple: #A855F7;
-  --bright-purple: #C084FC;
-  --network-cyan: #06B6D4;
+  --border-subtle: rgba(255, 255, 255, 0.04);
+  --border-focus: rgba(59, 130, 246, 0.5);
+
+  /* Primary Civic Trust Blue */
+  --primary: #2563EB;
+  --primary-hover: #1D4ED8;
+  --primary-subtle: rgba(37, 99, 235, 0.12);
+  --primary-border: rgba(37, 99, 235, 0.28);
+
+  /* Indian Civic Saffron / Amber (National Welfare Brand) */
+  --saffron: #F59E0B;
+  --saffron-hover: #D97706;
+  --saffron-subtle: rgba(245, 158, 11, 0.12);
+  --saffron-border: rgba(245, 158, 11, 0.25);
+
+  /* Official Verification Emerald Green */
+  --emerald: #10B981;
+  --emerald-subtle: rgba(16, 185, 129, 0.12);
+  --emerald-border: rgba(16, 185, 129, 0.25);
+
+  /* Text & Contrast Tokens (WCAG 2.1 AAA / AA) */
   --text-primary: #F8FAFC;
   --text-secondary: #94A3B8;
   --text-muted: #64748B;
-  --success: #10B981;
-  --success-bg: rgba(16, 185, 129, 0.1);
-  --gov-saffron: #F97316;
-  --gov-green: #10B981;
+  --text-dim: #475569;
+
+  /* Typography Scales */
+  --font-heading: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  --font-body: 'Inter', system-ui, -apple-system, sans-serif;
 }
 
 body {
   background-color: var(--background);
   color: var(--text-primary);
-  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-family: var(--font-body);
   min-height: 100vh;
   overflow-x: hidden;
   text-rendering: optimizeLegibility;
@@ -34,15 +51,15 @@ body {
 
 /* Typography Headings */
 .font-heading {
-  font-family: 'Plus Jakarta Sans', 'Inter', system-ui, sans-serif;
+  font-family: var(--font-heading);
 }
 
-/* Card & Surface Tokens */
+/* Government Civic Card Surfaces */
 .gov-card {
   background: var(--card-bg);
   border: 1px solid var(--border);
   border-radius: 1rem;
-  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(255, 255, 255, 0.03);
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.02);
   transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
@@ -52,34 +69,34 @@ body {
 
 .gov-card-hover:hover {
   background: var(--card-hover);
-  border-color: rgba(168, 85, 247, 0.35);
+  border-color: rgba(59, 130, 246, 0.35);
   transform: translateY(-2px);
-  box-shadow: 0 16px 36px -6px rgba(0, 0, 0, 0.6), 0 0 20px 0 rgba(168, 85, 247, 0.12), 0 0 0 1px rgba(168, 85, 247, 0.2);
+  box-shadow: 0 16px 36px -6px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(59, 130, 246, 0.18);
 }
 
 .gov-card-active {
   background: var(--card-hover);
-  border-color: rgba(168, 85, 247, 0.5);
+  border-color: rgba(59, 130, 246, 0.5);
 }
 
 /* Header & Glass Utilities */
 .glass-header {
-  background: rgba(9, 10, 15, 0.85);
+  background: rgba(8, 12, 21, 0.88);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   border-bottom: 1px solid var(--border);
 }
 
-/* Restrained Typography Gradients */
-.text-purple-gradient {
-  background: linear-gradient(135deg, #FFFFFF 20%, #E2D9FD 60%, #C084FC 100%);
+/* Restrained Civic Typography Gradients */
+.text-civic-gradient {
+  background: linear-gradient(135deg, #FFFFFF 30%, #E2E8F0 70%, #93C5FD 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
-.text-cyan-gradient {
-  background: linear-gradient(135deg, #FFFFFF 20%, #BAE6FD 60%, #38BDF8 100%);
+.text-saffron-gradient {
+  background: linear-gradient(135deg, #FFFFFF 20%, #FDE68A 60%, #F59E0B 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -91,19 +108,19 @@ body {
   height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: #090A0F;
+  background: #080C15;
 }
 ::-webkit-scrollbar-thumb {
-  background: #1E2330;
+  background: #1E293B;
   border-radius: 3px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #2D3548;
+  background: #334155;
 }
 
 /* Inputs, Selects, and Textareas */
 input, select, textarea {
-  background-color: #0E1017 !important;
+  background-color: #0E1422 !important;
   border: 1px solid rgba(255, 255, 255, 0.1) !important;
   color: #F8FAFC !important;
   border-radius: 0.75rem;
@@ -111,14 +128,14 @@ input, select, textarea {
 }
 
 input:focus, select:focus, textarea:focus {
-  border-color: #A855F7 !important;
-  box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.2) !important;
+  border-color: #3B82F6 !important;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2) !important;
   outline: none !important;
-  background-color: #12141D !important;
+  background-color: #121A2D !important;
 }
 
 select option {
-  background-color: #0E1017;
+  background-color: #0E1422;
   color: #F8FAFC;
 }
 
@@ -133,7 +150,7 @@ select option {
 }
 
 .skeleton-shimmer {
-  background: linear-gradient(90deg, #11131C 25%, #1C2030 50%, #11131C 75%);
+  background: linear-gradient(90deg, #111827 25%, #1E293B 50%, #111827 75%);
   background-size: 200% 100%;
   animation: shimmer 1.8s infinite;
 }
@@ -169,6 +186,20 @@ select option {
   animation: slideUp 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
+/* Slide in from right (Drawer) */
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+.animate-slide-in-right {
+  animation: slideInRight 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
 /* WCAG 2.1 AA Keyboard Focus Visibility */
 a:focus-visible, 
 button:focus-visible, 
@@ -176,9 +207,9 @@ input:focus-visible,
 select:focus-visible, 
 textarea:focus-visible, 
 [role="button"]:focus-visible {
-  outline: 2px solid #A855F7 !important;
+  outline: 2px solid #3B82F6 !important;
   outline-offset: 2px !important;
-  box-shadow: 0 0 0 4px rgba(168, 85, 247, 0.25) !important;
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.25) !important;
 }
 
 /* Respect reduced motion */

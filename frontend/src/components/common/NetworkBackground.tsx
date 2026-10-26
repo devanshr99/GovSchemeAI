@@ -1,159 +1,48 @@
 'use client';
 
-import React, { useEffect, useRef } from 'react';
+import React from 'react';
 
-interface Particle {
-  x: number;
-  y: number;
-  vx: number;
-  vy: number;
-  radius: number;
-  color: string;
-  glowColor: string;
-}
-
+/**
+ * Modern, calm atmospheric backdrop for GovSchemeAI.
+ * Uses high-performance CSS radial gradients and subtle civic geometry,
+ * avoiding distracting neon particle lines or high-GPU battery drain.
+ */
 export const NetworkBackground: React.FC = () => {
-  const canvasRef = useRef<HTMLCanvasElement | null>(null);
-
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-
-    let animationFrameId: number;
-    let particles: Particle[] = [];
-    let width = (canvas.width = window.innerWidth);
-    let height = (canvas.height = window.innerHeight);
-
-    // Respect user reduced-motion preference
-    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-    const isMobile = width < 768;
-    // Balanced network density: 40 nodes desktop, 22 mobile
-    const particleCount = isMobile ? 22 : 40;
-    const maxDistance = isMobile ? 120 : 155;
-
-    // Palette: Soft cyan, muted teal, pale cyan, and subtle violet accent
-    const nodePalette = [
-      { color: 'rgba(6, 182, 212, 0.52)', glow: 'rgba(6, 182, 212, 0.16)' },   // Soft Cyan
-      { color: 'rgba(13, 148, 136, 0.48)', glow: 'rgba(13, 148, 136, 0.14)' },  // Muted Teal
-      { color: 'rgba(34, 211, 238, 0.42)', glow: 'rgba(34, 211, 238, 0.12)' },  // Pale Cyan
-      { color: 'rgba(139, 92, 246, 0.38)', glow: 'rgba(139, 92, 246, 0.10)' },  // Subtle Violet
-    ];
-
-    const initParticles = () => {
-      particles = [];
-      width = canvas.width = window.innerWidth;
-      height = canvas.height = window.innerHeight;
-
-      for (let i = 0; i < particleCount; i++) {
-        const palette = nodePalette[Math.floor(Math.random() * nodePalette.length)];
-        // Slow graceful motion
-        const speed = prefersReducedMotion ? 0 : 0.07 + Math.random() * 0.09;
-        const angle = Math.random() * Math.PI * 2;
-
-        particles.push({
-          x: Math.random() * width,
-          y: Math.random() * height,
-          vx: Math.cos(angle) * speed,
-          vy: Math.sin(angle) * speed,
-          radius: Math.random() * 1.8 + 2.0, // 2.0px - 3.8px clearly visible nodes
-          color: palette.color,
-          glowColor: palette.glow,
-        });
-      }
-    };
-
-    initParticles();
-
-    const draw = () => {
-      ctx.clearRect(0, 0, width, height);
-
-      // Deep dark background fill
-      const gradient = ctx.createLinearGradient(0, 0, 0, height);
-      gradient.addColorStop(0, '#08090D');
-      gradient.addColorStop(0.5, '#07080C');
-      gradient.addColorStop(1, '#050608');
-      ctx.fillStyle = gradient;
-      ctx.fillRect(0, 0, width, height);
-
-      // Draw clearly visible connecting geometric lines (10% to 16% opacity)
-      for (let i = 0; i < particles.length; i++) {
-        for (let j = i + 1; j < particles.length; j++) {
-          const dx = particles[i].x - particles[j].x;
-          const dy = particles[i].y - particles[j].y;
-          const dist = Math.sqrt(dx * dx + dy * dy);
-
-          if (dist < maxDistance) {
-            // Line opacity range ~0.04 to 0.15
-            const lineAlpha = (1 - dist / maxDistance) * 0.15;
-            ctx.beginPath();
-            ctx.moveTo(particles[i].x, particles[i].y);
-            ctx.lineTo(particles[j].x, particles[j].y);
-            ctx.strokeStyle = `rgba(6, 182, 212, ${lineAlpha})`;
-            ctx.lineWidth = 0.85;
-            ctx.stroke();
-          }
-        }
-      }
-
-      // Draw clearly visible nodes with soft low-radius glow
-      for (let i = 0; i < particles.length; i++) {
-        const p = particles[i];
-
-        if (!prefersReducedMotion) {
-          p.x += p.vx;
-          p.y += p.vy;
-
-          if (p.x < -20) p.x = width + 20;
-          if (p.x > width + 20) p.x = -20;
-          if (p.y < -20) p.y = height + 20;
-          if (p.y > height + 20) p.y = -20;
-        }
-
-        // Soft outer halo ring
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, p.radius * 2.2, 0, Math.PI * 2);
-        ctx.fillStyle = p.glowColor;
-        ctx.fill();
-
-        // Visible node core
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
-        ctx.fillStyle = p.color;
-        ctx.fill();
-      }
-
-      animationFrameId = requestAnimationFrame(draw);
-    };
-
-    draw();
-
-    let resizeTimeout: NodeJS.Timeout;
-    const handleResize = () => {
-      clearTimeout(resizeTimeout);
-      resizeTimeout = setTimeout(() => {
-        initParticles();
-      }, 200);
-    };
-
-    window.addEventListener('resize', handleResize);
-
-    return () => {
-      cancelAnimationFrame(animationFrameId);
-      window.removeEventListener('resize', handleResize);
-      clearTimeout(resizeTimeout);
-    };
-  }, []);
-
   return (
-    <canvas
-      ref={canvasRef}
-      className="fixed inset-0 pointer-events-none z-0 block w-full h-full"
+    <div
+      className="fixed inset-0 pointer-events-none z-0 overflow-hidden"
       aria-hidden="true"
-    />
+    >
+      {/* Deep Dark Base Fill */}
+      <div className="absolute inset-0 bg-[#080C15]" />
+
+      {/* Atmospheric Civic Lighting - Soft Trust Blue Top-Left */}
+      <div 
+        className="absolute -top-[20%] -left-[10%] w-[60vw] h-[60vw] max-w-[800px] max-h-[800px] rounded-full opacity-[0.07] blur-[120px]"
+        style={{ background: 'radial-gradient(circle, #2563EB 0%, transparent 70%)' }}
+      />
+
+      {/* Atmospheric Saffron Ambient Warmth - Top-Right */}
+      <div 
+        className="absolute -top-[15%] -right-[10%] w-[50vw] h-[50vw] max-w-[700px] max-h-[700px] rounded-full opacity-[0.05] blur-[140px]"
+        style={{ background: 'radial-gradient(circle, #F59E0B 0%, transparent 70%)' }}
+      />
+
+      {/* Subtle Verified Emerald Glow - Bottom Center */}
+      <div 
+        className="absolute bottom-[-10%] left-[20%] w-[60vw] h-[40vw] max-w-[900px] max-h-[600px] rounded-full opacity-[0.04] blur-[160px]"
+        style={{ background: 'radial-gradient(circle, #10B981 0%, transparent 70%)' }}
+      />
+
+      {/* Subtle Civic Grid / Dot Pattern */}
+      <div 
+        className="absolute inset-0 opacity-[0.025]"
+        style={{
+          backgroundImage: `radial-gradient(rgba(255, 255, 255, 0.4) 1px, transparent 1px)`,
+          backgroundSize: '32px 32px',
+        }}
+      />
+    </div>
   );
 };
 

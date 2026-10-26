@@ -3,7 +3,17 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useApp } from '../../context/AppContext';
 import { api } from '../../lib/api';
-import { Send, RefreshCw, Bot, User as UserIcon, WifiOff, ArrowRight } from 'lucide-react';
+import { 
+  Send, 
+  RotateCcw, 
+  Bot, 
+  User as UserIcon, 
+  WifiOff, 
+  ArrowRight,
+  ShieldCheck,
+  Sparkles,
+  Info
+} from 'lucide-react';
 
 interface ChatMessage {
   role: 'user' | 'assistant';
@@ -23,7 +33,11 @@ function renderInline(text: string) {
       return <em key={i} className="italic text-slate-300">{part.slice(1, -1)}</em>;
     }
     if (part.startsWith('`') && part.endsWith('`')) {
-      return <code key={i} className="px-1.5 py-0.5 rounded bg-[#0E1017] border border-white/[0.08] text-purple-300 font-mono text-xs">{part.slice(1, -1)}</code>;
+      return (
+        <code key={i} className="px-1.5 py-0.5 rounded bg-[#0b0f19] border border-slate-750 text-blue-300 font-mono text-xs">
+          {part.slice(1, -1)}
+        </code>
+      );
     }
     return <span key={i}>{part}</span>;
   });
@@ -58,22 +72,22 @@ function renderMarkdown(text: string) {
   const flushTable = (key: string) => {
     if (tableHeaders.length > 0 || tableRows.length > 0) {
       renderedElements.push(
-        <div key={key} className="markdown-table-wrapper my-3 border border-white/[0.08] rounded-xl overflow-hidden">
-          <table className="markdown-table">
+        <div key={key} className="my-3 border border-slate-800 rounded-xl overflow-hidden bg-[#0c101c]">
+          <table className="w-full text-left text-xs border-collapse">
             {tableHeaders.length > 0 && (
-              <thead>
+              <thead className="bg-[#111827] text-slate-300 font-bold border-b border-slate-800">
                 <tr>
                   {tableHeaders.map((header, hIdx) => (
-                    <th key={hIdx}>{header}</th>
+                    <th key={hIdx} className="p-2.5 sm:p-3 border-r border-slate-800 last:border-r-0">{header}</th>
                   ))}
                 </tr>
               </thead>
             )}
-            <tbody>
+            <tbody className="divide-y divide-slate-800 text-slate-300">
               {tableRows.map((row, rIdx) => (
-                <tr key={rIdx}>
+                <tr key={rIdx} className="hover:bg-white/[0.02]">
                   {row.map((cell, cIdx) => (
-                    <td key={cIdx}>{renderInline(cell)}</td>
+                    <td key={cIdx} className="p-2.5 sm:p-3 border-r border-slate-800 last:border-r-0">{renderInline(cell)}</td>
                   ))}
                 </tr>
               ))}
@@ -117,11 +131,10 @@ function renderMarkdown(text: string) {
         flushParagraph(`p-before-bullet-${i}`);
         const content = trimmed.replace(/^[-•*]\s*/, '');
         renderedElements.push(
-          <ul key={`ul-${i}`} className="list-disc list-inside space-y-1 my-1">
-            <li className="text-xs sm:text-sm leading-relaxed text-slate-300">
-              {renderInline(content)}
-            </li>
-          </ul>
+          <div key={`ul-${i}`} className="flex items-start gap-2 my-1 text-xs sm:text-sm text-slate-200">
+            <span className="text-blue-400 mt-1 shrink-0">•</span>
+            <span>{renderInline(content)}</span>
+          </div>
         );
       } else if (trimmed === '') {
         flushParagraph(`p-blank-${i}`);
@@ -142,7 +155,7 @@ export default function ChatAssistant() {
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
       role: 'assistant',
-      content: "Welcome to Citizen Scheme Advisor AI. Ask me about central and state government schemes, eligibility requirements, required documents, or official application procedures.",
+      content: "Namaste! I am your GovSchemeAI Advisor. Ask me anything about Indian central and state welfare programs, eligibility rules, required application documents, or step-by-step submission procedures.",
     },
   ]);
   const [input, setInput] = useState<string>('');
@@ -209,8 +222,8 @@ export default function ChatAssistant() {
             const last = next[next.length - 1];
             if (last && last.role === 'assistant') {
               last.content = accumulatedResponse 
-                ? accumulatedResponse + '\n\n*(Connection lost)*'
-                : 'I could not connect to the Citizen Advisor engine. Verify local backend status.';
+                ? accumulatedResponse + '\n\n*(Connection interrupted)*'
+                : 'I could not connect to the Citizen Advisor engine. Please verify that the local backend service is running.';
               last.isStreaming = false;
             }
             return next;
@@ -245,14 +258,14 @@ export default function ChatAssistant() {
         'मैं किन सरकारी योजनाओं के लिए पात्र हूं?',
         'PM-KISAN आवेदन हेतु कौन से दस्तावेज़ चाहिए?',
         'मुद्रा ऋण योजना में कितना ब्याज लगेगा?',
-        'छात्रवृत्तियों की सूची दिखाएं',
+        'कॉलेज छात्रों के लिए छात्रवृत्तियों की सूची दिखाएं',
       ];
     }
     return [
-      'Which schemes am I eligible for?',
-      'How do I apply for PM-KISAN installment credits?',
-      'What documents are required for Mudra loans?',
-      'Find top scholarships for college students',
+      'What schemes can I get as a small farmer?',
+      'Documents required for Pradhan Mantri Mudra Loan',
+      'How to apply for PM-KISAN installment credits?',
+      'Higher education scholarships for female students',
     ];
   };
 
@@ -260,7 +273,7 @@ export default function ChatAssistant() {
     setMessages([
       {
         role: 'assistant',
-        content: "Welcome to Citizen Scheme Advisor AI. Ask me about central and state government schemes, eligibility requirements, required documents, or official application procedures.",
+        content: "Namaste! I am your GovSchemeAI Advisor. Ask me anything about Indian central and state welfare programs, eligibility rules, required application documents, or step-by-step submission procedures.",
       },
     ]);
     setSessionId(undefined);
@@ -268,18 +281,26 @@ export default function ChatAssistant() {
   };
 
   return (
-    <div className="mx-auto max-w-4xl w-full py-8 px-4 sm:px-6 lg:px-8 flex-1 flex flex-col relative z-10" style={{ height: 'calc(100vh - 120px)' }}>
+    <div className="mx-auto max-w-4xl w-full py-6 px-4 sm:px-6 lg:px-8 flex-1 flex flex-col relative z-10" style={{ height: 'calc(100vh - 110px)' }}>
       
       {/* Header Bar */}
-      <div className="flex items-center justify-between border-b border-white/[0.08] pb-4 mb-4 shrink-0">
+      <div className="flex items-center justify-between border-b border-slate-800/80 pb-3 mb-4 shrink-0">
         <div className="flex items-center gap-3">
-          <div className="h-9 w-9 rounded-xl bg-purple-500/15 border border-purple-500/30 flex items-center justify-center text-purple-400">
+          <div className="h-9 w-9 rounded-xl bg-blue-600/15 border border-blue-500/30 flex items-center justify-center text-blue-400">
             <Bot className="h-5 w-5" />
           </div>
           <div>
-            <h1 className="font-heading text-lg font-bold text-slate-100">Citizen Scheme Advisor AI</h1>
+            <div className="flex items-center gap-2">
+              <h1 className="font-heading text-base sm:text-lg font-bold text-slate-100">
+                Citizen Scheme Advisor AI
+              </h1>
+              <span className="hidden sm:inline-flex items-center gap-1 text-[10px] font-semibold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">
+                <ShieldCheck className="h-3 w-3" />
+                <span>Verified Guidelines</span>
+              </span>
+            </div>
             <p className="text-[10px] text-slate-400 font-semibold uppercase tracking-wider">
-              {sessionId ? `Session: ${sessionId.slice(0, 8)}...` : 'Verified Scheme Knowledge Base'}
+              {sessionId ? `Session Active • ${sessionId.slice(0, 8)}...` : 'Deterministic Context Engine'}
             </p>
           </div>
         </div>
@@ -295,10 +316,11 @@ export default function ChatAssistant() {
           <button
             type="button"
             onClick={resetChat}
-            className="p-2 rounded-xl bg-[#0E1017] border border-white/[0.08] text-xs text-slate-400 hover:text-white transition-all cursor-pointer flex items-center gap-1.5"
+            className="p-2 rounded-xl bg-[#111827] hover:bg-[#1e293b] border border-slate-800 text-xs text-slate-300 hover:text-white transition-all cursor-pointer flex items-center gap-1.5"
+            title="Start new conversation"
           >
-            <RefreshCw className="h-3.5 w-3.5 text-purple-400" />
-            <span>Reset Chat</span>
+            <RotateCcw className="h-3.5 w-3.5 text-blue-400" />
+            <span className="hidden sm:inline">New Chat</span>
           </button>
         </div>
       </div>
@@ -313,24 +335,24 @@ export default function ChatAssistant() {
             <div
               className={`h-8 w-8 rounded-xl flex items-center justify-center shrink-0 mt-1 ${
                 msg.role === 'user'
-                  ? 'bg-purple-600 text-white'
-                  : 'bg-[#0E1017] border border-purple-500/30 text-purple-400'
+                  ? 'bg-blue-600 text-white shadow-xs'
+                  : 'bg-[#111827] border border-slate-800 text-blue-400'
               }`}
             >
               {msg.role === 'user' ? <UserIcon className="h-4 w-4" /> : <Bot className="h-4 w-4" />}
             </div>
 
-            <div className={`flex flex-col max-w-[85%] ${msg.role === 'user' ? 'items-end' : 'items-start'}`}>
+            <div className={`flex flex-col max-w-[85%] sm:max-w-[80%] ${msg.role === 'user' ? 'items-end' : 'items-start'}`}>
               <div
                 className={`p-4 rounded-2xl border ${
                   msg.role === 'user'
-                    ? 'bg-purple-600 border-purple-500 text-white rounded-tr-none'
-                    : 'gov-card text-slate-200 rounded-tl-none border-white/[0.08] bg-[#0E1017]'
+                    ? 'bg-blue-600 border-blue-500 text-white rounded-tr-none shadow-sm'
+                    : 'text-slate-200 rounded-tl-none border-slate-800 bg-[#111827] shadow-sm'
                 } ${msg.isStreaming ? 'typewriter-cursor' : ''}`}
               >
                 {msg.role === 'assistant'
                   ? <div className="space-y-1">{renderMarkdown(msg.content)}</div>
-                  : <p className="text-xs sm:text-sm leading-relaxed">{msg.content}</p>
+                  : <p className="text-xs sm:text-sm leading-relaxed whitespace-pre-wrap">{msg.content}</p>
                 }
               </div>
             </div>
@@ -341,19 +363,22 @@ export default function ChatAssistant() {
       </div>
 
       {/* Suggested Questions */}
-      {!loading && (
+      {!loading && messages.length <= 2 && (
         <div className="mb-3 shrink-0 animate-fade-in">
-          <p className="text-[9px] text-slate-400 font-extrabold uppercase tracking-wider mb-2">Suggested Prompt Topics:</p>
-          <div className="flex flex-wrap gap-2">
+          <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-2 flex items-center gap-1.5">
+            <Sparkles className="h-3 w-3 text-amber-400" />
+            <span>Popular Citizen Queries:</span>
+          </p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
             {getSuggestedQuestions().map((q, idx) => (
               <button
                 key={idx}
                 type="button"
                 onClick={() => handleSendMessage(q)}
-                className="text-xs px-3 py-2 rounded-xl bg-[#0E1017] border border-white/[0.08] hover:border-purple-500/40 text-slate-300 hover:text-white flex items-center gap-1.5 transition-all text-left cursor-pointer"
+                className="text-xs px-3.5 py-2.5 rounded-xl bg-[#111827] border border-slate-800 hover:border-blue-500/50 text-slate-300 hover:text-white flex items-center justify-between gap-2 transition-all text-left cursor-pointer group"
               >
-                <span>{q}</span>
-                <ArrowRight className="h-3 w-3 text-purple-400 shrink-0" />
+                <span className="line-clamp-1">{q}</span>
+                <ArrowRight className="h-3.5 w-3.5 text-blue-400 shrink-0 group-hover:translate-x-0.5 transition-transform" />
               </button>
             ))}
           </div>
@@ -361,28 +386,38 @@ export default function ChatAssistant() {
       )}
 
       {/* Input Bar */}
-      <div className="relative shrink-0">
-        <input
-          ref={inputRef}
-          type="text"
-          placeholder="Ask Citizen Advisor about any government scheme..."
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          onKeyDown={handleKeyDown}
-          disabled={loading}
-          maxLength={500}
-          className="w-full pl-4 pr-14 py-3.5 rounded-2xl text-xs sm:text-sm bg-[#0E1017] border border-white/[0.08] text-slate-100 placeholder-slate-500 focus:border-purple-500"
-        />
-        <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
-          <button
-            type="button"
-            onClick={() => handleSendMessage(input)}
-            disabled={loading || !input.trim()}
-            className="p-2 rounded-xl bg-purple-600 hover:bg-purple-500 text-white transition-all disabled:opacity-40 cursor-pointer shadow-xs"
-            aria-label="Send message"
-          >
-            <Send className="h-4 w-4" />
-          </button>
+      <div className="space-y-2 shrink-0">
+        <div className="relative">
+          <input
+            ref={inputRef}
+            type="text"
+            placeholder="Ask Citizen Advisor about schemes, eligibility, documents, or subsidies..."
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            onKeyDown={handleKeyDown}
+            disabled={loading}
+            maxLength={500}
+            className="w-full pl-4 pr-14 py-3.5 rounded-2xl text-xs sm:text-sm bg-[#111827] border border-slate-700/80 text-slate-100 placeholder-slate-500 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 shadow-inner"
+          />
+          <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
+            <button
+              type="button"
+              onClick={() => handleSendMessage(input)}
+              disabled={loading || !input.trim()}
+              className="p-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white transition-all disabled:opacity-40 cursor-pointer shadow-xs disabled:cursor-not-allowed"
+              aria-label="Send query"
+            >
+              <Send className="h-4 w-4" />
+            </button>
+          </div>
+        </div>
+
+        <div className="flex items-center justify-between text-[10px] text-slate-500 px-1">
+          <span className="flex items-center gap-1">
+            <Info className="h-2.5 w-2.5 text-slate-400" />
+            <span>AI responses are informational. Verify criteria on official government department portals.</span>
+          </span>
+          <span className="hidden sm:inline">Press Enter to send</span>
         </div>
       </div>
     </div>

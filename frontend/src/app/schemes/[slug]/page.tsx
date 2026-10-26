@@ -4,10 +4,12 @@ import React, { useState, useEffect, use } from 'react';
 import { useApp } from '../../../context/AppContext';
 import { api } from '../../../lib/api';
 import { SchemeDetail } from '../../../types/scheme';
-import { AmazingButton } from '../../../components/common/AmazingButton';
+import { Modal } from '../../../components/common/Modal';
+import { CompareFloatingBar } from '../../../components/common/CompareFloatingBar';
 import Link from 'next/link';
 import {
   ArrowLeft, 
+  ArrowRight,
   Phone, 
   Calendar, 
   Award, 
@@ -24,10 +26,14 @@ import {
   BookmarkCheck, 
   Copy, 
   CheckCircle2,
-  ShieldAlert, 
+  AlertTriangle, 
   Info,
   Scale,
-  Coins
+  Coins,
+  Check,
+  Bot,
+  HelpCircle,
+  Download
 } from 'lucide-react';
 
 export default function SchemeDetailPage({ params }: { params: Promise<{ slug: string }> }) {
@@ -37,8 +43,9 @@ export default function SchemeDetailPage({ params }: { params: Promise<{ slug: s
   const [scheme, setScheme] = useState<SchemeDetail | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState<'overview' | 'eligibility' | 'documents' | 'process'>('overview');
   
-  // Safe lazy initializer for bookmark state
+  // Bookmark state
   const [isBookmarked, setIsBookmarked] = useState<boolean>(() => {
     if (typeof window !== 'undefined') {
       try {
@@ -51,6 +58,7 @@ export default function SchemeDetailPage({ params }: { params: Promise<{ slug: s
     return false;
   });
 
+  // Compare state
   const [isCompared, setIsCompared] = useState<boolean>(() => {
     if (typeof window !== 'undefined') {
       try {
@@ -63,28 +71,25 @@ export default function SchemeDetailPage({ params }: { params: Promise<{ slug: s
     return false;
   });
 
-  const [toast, setToast] = useState<string | null>(null);
+  const [shareModalOpen, setShareModalOpen] = useState(false);
+  const [copied, setCopied] = useState(false);
   const [userProfileCheck, setUserProfileCheck] = useState<{
     status: 'eligible' | 'not_eligible' | 'not_scanned';
     passedRules: string[];
     failedRules: string[];
   }>({ status: 'not_scanned', passedRules: [], failedRules: [] });
 
-  const showToast = (msg: string) => {
-    setToast(msg);
-    setTimeout(() => setToast(null), 3000);
-  };
-
   useEffect(() => {
     if (!slug) return;
     let isMounted = true;
+    setLoading(true);
 
     api.getSchemeDetail(slug)
       .then(res => {
         if (!isMounted) return;
         setScheme(res);
 
-        // Update recently viewed
+        // Update recently viewed history in localStorage
         if (typeof window !== 'undefined') {
           try {
             const recent = JSON.parse(localStorage.getItem('govscheme_recently_viewed') || '[]');
@@ -107,16 +112,17 @@ export default function SchemeDetailPage({ params }: { params: Promise<{ slug: s
           }
         }
 
+        // Quick evaluation against stored citizen profile if present
         const profile = api.getProfileFromStorage();
         if (profile && res.id) {
           api.checkEligibility(profile)
-            .then((checkRes) => {
-              const matchedScheme = checkRes.schemes.find((s) => s.slug === slug);
-              if (matchedScheme) {
+            .then(checkRes => {
+              const matched = checkRes.schemes.find(s => s.slug === slug);
+              if (matched) {
                 const passed: string[] = [];
                 const failed: string[] = [];
-                if (matchedScheme.rules_evaluation) {
-                  matchedScheme.rules_evaluation.forEach(rule => {
+                if (matched.rules_evaluation) {
+                  matched.rules_evaluation.forEach(rule => {
                     if (rule.startsWith('✓')) passed.push(rule.replace('✓ ', ''));
                     else if (rule.startsWith('✗')) failed.push(rule.replace('✗ ', ''));
                   });
@@ -124,59 +130,49 @@ export default function SchemeDetailPage({ params }: { params: Promise<{ slug: s
                 setUserProfileCheck({
                   status: failed.length === 0 ? 'eligible' : 'not_eligible',
                   passedRules: passed,
-                  failedRules: failed
-                });
-              } else {
-                setUserProfileCheck({
-                  status: 'not_eligible',
-                  passedRules: [],
-                  failedRules: ['Income limit, occupation, or residency requirements are not met.']
+                  failedRules: failed,
                 });
               }
             })
-            .catch(err => console.error('Eligibility dynamic evaluate failed:', err));
+            .catch(() => {});
         }
       })
       .catch(err => {
-        console.error(err);
-        setError('Scheme document could not be loaded or server is offline.');
+        if (!isMounted) return;
+        console.error('Scheme detail error:', err);
+        setError('Government scheme record not found or temporarily unavailable.');
       })
-      .finally(() => setLoading(false));
+      .finally(() => {
+        if (isMounted) setLoading(false);
+      });
 
-    return () => {
-      isMounted = false;
-    };
+    return () => { isMounted = false; };
   }, [slug]);
 
   const toggleBookmark = () => {
-    if (!scheme) return;
     try {
       const saved: string[] = JSON.parse(localStorage.getItem('govscheme_bookmarks') || '[]');
       let updated: string[];
       if (saved.includes(slug)) {
         updated = saved.filter((s: string) => s !== slug);
         setIsBookmarked(false);
-        showToast('Removed from saved bookmarks');
       } else {
         updated = [...saved, slug];
         setIsBookmarked(true);
-        showToast('Saved to bookmarks');
       }
       localStorage.setItem('govscheme_bookmarks', JSON.stringify(updated));
     } catch (err) {
-      console.error(err);
+      console.error('Bookmark error:', err);
     }
   };
 
   const toggleCompare = () => {
-    if (!scheme) return;
     try {
       const compareList: string[] = JSON.parse(localStorage.getItem('govscheme_compare') || '[]');
       let updated: string[];
       if (compareList.includes(slug)) {
         updated = compareList.filter((s: string) => s !== slug);
         setIsCompared(false);
-        showToast('Removed from comparison list');
       } else {
         if (compareList.length >= 3) {
           updated = [...compareList.slice(1), slug];
@@ -184,468 +180,406 @@ export default function SchemeDetailPage({ params }: { params: Promise<{ slug: s
           updated = [...compareList, slug];
         }
         setIsCompared(true);
-        showToast('Added to comparison list');
       }
       localStorage.setItem('govscheme_compare', JSON.stringify(updated));
     } catch (err) {
-      console.error(err);
-    }
-  };
-
-  const handleShare = () => {
-    const shareUrl = typeof window !== 'undefined' ? window.location.href : '';
-    if (navigator.share) {
-      navigator.share({
-        title: scheme?.name || 'Government Scheme',
-        text: `Official Government Scheme details: ${scheme?.name}`,
-        url: shareUrl
-      }).catch(err => console.error(err));
-    } else {
-      navigator.clipboard.writeText(shareUrl);
-      showToast('Link copied to clipboard!');
+      console.error('Compare error:', err);
     }
   };
 
   const handleCopyLink = () => {
-    if (scheme?.official_website) {
-      navigator.clipboard.writeText(scheme.official_website);
-      showToast('Official portal link copied!');
+    if (typeof window !== 'undefined') {
+      navigator.clipboard.writeText(window.location.href);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
     }
   };
 
   if (loading) {
     return (
-      <div className="mx-auto max-w-4xl w-full py-16 px-4 space-y-6">
-        <div className="h-4 w-24 rounded bg-[#11131C] skeleton-shimmer" />
-        <div className="gov-card rounded-2xl p-8 space-y-6 border border-white/[0.08]">
-          <div className="h-8 w-3/4 rounded bg-[#161926] skeleton-shimmer" />
-          <div className="h-4 w-1/2 rounded bg-[#161926] skeleton-shimmer" />
-          <div className="h-28 rounded-xl bg-[#161926] skeleton-shimmer" />
-        </div>
+      <div className="mx-auto max-w-5xl w-full py-12 px-4 sm:px-6 lg:px-8 space-y-6">
+        <div className="h-4 w-32 rounded skeleton-shimmer" />
+        <div className="h-10 w-2/3 rounded-xl skeleton-shimmer" />
+        <div className="h-48 w-full rounded-2xl skeleton-shimmer" />
+        <div className="h-96 w-full rounded-2xl skeleton-shimmer" />
       </div>
     );
   }
 
   if (error || !scheme) {
     return (
-      <div className="mx-auto max-w-3xl w-full py-16 px-4 text-center space-y-6">
-        <div className="inline-flex h-16 w-16 items-center justify-center rounded-2xl bg-[#0E1017] border border-white/[0.08]">
-          <FileText className="h-8 w-8 text-rose-400" />
-        </div>
-        <div className="space-y-2">
-          <h2 className="font-heading text-2xl font-bold text-slate-100">Scheme Document Not Found</h2>
-          <p className="text-slate-400 text-xs max-w-md mx-auto">{error || 'The requested scheme record could not be loaded.'}</p>
-        </div>
+      <div className="mx-auto max-w-md w-full py-20 px-4 text-center space-y-4">
+        <AlertTriangle className="h-12 w-12 text-amber-400 mx-auto" />
+        <h2 className="font-heading text-xl font-bold text-slate-100">Scheme Record Unavailable</h2>
+        <p className="text-xs text-slate-400">{error || 'This scheme could not be located in our directory.'}</p>
         <Link
           href="/schemes"
-          className="inline-flex items-center gap-2 px-6 py-3 bg-purple-600 hover:bg-purple-500 text-white rounded-xl font-bold text-xs shadow-lg transition-all"
+          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold transition-colors"
         >
           <ArrowLeft className="h-4 w-4" />
-          <span>Back to All Schemes</span>
+          <span>Return to Schemes Directory</span>
         </Link>
       </div>
     );
   }
 
+  const isCentral = scheme.level === 'Central' || !scheme.level;
   const displayName = language === 'hi' && scheme.name_hi ? scheme.name_hi : scheme.name;
-  const displayDesc = language === 'hi' && scheme.description_hi ? scheme.description_hi : scheme.description;
-  const displayBenefits = language === 'hi' && scheme.benefits_hi ? scheme.benefits_hi : scheme.benefits;
-  const displayAppProcess = language === 'hi' && scheme.application_process_hi ? scheme.application_process_hi : scheme.application_process;
-
-  const incomeLimitRule = scheme.eligibility_rules_summary.find(r => r.toLowerCase().includes('income'));
-
-  const stateNames: Record<string, string> = {
-    "UP": "Uttar Pradesh", "MH": "Maharashtra", "DL": "Delhi", "KA": "Karnataka",
-    "TN": "Tamil Nadu", "GJ": "Gujarat", "RJ": "Rajasthan", "MP": "Madhya Pradesh",
-    "WB": "West Bengal", "AP": "Andhra Pradesh", "TG": "Telangana", "BR": "Bihar"
-  };
-  const stateDisplayName = scheme.state_code ? (stateNames[scheme.state_code] || scheme.state_code) : 'All India';
 
   return (
-    <div className="mx-auto max-w-5xl w-full py-8 sm:py-10 px-4 sm:px-6 lg:px-8 space-y-8 animate-fade-in relative z-10">
+    <div className="mx-auto max-w-5xl w-full py-8 sm:py-10 px-4 sm:px-6 lg:px-8 space-y-8 relative z-10 animate-fade-in">
       
-      {/* Toast Alert */}
-      {toast && (
-        <div className="fixed bottom-8 right-8 px-5 py-3 rounded-xl bg-[#0E1017]/95 border border-emerald-500/40 text-emerald-300 text-xs font-semibold shadow-2xl backdrop-blur-md flex items-center gap-2 z-50 animate-slide-up">
-          <CheckCircle2 className="h-4 w-4 text-emerald-400" />
-          <span>{toast}</span>
-        </div>
-      )}
+      {/* Floating Compare Tray */}
+      <CompareFloatingBar />
 
-      {/* Breadcrumb Navigation & Top Action Bar */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        {/* Breadcrumb */}
-        <nav aria-label="Breadcrumb" className="flex items-center gap-1.5 text-xs text-slate-400">
-          <Link href="/" className="hover:text-white transition-colors">Home</Link>
-          <ChevronRight className="h-3 w-3 text-slate-600" />
-          <Link href="/schemes" className="hover:text-white transition-colors">Schemes</Link>
-          <ChevronRight className="h-3 w-3 text-slate-600" />
-          <span className="text-purple-300 font-semibold truncate max-w-xs">{displayName}</span>
-        </nav>
+      {/* Breadcrumbs Navigation */}
+      <nav className="flex items-center gap-2 text-xs text-slate-400" aria-label="Breadcrumb">
+        <Link href="/" className="hover:text-white transition-colors">Home</Link>
+        <ChevronRight className="h-3 w-3 text-slate-600" />
+        <Link href="/schemes" className="hover:text-white transition-colors">Schemes</Link>
+        <ChevronRight className="h-3 w-3 text-slate-600" />
+        <span className="text-slate-200 truncate max-w-xs">{scheme.name}</span>
+      </nav>
 
-        {/* Action Controls */}
-        <div className="flex flex-wrap items-center gap-2">
-          {/* Compare Button */}
-          <button
-            type="button"
-            onClick={toggleCompare}
-            className={`px-3 py-1.5 rounded-xl border transition-all cursor-pointer flex items-center gap-1.5 text-xs font-semibold ${
-              isCompared
-                ? 'bg-purple-600/20 border-purple-500/40 text-purple-300'
-                : 'bg-[#0E1017] border-white/[0.08] text-slate-400 hover:text-white'
-            }`}
-          >
-            <Scale className="h-3.5 w-3.5" />
-            <span>{isCompared ? 'In Compare' : 'Compare'}</span>
-          </button>
+      {/* Main Header Card */}
+      <div className="gov-card p-6 sm:p-8 rounded-3xl border border-white/[0.08] bg-[#0E1422] space-y-5">
+        
+        {/* Badges Strip */}
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-md bg-blue-500/15 text-blue-300 border border-blue-500/30">
+              {scheme.category_name || 'General Welfare'}
+            </span>
+            <span className={`text-xs font-bold uppercase tracking-wider px-2.5 py-1 rounded-md border ${
+              isCentral 
+                ? 'bg-amber-500/15 text-amber-300 border-amber-500/30' 
+                : 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30'
+            }`}>
+              {isCentral ? 'Central Ministry Scheme' : `State Scheme (${scheme.state_name || 'State'})`}
+            </span>
+            <span className="inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-1 rounded-md bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+              <ShieldCheck className="h-3.5 w-3.5" />
+              <span>Verified Government Record</span>
+            </span>
+          </div>
 
-          {/* Bookmark Button */}
-          <button
-            type="button"
-            onClick={toggleBookmark}
-            className={`px-3 py-1.5 rounded-xl border transition-all cursor-pointer flex items-center gap-1.5 text-xs font-semibold ${
-              isBookmarked
-                ? 'bg-purple-600/20 border-purple-500/40 text-purple-300'
-                : 'bg-[#0E1017] border-white/[0.08] text-slate-400 hover:text-white'
-            }`}
-          >
-            {isBookmarked ? <BookmarkCheck className="h-3.5 w-3.5 text-purple-400" /> : <Bookmark className="h-3.5 w-3.5" />}
-            <span>{isBookmarked ? 'Saved' : 'Save Scheme'}</span>
-          </button>
-
-          {/* Share Button */}
-          <button
-            type="button"
-            onClick={handleShare}
-            className="px-3 py-1.5 rounded-xl bg-[#0E1017] border border-white/[0.08] text-slate-400 hover:text-white transition-all cursor-pointer flex items-center gap-1.5 text-xs font-semibold"
-          >
-            <Share2 className="h-3.5 w-3.5" />
-            <span>Share</span>
-          </button>
-
-          {/* Copy Official Link */}
-          {scheme.official_website && (
+          {/* Quick Action Buttons: Share, Bookmark, Compare */}
+          <div className="flex items-center gap-2">
             <button
               type="button"
-              onClick={handleCopyLink}
-              className="px-3 py-1.5 rounded-xl bg-[#0E1017] border border-white/[0.08] text-slate-400 hover:text-white transition-all cursor-pointer flex items-center gap-1.5 text-xs font-semibold"
+              onClick={toggleBookmark}
+              className={`p-2 rounded-xl border text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer ${
+                isBookmarked
+                  ? 'bg-amber-500/20 text-amber-300 border-amber-500/40'
+                  : 'bg-[#111827] text-slate-300 hover:text-white border-white/[0.08]'
+              }`}
+              title={isBookmarked ? 'Saved to Dashboard' : 'Save Scheme'}
             >
-              <Copy className="h-3.5 w-3.5" />
-              <span>Copy Link</span>
+              {isBookmarked ? <BookmarkCheck className="h-4 w-4 text-amber-400" /> : <Bookmark className="h-4 w-4" />}
+              <span className="hidden sm:inline">{isBookmarked ? 'Saved' : 'Save'}</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={toggleCompare}
+              className={`p-2 rounded-xl border text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer ${
+                isCompared
+                  ? 'bg-blue-600/25 text-blue-300 border-blue-500/40'
+                  : 'bg-[#111827] text-slate-300 hover:text-white border-white/[0.08]'
+              }`}
+              title={isCompared ? 'In Compare List' : 'Add to Compare'}
+            >
+              <Scale className="h-4 w-4 text-blue-400" />
+              <span className="hidden sm:inline">{isCompared ? 'Compared' : 'Compare'}</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setShareModalOpen(true)}
+              className="p-2 rounded-xl bg-[#111827] border border-white/[0.08] text-slate-300 hover:text-white text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer"
+              title="Share Scheme"
+            >
+              <Share2 className="h-4 w-4" />
+              <span className="hidden sm:inline">Share</span>
+            </button>
+          </div>
+        </div>
+
+        {/* Title & Ministry */}
+        <div className="space-y-2">
+          <h1 className="font-heading text-2xl sm:text-3xl lg:text-4xl font-black text-slate-100 leading-tight">
+            {displayName}
+          </h1>
+          {(scheme.ministry_name || scheme.ministry) && (
+            <div className="flex items-center gap-2 text-xs sm:text-sm text-slate-400">
+              <Building2 className="h-4 w-4 text-slate-500 shrink-0" />
+              <span>{scheme.ministry_name || scheme.ministry}</span>
+            </div>
+          )}
+        </div>
+
+        {/* Top Summary Stats Bar */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-3 border-t border-white/[0.06]">
+          <div className="p-3.5 rounded-xl bg-[#111827] border border-white/[0.06]">
+            <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider block">Benefit Quantum</span>
+            <span className="text-base font-bold text-emerald-400 font-heading block mt-0.5">
+              {scheme.benefits_amount || 'Financial Assistance / Subsidy'}
+            </span>
+          </div>
+
+          <div className="p-3.5 rounded-xl bg-[#111827] border border-white/[0.06]">
+            <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider block">Jurisdiction Coverage</span>
+            <span className="text-base font-bold text-slate-200 font-heading block mt-0.5">
+              {scheme.state_name || 'Pan-India (Central)'}
+            </span>
+          </div>
+
+          <div className="p-3.5 rounded-xl bg-[#111827] border border-white/[0.06]">
+            <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider block">Application Mode</span>
+            <span className="text-base font-bold text-blue-400 font-heading block mt-0.5">
+              {scheme.application_url || scheme.official_website || scheme.portal_url ? 'Online Portal Submission' : 'Direct Departmental Channel'}
+            </span>
+          </div>
+        </div>
+
+        {/* Instant Citizen Qualifier Notice (If user scanned profile) */}
+        {userProfileCheck.status !== 'not_scanned' && (
+          <div className={`p-4 rounded-xl border flex items-start gap-3 ${
+            userProfileCheck.status === 'eligible'
+              ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-200'
+              : 'bg-amber-500/10 border-amber-500/30 text-amber-200'
+          }`}>
+            {userProfileCheck.status === 'eligible' ? (
+              <CheckCircle2 className="h-5 w-5 text-emerald-400 shrink-0 mt-0.5" />
+            ) : (
+              <Info className="h-5 w-5 text-amber-400 shrink-0 mt-0.5" />
+            )}
+            <div className="space-y-1">
+              <span className="text-xs font-bold block">
+                {userProfileCheck.status === 'eligible'
+                  ? 'Your Saved Demographic Profile Matches This Scheme!'
+                  : 'Profile Evaluation Notice'}
+              </span>
+              <p className="text-[11px] text-slate-300 leading-relaxed">
+                {userProfileCheck.status === 'eligible'
+                  ? 'You satisfy the basic demographic criteria on record. Please review required documents below to prepare your submission.'
+                  : 'Some criteria require verification. Check the eligibility requirements tab below.'}
+              </p>
+            </div>
+          </div>
+        )}
+
+      </div>
+
+      {/* Tabs Navigation */}
+      <div className="flex items-center gap-2 border-b border-white/[0.08] overflow-x-auto pb-2 scrollbar-none">
+        {[
+          { id: 'overview', label: 'Overview & Benefits', icon: FileText },
+          { id: 'eligibility', label: 'Eligibility Criteria', icon: CheckCircle2 },
+          { id: 'documents', label: 'Required Documents', icon: Award },
+          { id: 'process', label: 'Application Steps', icon: ArrowRight },
+        ].map((tab) => {
+          const Icon = tab.icon;
+          const isActive = activeTab === tab.id;
+          return (
+            <button
+              key={tab.id}
+              type="button"
+              onClick={() => setActiveTab(tab.id as 'overview' | 'eligibility' | 'documents' | 'process')}
+              className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap cursor-pointer ${
+                isActive
+                  ? 'bg-blue-600 text-white shadow-sm'
+                  : 'text-slate-400 hover:text-white hover:bg-white/[0.04]'
+              }`}
+            >
+              <Icon className="h-4 w-4" />
+              <span>{tab.label}</span>
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Tab Panels */}
+      <div className="gov-card p-6 sm:p-8 rounded-3xl border border-white/[0.08] bg-[#0E1422]">
+        
+        {/* Tab 1: Overview & Benefits */}
+        {activeTab === 'overview' && (
+          <div className="space-y-6 animate-fade-in">
+            <div className="space-y-3">
+              <h2 className="font-heading text-lg font-bold text-slate-100 flex items-center gap-2">
+                <FileText className="h-5 w-5 text-blue-400" />
+                <span>Scheme Description & Purpose</span>
+              </h2>
+              <p className="text-xs sm:text-sm text-slate-300 leading-relaxed whitespace-pre-line">
+                {scheme.description || 'Official scheme details describing beneficiary entitlement, scope, and objectives.'}
+              </p>
+            </div>
+
+            {(scheme.benefits_description || scheme.benefits) && (
+              <div className="p-5 rounded-2xl bg-[#111827] border border-white/[0.06] space-y-2">
+                <span className="text-xs font-bold text-emerald-400 uppercase tracking-wider block">
+                  Detailed Benefits & Assistance Structure
+                </span>
+                <p className="text-xs sm:text-sm text-slate-300 leading-relaxed whitespace-pre-line">
+                  {scheme.benefits_description || scheme.benefits}
+                </p>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Tab 2: Eligibility Criteria */}
+        {activeTab === 'eligibility' && (
+          <div className="space-y-6 animate-fade-in">
+            <div className="space-y-3">
+              <h2 className="font-heading text-lg font-bold text-slate-100 flex items-center gap-2">
+                <CheckCircle2 className="h-5 w-5 text-emerald-400" />
+                <span>Who is Eligible?</span>
+              </h2>
+              <p className="text-xs text-slate-400">
+                Review the mandatory eligibility standards defined by the governing ministry.
+              </p>
+            </div>
+
+            <div className="p-5 rounded-2xl bg-[#111827] border border-white/[0.06] space-y-3">
+              <p className="text-xs sm:text-sm text-slate-300 leading-relaxed whitespace-pre-line">
+                {scheme.eligibility_criteria || 'General citizen eligibility as mandated by the published departmental guidelines.'}
+              </p>
+            </div>
+
+            <div className="p-4 rounded-xl bg-blue-500/10 border border-blue-500/20 text-xs text-blue-300 flex items-start gap-2.5">
+              <Sparkles className="h-4 w-4 text-blue-400 shrink-0 mt-0.5" />
+              <span>
+                Want to double check? Run our <Link href="/eligibility" className="underline font-bold text-white">Eligibility Quick-Scan</Link> to automatically compare your profile against all 130+ schemes.
+              </span>
+            </div>
+          </div>
+        )}
+
+        {/* Tab 3: Required Documents */}
+        {activeTab === 'documents' && (
+          <div className="space-y-6 animate-fade-in">
+            <div className="space-y-3">
+              <h2 className="font-heading text-lg font-bold text-slate-100 flex items-center gap-2">
+                <Award className="h-5 w-5 text-amber-400" />
+                <span>Documents Checklist</span>
+              </h2>
+              <p className="text-xs text-slate-400">
+                Keep scanned copies or self-attested physical photocopies ready before commencing application.
+              </p>
+            </div>
+
+            <div className="p-5 rounded-2xl bg-[#111827] border border-white/[0.06] space-y-3">
+              <p className="text-xs sm:text-sm text-slate-300 leading-relaxed whitespace-pre-line">
+                {scheme.documents_required || 'Standard citizen identification documents: Aadhaar card, residence proof, income certificate, and active bank passbook.'}
+              </p>
+            </div>
+          </div>
+        )}
+
+        {/* Tab 4: Application Steps */}
+        {activeTab === 'process' && (
+          <div className="space-y-6 animate-fade-in">
+            <div className="space-y-3">
+              <h2 className="font-heading text-lg font-bold text-slate-100 flex items-center gap-2">
+                <ArrowRight className="h-5 w-5 text-blue-400" />
+                <span>How to Apply</span>
+              </h2>
+              <p className="text-xs text-slate-400">
+                Follow these official steps to submit your application on the designated government domain.
+              </p>
+            </div>
+
+            <div className="p-5 rounded-2xl bg-[#111827] border border-white/[0.06] space-y-3">
+              <p className="text-xs sm:text-sm text-slate-300 leading-relaxed whitespace-pre-line">
+                {scheme.application_process || 'Applications are submitted online via the official ministry portal or through local Common Service Centers (CSC) / district collectorate counters.'}
+              </p>
+            </div>
+          </div>
+        )}
+
+      </div>
+
+      {/* Official Government Direct Application Action Card */}
+      <div className="gov-card p-6 sm:p-8 rounded-3xl border border-blue-500/30 bg-gradient-to-r from-[#0E1422] via-[#111827] to-[#0E1422] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
+        <div className="space-y-1.5 max-w-xl">
+          <div className="flex items-center gap-2 text-xs font-bold text-emerald-400">
+            <ShieldCheck className="h-4 w-4" />
+            <span>Direct Government Portal Submission</span>
+          </div>
+          <h3 className="font-heading text-lg font-bold text-slate-100">
+            Ready to Submit Your Application?
+          </h3>
+          <p className="text-xs text-slate-400 leading-relaxed">
+            GovSchemeAI connects you directly to the official government portal. Verify details on the authorized .gov.in domain.
+          </p>
+        </div>
+
+        <div className="flex flex-wrap items-center gap-3 shrink-0">
+          <Link
+            href={`/chat?q=${encodeURIComponent(`Help me apply for ${scheme.name}. What documents are needed and what are the exact steps?`)}`}
+            className="px-4 py-2.5 rounded-xl bg-white/[0.06] hover:bg-white/[0.1] text-slate-200 text-xs font-bold flex items-center gap-1.5 transition-colors"
+          >
+            <Bot className="h-4 w-4 text-blue-400" />
+            <span>Ask Advisor AI</span>
+          </Link>
+
+          {(scheme.application_url || scheme.official_website || scheme.portal_url) ? (
+            <a
+              href={scheme.application_url || scheme.official_website || scheme.portal_url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold flex items-center gap-2 shadow-md transition-colors"
+            >
+              <span>Visit Official Portal</span>
+              <ExternalLink className="h-4 w-4" />
+            </a>
+          ) : (
+            <button
+              disabled
+              className="px-5 py-2.5 rounded-xl bg-white/[0.05] text-slate-500 text-xs font-bold cursor-not-allowed"
+            >
+              Portal Link Updating
             </button>
           )}
         </div>
       </div>
 
-      {/* Main Scheme Document Container */}
-      <div className="gov-card rounded-3xl overflow-hidden relative border border-white/[0.08]">
-        
-        {/* Top Accent Stripe */}
-        <div className="h-1 bg-gradient-to-r from-purple-600 via-purple-400 to-cyan-500" />
-
-        <div className="p-6 sm:p-10 space-y-8">
-          
-          {/* Header Metadata */}
-          <div className="space-y-4">
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="text-[10px] uppercase font-extrabold tracking-wider px-3 py-1 rounded-lg bg-purple-500/15 text-purple-300 border border-purple-500/30">
-                {scheme.category_icon || '📁'} {scheme.category_name || 'General Welfare'}
-              </span>
-              <span className="text-[10px] uppercase font-extrabold tracking-wider px-3 py-1 rounded-lg bg-cyan-500/15 text-cyan-400 border border-cyan-500/30">
-                {scheme.level || 'Central'}
-              </span>
-              <span className="text-[10px] uppercase font-extrabold tracking-wider px-3 py-1 rounded-lg bg-[#0E1017] text-slate-300 border border-white/[0.08] flex items-center gap-1">
-                <MapPin className="h-3 w-3" />
-                <span>{stateDisplayName}</span>
-              </span>
-              <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-lg border border-emerald-500/20">
-                <ShieldCheck className="h-3.5 w-3.5" />
-                <span>Verified Official Government Source</span>
-              </span>
-            </div>
-
-            <h1 className="font-heading text-2xl sm:text-4xl font-black text-slate-100 leading-tight">
-              {displayName}
-            </h1>
-
-            {scheme.ministry && (
-              <div className="flex items-center gap-2 text-slate-400 text-xs">
-                <Building2 className="h-4 w-4 text-purple-400 shrink-0" />
-                <span className="font-semibold text-slate-200">{scheme.ministry}</span>
-              </div>
-            )}
+      {/* Share Modal Dialog */}
+      <Modal
+        isOpen={shareModalOpen}
+        onClose={() => setShareModalOpen(false)}
+        title="Share Government Scheme"
+        description="Share official scheme details with fellow citizens via direct link."
+      >
+        <div className="space-y-4">
+          <div className="p-3 rounded-xl bg-[#080C15] border border-white/[0.08]">
+            <div className="text-xs font-bold text-slate-200 line-clamp-1">{scheme.name}</div>
+            <div className="text-[11px] text-slate-400 mt-0.5">{scheme.ministry_name || 'Government of India'}</div>
           </div>
 
-          {/* Quick Metrics 3-Card Bar */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            {/* Benefit Amount */}
-            <div className="p-4 rounded-2xl bg-[#0E1017] border border-white/[0.08] flex gap-3.5 items-center">
-              <div className="h-10 w-10 rounded-xl bg-purple-500/15 border border-purple-500/30 flex items-center justify-center text-purple-400 shrink-0">
-                <Coins className="h-5 w-5" />
-              </div>
-              <div>
-                <span className="text-[9px] uppercase tracking-wider font-extrabold text-slate-400 block">{t('benefits')}</span>
-                <span className="text-sm font-bold text-slate-100">{scheme.benefits_amount || 'Various Financial Aids'}</span>
-              </div>
-            </div>
-
-            {/* Income Ceiling */}
-            <div className="p-4 rounded-2xl bg-[#0E1017] border border-white/[0.08] flex gap-3.5 items-center">
-              <div className="h-10 w-10 rounded-xl bg-cyan-500/15 border border-cyan-500/30 flex items-center justify-center text-cyan-400 shrink-0">
-                <FileText className="h-5 w-5" />
-              </div>
-              <div>
-                <span className="text-[9px] uppercase tracking-wider font-extrabold text-slate-400 block">Income Ceiling</span>
-                <span className="text-sm font-bold text-slate-100">
-                  {incomeLimitRule ? incomeLimitRule.replace(/income/gi, '').replace(/[✓✗:-]/g, '').trim() : 'No Limit / General'}
-                </span>
-              </div>
-            </div>
-
-            {/* Deadline */}
-            <div className="p-4 rounded-2xl bg-[#0E1017] border border-white/[0.08] flex gap-3.5 items-center">
-              <div className="h-10 w-10 rounded-xl bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center text-emerald-400 shrink-0">
-                <Calendar className="h-5 w-5" />
-              </div>
-              <div>
-                <span className="text-[9px] uppercase tracking-wider font-extrabold text-slate-400 block">{t('deadline')}</span>
-                <span className="text-sm font-bold text-slate-100">{scheme.deadline || 'Ongoing / Year-Round'}</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Citizen Saved Profile Match Notice */}
-          {userProfileCheck.status !== 'not_scanned' && (
-            <div className={`p-4 rounded-2xl border flex gap-3.5 ${
-              userProfileCheck.status === 'eligible'
-                ? 'bg-emerald-500/10 border-emerald-500/30 text-slate-100'
-                : 'bg-rose-500/10 border-rose-500/30 text-slate-100'
-            }`}>
-              <div className="shrink-0 mt-0.5">
-                {userProfileCheck.status === 'eligible'
-                  ? <CheckCircle2 className="h-5 w-5 text-emerald-400" />
-                  : <ShieldAlert className="h-5 w-5 text-rose-400" />
-                }
-              </div>
-              <div className="space-y-1 text-xs">
-                <h4 className="font-bold text-slate-100">
-                  {userProfileCheck.status === 'eligible'
-                    ? 'Eligible according to your saved profile!'
-                    : 'Profile criteria mismatch'}
-                </h4>
-                <ul className="space-y-0.5 text-xs text-slate-400">
-                  {userProfileCheck.passedRules.map((rule, idx) => (
-                    <li key={`p-${idx}`} className="flex items-center gap-1 text-emerald-400">
-                      <span>✓</span> <span>{rule}</span>
-                    </li>
-                  ))}
-                  {userProfileCheck.failedRules.map((rule, idx) => (
-                    <li key={`f-${idx}`} className="flex items-center gap-1 text-rose-400">
-                      <span>✗</span> <span>{rule}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </div>
-          )}
-
-          {/* AI Smart Overview */}
-          {scheme.ai_summary && (
-            <div className="p-5 rounded-2xl bg-purple-950/20 border border-purple-500/25 space-y-2">
-              <h3 className="text-xs font-bold uppercase tracking-wider text-purple-300 flex items-center gap-1.5">
-                <Sparkles className="h-4 w-4 text-purple-400" />
-                <span>AI Citizen Brief</span>
-              </h3>
-              <p className="text-xs sm:text-sm text-slate-200 leading-relaxed italic">
-                &ldquo;{scheme.ai_summary}&rdquo;
-              </p>
-            </div>
-          )}
-
-          {/* Scheme Summary & Objective */}
-          {displayDesc && (
-            <div className="space-y-2.5">
-              <h2 className="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-2 border-b border-white/[0.06] pb-2">
-                <Info className="h-4 w-4 text-purple-400" />
-                <span>Scheme Objective & Summary</span>
-              </h2>
-              <div className="text-xs sm:text-sm text-slate-300 leading-relaxed bg-[#0E1017] p-5 rounded-2xl border border-white/[0.08] whitespace-pre-line">
-                {displayDesc}
-              </div>
-            </div>
-          )}
-
-          {/* Benefits Details */}
-          {displayBenefits && (
-            <div className="space-y-2.5">
-              <h2 className="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-2 border-b border-white/[0.06] pb-2">
-                <Award className="h-4 w-4 text-purple-400" />
-                <span>Benefits & Financial Entitlements</span>
-              </h2>
-              <div className="text-xs sm:text-sm text-slate-300 leading-relaxed bg-[#0E1017] p-5 rounded-2xl border border-white/[0.08] whitespace-pre-line">
-                {displayBenefits}
-              </div>
-            </div>
-          )}
-
-          {/* Mandatory Eligibility Rules Summary */}
-          {scheme.eligibility_rules_summary && scheme.eligibility_rules_summary.length > 0 && (
-            <div className="space-y-2.5">
-              <h2 className="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-2 border-b border-white/[0.06] pb-2">
-                <ShieldCheck className="h-4 w-4 text-emerald-400" />
-                <span>Eligibility Requirements Checklist</span>
-              </h2>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                {scheme.eligibility_rules_summary.map((rule, idx) => (
-                  <div key={idx} className="flex items-start gap-2.5 text-xs text-slate-300 bg-[#0E1017] p-3.5 rounded-xl border border-white/[0.08]">
-                    <CheckCircle2 className="h-4 w-4 text-emerald-400 shrink-0 mt-0.5" />
-                    <span>{rule}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Required Documents Checklist */}
-          {scheme.required_documents && scheme.required_documents.length > 0 && (
-            <div className="space-y-2.5">
-              <h2 className="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-2 border-b border-white/[0.06] pb-2">
-                <FileText className="h-4 w-4 text-cyan-400" />
-                <span>Required Documents Checklist</span>
-              </h2>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                {scheme.required_documents.map((doc, idx) => (
-                  <div key={idx} className="flex items-center gap-3 text-xs text-slate-200 bg-[#0E1017] p-3 rounded-xl border border-white/[0.08]">
-                    <div className="h-5 w-5 rounded bg-purple-600/20 text-purple-300 font-bold text-[10px] flex items-center justify-center shrink-0">
-                      {idx + 1}
-                    </div>
-                    <span>{doc}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Application Procedure */}
-          {displayAppProcess && (
-            <div className="space-y-2.5">
-              <h2 className="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-2 border-b border-white/[0.06] pb-2">
-                <Sparkles className="h-4 w-4 text-purple-400" />
-                <span>Official Application Procedure</span>
-              </h2>
-              <div className="text-xs sm:text-sm text-slate-300 leading-relaxed bg-[#0E1017] p-5 rounded-2xl border border-white/[0.08] whitespace-pre-line">
-                {displayAppProcess}
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* Action Footer CTA Bar */}
-        <div className="border-t border-white/[0.08] bg-[#0E1017] p-6 sm:p-8 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-          <div className="flex flex-wrap gap-4 text-xs">
-            {scheme.helpline && (
-              <div className="flex items-center gap-2">
-                <Phone className="h-4 w-4 text-purple-400" />
-                <span className="text-slate-400">Helpline: <strong className="text-slate-200">{scheme.helpline}</strong></span>
-              </div>
-            )}
-            {scheme.launched_date && (
-              <div className="flex items-center gap-2">
-                <Clock className="h-4 w-4 text-cyan-400" />
-                <span className="text-slate-400">Launched: <strong className="text-slate-200">{scheme.launched_date}</strong></span>
-              </div>
-            )}
-          </div>
-
-          <div className="flex flex-wrap gap-3 w-full sm:w-auto">
-            <AmazingButton
-              href="/eligibility"
-              variant="secondary"
-              size="md"
-              icon={<ShieldCheck className="h-4 w-4 text-purple-400" />}
-              iconPosition="left"
-              className="flex-1 sm:flex-initial"
-            >
-              Check My Eligibility
-            </AmazingButton>
-            {scheme.application_url && (
-              <a
-                href={scheme.application_url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white rounded-xl text-xs font-extrabold shadow-lg shadow-purple-600/25 transition-all cursor-pointer border border-white/20 active:scale-[0.98]"
-                title="Direct link to official government submission portal"
+          <div className="space-y-2">
+            <span className="text-[11px] text-slate-400 font-medium">Scheme Page Link</span>
+            <div className="flex items-center gap-2">
+              <input
+                type="text"
+                readOnly
+                value={typeof window !== 'undefined' ? window.location.href : ''}
+                className="w-full text-xs px-3 py-2 rounded-lg bg-[#080C15] border border-white/[0.1] text-slate-300"
+              />
+              <button
+                type="button"
+                onClick={handleCopyLink}
+                className="px-3.5 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold flex items-center gap-1.5 shrink-0 transition-colors cursor-pointer"
               >
-                <span>Apply on Official Portal</span>
-                <ExternalLink className="h-4 w-4" />
-              </a>
-            )}
+                {copied ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
+                <span>{copied ? 'Copied' : 'Copy'}</span>
+              </button>
+            </div>
           </div>
         </div>
-      </div>
+      </Modal>
 
-      {/* Related & Similar Schemes */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
-        {scheme.related_schemes && scheme.related_schemes.length > 0 && (
-          <div className="space-y-3">
-            <h3 className="font-heading text-sm font-bold text-slate-200 flex items-center gap-2">
-              <Sparkles className="h-4 w-4 text-purple-400" />
-              <span>Related Category Schemes</span>
-            </h3>
-            <div className="space-y-2">
-              {scheme.related_schemes.map((rel) => (
-                <Link
-                  href={`/schemes/${rel.slug}`}
-                  key={rel.id}
-                  className="block gov-card p-4 rounded-xl border border-white/[0.08] hover:border-purple-500/40 transition-all group"
-                >
-                  <div className="flex justify-between items-center gap-2">
-                    <div className="space-y-0.5">
-                      <span className="text-[9px] uppercase font-bold tracking-wider text-purple-400">
-                        {rel.category_name || 'General'}
-                      </span>
-                      <h4 className="font-bold text-xs text-slate-200 group-hover:text-purple-300 transition-colors line-clamp-1">
-                        {language === 'hi' && rel.name_hi ? rel.name_hi : rel.name}
-                      </h4>
-                    </div>
-                    <ChevronRight className="h-4 w-4 text-slate-500 group-hover:text-purple-300 transition-colors shrink-0" />
-                  </div>
-                </Link>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {scheme.similar_schemes && scheme.similar_schemes.length > 0 && (
-          <div className="space-y-3">
-            <h3 className="font-heading text-sm font-bold text-slate-200 flex items-center gap-2">
-              <Award className="h-4 w-4 text-cyan-400" />
-              <span>Similar Level Schemes</span>
-            </h3>
-            <div className="space-y-2">
-              {scheme.similar_schemes.map((sim) => (
-                <Link
-                  href={`/schemes/${sim.slug}`}
-                  key={sim.id}
-                  className="block gov-card p-4 rounded-xl border border-white/[0.08] hover:border-cyan-500/40 transition-all group"
-                >
-                  <div className="flex justify-between items-center gap-2">
-                    <div className="space-y-0.5">
-                      <span className="text-[9px] uppercase font-bold tracking-wider text-cyan-400">
-                        {sim.level || 'Central'}
-                      </span>
-                      <h4 className="font-bold text-xs text-slate-200 group-hover:text-cyan-300 transition-colors line-clamp-1">
-                        {language === 'hi' && sim.name_hi ? sim.name_hi : sim.name}
-                      </h4>
-                    </div>
-                    <ChevronRight className="h-4 w-4 text-slate-500 group-hover:text-cyan-300 transition-colors shrink-0" />
-                  </div>
-                </Link>
-              ))}
-            </div>
-          </div>
-        )}
-      </div>
     </div>
   );
 }

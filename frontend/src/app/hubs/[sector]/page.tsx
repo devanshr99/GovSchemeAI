@@ -3,6 +3,7 @@
 import React, { useState, useEffect, use } from 'react';
 import { api } from '../../../lib/api';
 import { SchemeCard } from '../../../components/schemes/SchemeCard';
+import { CompareFloatingBar } from '../../../components/common/CompareFloatingBar';
 import { SchemeCard as SchemeCardType } from '../../../types/scheme';
 import Link from 'next/link';
 import { 
@@ -23,6 +24,7 @@ interface SectorConfig {
   categorySlug: string;
   icon: LucideIcon;
   badge: string;
+  badgeBg: string;
   subtitle: string;
   description: string;
   stats: { label: string; value: string }[];
@@ -33,7 +35,8 @@ const SECTOR_MAP: Record<string, SectorConfig> = {
     title: 'Student Hub & Scholarships',
     categorySlug: 'education',
     icon: GraduationCap,
-    badge: 'Education & Learning Portal',
+    badge: 'Education & Grants',
+    badgeBg: 'bg-blue-500/10 text-blue-300 border-blue-500/20',
     subtitle: 'Scholarships, Fee Subventions & Fellowships',
     description: 'Index of central and state scholarships, National Scholarship Portal opportunities, research stipends, and higher education loan assistance.',
     stats: [
@@ -47,6 +50,7 @@ const SECTOR_MAP: Record<string, SectorConfig> = {
     categorySlug: 'business',
     icon: Rocket,
     badge: 'Enterprise & Seed Grants',
+    badgeBg: 'bg-amber-500/10 text-amber-300 border-amber-500/20',
     subtitle: 'Startup India Seed Funding & Mudra Loans',
     description: 'Discover collateral-free credit guarantees, Startup India seed grants, patent registration rebates, and state incubator subsidies.',
     stats: [
@@ -60,6 +64,7 @@ const SECTOR_MAP: Record<string, SectorConfig> = {
     categorySlug: 'agriculture',
     icon: Sprout,
     badge: 'Kisan Welfare Portal',
+    badgeBg: 'bg-emerald-500/10 text-emerald-300 border-emerald-500/20',
     subtitle: 'PM-KISAN, Crop Insurance & Fertilizer Aids',
     description: 'Financial support for Indian farmers: PM-KISAN installment credits, PM Fasal Bima Yojana crop insurance, Kisan Credit Cards, and solar pumps.',
     stats: [
@@ -73,6 +78,7 @@ const SECTOR_MAP: Record<string, SectorConfig> = {
     categorySlug: 'health',
     icon: HeartHandshake,
     badge: 'Women Empowerment Portal',
+    badgeBg: 'bg-rose-500/10 text-rose-300 border-rose-500/20',
     subtitle: 'Maternity Benefits, SHG Loans & Savings Plans',
     description: 'Dedicated welfare schemes for women: Pradhan Mantri Matru Vandana Yojana, Sukanya Samriddhi Yojana for girl child, and self-help group micro credits.',
     stats: [
@@ -86,6 +92,7 @@ const SECTOR_MAP: Record<string, SectorConfig> = {
     categorySlug: 'employment',
     icon: Briefcase,
     badge: 'Youth & Skill Development',
+    badgeBg: 'bg-cyan-500/10 text-cyan-300 border-cyan-500/20',
     subtitle: 'PM Kaushal Vikas & Apprenticeship Stipends',
     description: 'Empowering young citizens through skill certification courses, paid apprenticeship allowances, and job matching linkages.',
     stats: [
@@ -99,6 +106,7 @@ const SECTOR_MAP: Record<string, SectorConfig> = {
     categorySlug: 'business',
     icon: Building2,
     badge: 'Micro & Small Business Portal',
+    badgeBg: 'bg-indigo-500/10 text-indigo-300 border-indigo-500/20',
     subtitle: 'Collateral-Free Credit & Technology Grants',
     description: 'Index of MSME schemes, CGTMSE collateral-free loans, Udyam registration benefits, and technology up-gradation assistance.',
     stats: [
@@ -122,9 +130,10 @@ export default function DynamicSectorHubPage({ params }: { params: Promise<{ sec
 
   useEffect(() => {
     let isCurrent = true;
+    setLoading(true);
     api.getSchemes({
       category: config.categorySlug,
-      pageSize: 20,
+      pageSize: 30,
       activeOnly: true,
     })
       .then((res) => {
@@ -150,23 +159,26 @@ export default function DynamicSectorHubPage({ params }: { params: Promise<{ sec
     <div className="mx-auto max-w-7xl w-full py-8 sm:py-10 px-4 sm:px-6 lg:px-8 space-y-8 relative z-10 animate-fade-in">
       
       {/* Top Breadcrumb */}
-      <Link href="/hubs" className="inline-flex items-center gap-1.5 text-xs font-semibold text-purple-400 hover:text-purple-300 hover:underline">
+      <Link 
+        href="/hubs" 
+        className="inline-flex items-center gap-1.5 text-xs font-semibold text-blue-400 hover:text-blue-300 hover:underline"
+      >
         <ArrowLeft className="h-3.5 w-3.5" />
         <span>All Sector Hubs</span>
       </Link>
 
       {/* Sector Hero Header */}
-      <div className="gov-card p-6 sm:p-10 rounded-3xl border border-white/[0.08] relative overflow-hidden bg-gradient-to-br from-[#11131C] via-[#161926] to-[#0E1017]">
+      <div className="p-6 sm:p-10 rounded-3xl border border-slate-800 relative overflow-hidden bg-[#111827] shadow-xl">
         <div className="space-y-4 max-w-3xl">
           
           <div className="flex flex-wrap items-center gap-2">
-            <span className="text-[10px] uppercase font-extrabold tracking-wider px-3 py-1 rounded-lg bg-purple-500/15 text-purple-300 border border-purple-500/30 flex items-center gap-1.5">
+            <span className={`text-[10px] uppercase font-bold tracking-wider px-3 py-1 rounded-lg border flex items-center gap-1.5 ${config.badgeBg}`}>
               <Icon className="h-3.5 w-3.5" />
               <span>{config.badge}</span>
             </span>
             <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-lg border border-emerald-500/20">
               <ShieldCheck className="h-3.5 w-3.5" />
-              <span>Verified Government Matrix</span>
+              <span>Verified Government Schemes</span>
             </span>
           </div>
 
@@ -181,9 +193,9 @@ export default function DynamicSectorHubPage({ params }: { params: Promise<{ sec
           {/* Quick Metrics */}
           <div className="grid grid-cols-3 gap-3 pt-2 max-w-md">
             {config.stats.map((st, idx) => (
-              <div key={idx} className="p-3 rounded-xl bg-[#0E1017] border border-white/[0.08]">
+              <div key={idx} className="p-3 rounded-xl bg-[#0b0f19] border border-slate-800">
                 <div className="font-heading text-sm sm:text-base font-bold text-slate-100">{st.value}</div>
-                <div className="text-[9px] uppercase font-extrabold text-slate-400 tracking-wider mt-0.5">{st.label}</div>
+                <div className="text-[9px] uppercase font-bold text-slate-400 tracking-wider mt-0.5">{st.label}</div>
               </div>
             ))}
           </div>
@@ -191,25 +203,25 @@ export default function DynamicSectorHubPage({ params }: { params: Promise<{ sec
       </div>
 
       {/* Search Bar */}
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 border-b border-white/[0.08] pb-4">
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 border-b border-slate-800/80 pb-4">
         <h2 className="font-heading text-xl font-bold text-slate-100">
-          Sector Opportunities ({filteredSchemes.length})
+          Sector Schemes ({filteredSchemes.length})
         </h2>
 
         <div className="relative w-full sm:w-72">
           <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-400" />
           <input
             type="text"
-            placeholder={`Search ${config.title.toLowerCase()}...`}
+            placeholder={`Filter ${config.title.toLowerCase()}...`}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-9 pr-3 py-2 text-xs rounded-xl bg-[#0E1017] border border-white/[0.08] text-slate-100 placeholder-slate-500 focus:border-purple-500"
+            className="w-full pl-9 pr-3 py-2 text-xs rounded-xl bg-[#111827] border border-slate-700/80 text-slate-100 placeholder-slate-500 focus:border-blue-500 focus:outline-none"
           />
         </div>
       </div>
 
       {/* Schemes Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pb-20">
         {filteredSchemes.map((scheme) => (
           <SchemeCard 
             key={scheme.id} 
@@ -222,20 +234,26 @@ export default function DynamicSectorHubPage({ params }: { params: Promise<{ sec
       {loading && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {[1, 2, 3, 4].map(n => (
-            <div key={n} className="gov-card h-44 rounded-2xl skeleton-shimmer opacity-40 border border-white/[0.08]" />
+            <div key={n} className="h-44 rounded-2xl bg-[#111827] border border-slate-800 animate-pulse" />
           ))}
         </div>
       )}
 
       {!loading && filteredSchemes.length === 0 && (
-        <div className="gov-card p-12 text-center space-y-3 rounded-3xl border border-white/[0.08] max-w-md mx-auto">
+        <div className="p-12 text-center space-y-3 rounded-3xl border border-slate-800 bg-[#111827] max-w-md mx-auto">
           <p className="text-sm font-bold text-slate-100">No schemes found matching search in this hub.</p>
-          <p className="text-xs text-slate-400">Try clearing search or browse all central schemes.</p>
-          <Link href="/schemes" className="inline-block px-4 py-2 bg-purple-600 hover:bg-purple-500 text-white rounded-xl text-xs font-bold mt-2 shadow-xs transition-all">
+          <p className="text-xs text-slate-400">Try clearing your search query or browse all central schemes.</p>
+          <Link 
+            href="/schemes" 
+            className="inline-block px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-xs font-bold mt-2 shadow-xs transition-all"
+          >
             Browse All Schemes
           </Link>
         </div>
       )}
+
+      {/* Floating Compare Bar */}
+      <CompareFloatingBar />
     </div>
   );
 }

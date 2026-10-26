@@ -7,6 +7,7 @@ import { api } from '../../lib/api';
 import { Logo } from '../common/Logo';
 import { AmazingButton } from '../common/AmazingButton';
 import { LanguagePicker } from './LanguagePicker';
+import { DropdownMenu, DropdownItem } from '../common/DropdownMenu';
 import { 
   Home, 
   Layers, 
@@ -18,7 +19,13 @@ import {
   Settings,
   Scale,
   Sparkles,
-  ShieldCheck
+  ShieldCheck,
+  GraduationCap,
+  Sprout,
+  HeartHandshake,
+  Rocket,
+  MoreVertical,
+  Code
 } from 'lucide-react';
 
 export const Navbar: React.FC = () => {
@@ -63,19 +70,97 @@ export const Navbar: React.FC = () => {
     };
   }, []);
 
-  const navItems = [
-    { href: '/', label: 'Home', icon: Home },
-    { href: '/schemes', label: 'Schemes', icon: Layers },
-    { href: '/compare', label: 'Compare', icon: Scale, count: compareCount },
-    { href: '/chat', label: 'Advisor AI', icon: Bot },
-    { href: '/hubs', label: 'Sector Hubs', icon: Grid },
-    { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
+  // Dropdown Items for "Explore Schemes"
+  const exploreItems: DropdownItem[] = [
+    {
+      label: 'All Government Schemes',
+      description: 'Search & filter 130+ central and state ministry schemes',
+      href: '/schemes',
+      icon: <Layers className="h-4 w-4" />,
+    },
+    {
+      label: 'Sector Hubs Overview',
+      description: 'Dedicated portals for farmers, students, women & startups',
+      href: '/hubs',
+      icon: <Grid className="h-4 w-4" />,
+    },
+    {
+      label: 'Side-by-Side Comparison',
+      description: 'Compare benefits, eligibility & documents for up to 3 schemes',
+      href: '/compare',
+      icon: <Scale className="h-4 w-4" />,
+      badge: compareCount > 0 ? `${compareCount}` : undefined,
+    },
+    { divider: true, label: '' },
+    {
+      label: 'Farmer Welfare (Kisan Hub)',
+      description: 'PM-KISAN, crop insurance, fertilizer subsidies',
+      href: '/hubs/farmer',
+      icon: <Sprout className="h-4 w-4 text-emerald-400" />,
+    },
+    {
+      label: 'Student Scholarships Hub',
+      description: 'National Scholarship Portal, fee waivers, fellowships',
+      href: '/hubs/student',
+      icon: <GraduationCap className="h-4 w-4 text-blue-400" />,
+    },
+    {
+      label: 'Women & Child Welfare Hub',
+      description: 'Maternity assistance, SHG loans, Sukanya Samriddhi',
+      href: '/hubs/women',
+      icon: <HeartHandshake className="h-4 w-4 text-pink-400" />,
+    },
+    {
+      label: 'Startup & MSME Credit Hub',
+      description: 'Mudra business loans, Startup India seed funding',
+      href: '/hubs/startup',
+      icon: <Rocket className="h-4 w-4 text-amber-400" />,
+    },
+  ];
+
+  // Dropdown Items for "Citizen Tools"
+  const citizenToolsItems: DropdownItem[] = [
+    {
+      label: 'Eligibility Quick-Scan',
+      description: 'Evaluate demographic profile against all scheme matrices',
+      href: '/eligibility',
+      icon: <Sparkles className="h-4 w-4 text-amber-400" />,
+      badge: 'Recommended',
+    },
+    {
+      label: 'Citizen Advisor AI',
+      description: 'Chat with our scheme intelligence model for guidelines',
+      href: '/chat',
+      icon: <Bot className="h-4 w-4 text-blue-400" />,
+    },
+    {
+      label: 'Citizen Workspace / Dashboard',
+      description: 'Review saved bookmarks, recent searches & match history',
+      href: '/dashboard',
+      icon: <LayoutDashboard className="h-4 w-4 text-emerald-400" />,
+    },
+  ];
+
+  // More Options Menu
+  const moreItems: DropdownItem[] = [
+    {
+      label: 'Admin Staging Portal',
+      description: 'Manage crawler synchronization and scheme database',
+      href: '/admin',
+      icon: <Settings className="h-4 w-4 text-slate-400" />,
+    },
+    {
+      label: 'Developer & Architecture',
+      description: 'System specifications, APIs, and data provenance',
+      href: '/about-developer',
+      icon: <Code className="h-4 w-4 text-slate-400" />,
+    },
   ];
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-white/[0.08] bg-[#090A0F]/90 backdrop-blur-md">
-      {/* Top Citizen Service Utility Strip */}
-      <div className="hidden md:flex items-center justify-between px-4 sm:px-6 lg:px-8 py-1 bg-[#06070B] border-b border-white/[0.04] text-[11px] text-slate-400">
+    <header className="sticky top-0 z-50 w-full border-b border-white/[0.08] bg-[#080C15]/95 backdrop-blur-md">
+      {/* Official Government Utility Strip */}
+      <div className="hidden md:flex items-center justify-between px-4 sm:px-6 lg:px-8 py-1 bg-[#060910] border-b border-white/[0.04] text-[11px] text-slate-400">
         <div className="flex items-center gap-2">
           <span className="inline-flex items-center gap-1 font-semibold text-emerald-400">
             <ShieldCheck className="h-3 w-3" />
@@ -85,12 +170,12 @@ export const Navbar: React.FC = () => {
           <span>Verified Central & State Government Welfare Schemes Index</span>
         </div>
         <div className="flex items-center gap-4 text-slate-400">
-          <Link href="/eligibility" className="hover:text-purple-300 font-semibold flex items-center gap-1 transition-colors">
-            <Sparkles className="h-3 w-3 text-purple-400" />
-            <span>Eligibility Quick-Scan</span>
+          <Link href="/eligibility" className="hover:text-blue-300 font-semibold flex items-center gap-1 transition-colors">
+            <Sparkles className="h-3 w-3 text-amber-400" />
+            <span>Find My Eligible Benefits</span>
           </Link>
           <span className="text-slate-600">•</span>
-          <span>Direct .gov.in Application Verification</span>
+          <span>Direct Official .gov.in Verification</span>
         </div>
       </div>
 
@@ -104,38 +189,67 @@ export const Navbar: React.FC = () => {
             </Link>
           </div>
 
-          {/* Desktop Nav Links */}
+          {/* Desktop Smart Grouped Navigation */}
           <nav className="hidden lg:flex items-center gap-1" aria-label="Main Navigation">
-            {navItems.map((item) => {
-              const Icon = item.icon;
-              const isActive = pathname === item.href || (item.href !== '/' && pathname?.startsWith(item.href));
-              return (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className={`flex items-center gap-1.5 text-xs font-semibold px-3 py-2 rounded-lg transition-all duration-150 relative ${
-                    isActive
-                      ? 'bg-purple-600/15 text-purple-300 border border-purple-500/30'
-                      : 'text-slate-400 hover:text-slate-100 hover:bg-white/[0.04]'
-                  }`}
-                >
-                  <Icon className={`h-3.5 w-3.5 ${isActive ? 'text-purple-400' : 'text-slate-400'}`} />
-                  <span>{item.label}</span>
-                  {item.count !== undefined && item.count > 0 && (
-                    <span className="ml-0.5 px-1.5 py-0.2 rounded-full text-[9px] font-bold bg-purple-500 text-white">
-                      {item.count}
-                    </span>
-                  )}
-                </Link>
-              );
-            })}
+            <Link
+              href="/"
+              className={`flex items-center gap-1.5 text-xs font-semibold px-3 py-2 rounded-lg transition-all duration-150 ${
+                pathname === '/'
+                  ? 'bg-blue-600/15 text-blue-300 border border-blue-500/30'
+                  : 'text-slate-300 hover:text-white hover:bg-white/[0.04] border border-transparent'
+              }`}
+            >
+              <Home className="h-3.5 w-3.5 text-slate-400" />
+              <span>Home</span>
+            </Link>
+
+            {/* Explore Schemes Dropdown */}
+            <DropdownMenu
+              label="Explore Schemes"
+              icon={<Layers className="h-3.5 w-3.5" />}
+              items={exploreItems}
+              badge={compareCount > 0 ? compareCount : undefined}
+            />
+
+            {/* Citizen Tools Dropdown */}
+            <DropdownMenu
+              label="Citizen Tools"
+              icon={<Sparkles className="h-3.5 w-3.5 text-amber-400" />}
+              items={citizenToolsItems}
+            />
+
+            {/* Direct Advisor AI Link */}
+            <Link
+              href="/chat"
+              className={`flex items-center gap-1.5 text-xs font-semibold px-3 py-2 rounded-lg transition-all duration-150 ${
+                pathname === '/chat'
+                  ? 'bg-blue-600/15 text-blue-300 border border-blue-500/30'
+                  : 'text-slate-300 hover:text-white hover:bg-white/[0.04] border border-transparent'
+              }`}
+            >
+              <Bot className="h-3.5 w-3.5 text-blue-400" />
+              <span>Advisor AI</span>
+            </Link>
+
+            {/* Citizen Dashboard Link */}
+            <Link
+              href="/dashboard"
+              className={`flex items-center gap-1.5 text-xs font-semibold px-3 py-2 rounded-lg transition-all duration-150 ${
+                pathname === '/dashboard'
+                  ? 'bg-blue-600/15 text-blue-300 border border-blue-500/30'
+                  : 'text-slate-300 hover:text-white hover:bg-white/[0.04] border border-transparent'
+              }`}
+            >
+              <LayoutDashboard className="h-3.5 w-3.5 text-slate-400" />
+              <span>Dashboard</span>
+            </Link>
           </nav>
 
           {/* Right Controls */}
-          <div className="flex items-center gap-2.5">
-            {/* Backend Engine Status Indicator */}
+          <div className="flex items-center gap-2 sm:gap-3">
+            {/* Backend Engine Health Indicator */}
             <div
-              className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider bg-[#0E1017] border border-white/[0.08]"
+              className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider bg-[#0E1422] border border-white/[0.08]"
               title={backendOnline === null ? 'Checking API status...' : backendOnline ? 'API Engine Active' : 'API Engine Offline'}
             >
               <div
@@ -152,39 +266,36 @@ export const Navbar: React.FC = () => {
               </span>
             </div>
 
-            {/* Eligibility Quick Action */}
+            {/* Primary Action Button: Saffron High-Visibility CTA */}
             <AmazingButton
               href="/eligibility"
-              variant="gradient"
+              variant="saffron"
               size="sm"
-              icon={<Sparkles className="h-3 w-3" />}
-              className="hidden lg:inline-flex text-[11px] py-1.5 px-3"
+              icon={<Sparkles className="h-3.5 w-3.5" />}
+              iconPosition="left"
+              className="hidden md:inline-flex text-xs py-1.5 px-3.5"
             >
-              Eligibility Scan
+              Check Benefits
             </AmazingButton>
 
             {/* Language Picker */}
             <LanguagePicker />
 
-            {/* Admin Portal Link */}
-            <Link
-              href="/admin"
-              className={`hidden sm:flex items-center gap-1 px-2.5 py-1.5 rounded-lg border text-xs font-semibold transition-all ${
-                pathname === '/admin'
-                  ? 'bg-purple-600/20 border-purple-500/40 text-purple-300'
-                  : 'border-white/[0.08] text-slate-400 hover:text-slate-100 bg-[#0E1017] hover:bg-[#161924]'
-              }`}
-              title="Admin Portal"
-            >
-              <Settings className="h-3.5 w-3.5" />
-              <span className="hidden md:inline">Admin</span>
-            </Link>
+            {/* More Contextual Actions (Desktop) */}
+            <div className="hidden lg:block">
+              <DropdownMenu
+                label=""
+                icon={<MoreVertical className="h-4 w-4 text-slate-400" />}
+                items={moreItems}
+                align="right"
+              />
+            </div>
 
             {/* Mobile Menu Button */}
             <button
               type="button"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="lg:hidden flex items-center justify-center h-9 w-9 rounded-lg border border-white/[0.08] bg-[#0E1017] text-slate-400 hover:text-white transition-all cursor-pointer"
+              className="lg:hidden flex items-center justify-center h-9 w-9 rounded-lg border border-white/[0.08] bg-[#0E1422] text-slate-300 hover:text-white transition-all cursor-pointer"
               aria-label="Toggle Navigation Menu"
               aria-expanded={mobileMenuOpen}
             >
@@ -195,67 +306,147 @@ export const Navbar: React.FC = () => {
 
         {/* Mobile Navigation Drawer */}
         {mobileMenuOpen && (
-          <div className="lg:hidden border-t border-white/[0.08] py-3 bg-[#090A0F]/95 backdrop-blur-xl animate-fade-in">
-            <div className="space-y-1 px-1">
-              {navItems.map((item) => {
-                const Icon = item.icon;
-                const isActive = pathname === item.href || (item.href !== '/' && pathname?.startsWith(item.href));
-                return (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    onClick={() => setMobileMenuOpen(false)}
-                    className={`flex items-center justify-between text-xs font-semibold px-4 py-2.5 rounded-lg transition-all ${
-                      isActive
-                        ? 'bg-purple-600/20 text-purple-300 border border-purple-500/30'
-                        : 'text-slate-300 hover:text-white hover:bg-white/[0.04]'
-                    }`}
-                  >
-                    <div className="flex items-center gap-3">
-                      <Icon className="h-4 w-4 text-purple-400" />
-                      <span>{item.label}</span>
-                    </div>
-                    {item.count !== undefined && item.count > 0 && (
-                      <span className="px-1.5 py-0.5 rounded-full text-[9px] font-bold bg-purple-500 text-white">
-                        {item.count}
-                      </span>
-                    )}
-                  </Link>
-                );
-              })}
-
+          <div className="lg:hidden border-t border-white/[0.08] py-4 bg-[#080C15]/98 backdrop-blur-2xl animate-fade-in max-h-[85vh] overflow-y-auto">
+            <div className="space-y-4 px-2">
+              
+              {/* Primary Mobile CTA */}
               <Link
                 href="/eligibility"
                 onClick={() => setMobileMenuOpen(false)}
-                className="flex items-center gap-3 text-xs font-semibold px-4 py-2.5 rounded-lg text-purple-300 bg-purple-600/15 border border-purple-500/20 hover:bg-purple-600/25 mt-1"
+                className="flex items-center justify-center gap-2 text-xs font-bold px-4 py-3 rounded-xl bg-amber-500 text-slate-950 shadow-md"
               >
-                <Sparkles className="h-4 w-4 text-purple-400" />
-                <span>Check My Eligibility</span>
+                <Sparkles className="h-4 w-4" />
+                <span>Check My Scheme Eligibility</span>
               </Link>
 
-              <Link
-                href="/about-developer"
-                onClick={() => setMobileMenuOpen(false)}
-                className="flex items-center gap-3 text-xs font-medium px-4 py-2.5 rounded-lg text-slate-400 hover:text-white hover:bg-white/[0.04]"
-              >
-                Developer Info & Architecture
-              </Link>
-
-              <Link
-                href="/admin"
-                onClick={() => setMobileMenuOpen(false)}
-                className="flex items-center gap-3 text-xs font-medium px-4 py-2.5 rounded-lg text-slate-400 hover:text-white hover:bg-white/[0.04]"
-              >
-                <Settings className="h-4 w-4 text-amber-400" />
-                Admin Staging Portal
-              </Link>
-
-              <div className="pt-2 px-4 flex items-center justify-between text-[11px] text-slate-500 border-t border-white/[0.06] mt-2">
-                <span>System Status</span>
-                <span className={`font-semibold ${backendOnline ? 'text-emerald-400' : 'text-rose-400'}`}>
-                  {backendOnline ? '● Engine Active' : '○ Engine Offline'}
+              {/* Core Links */}
+              <div className="space-y-1">
+                <span className="text-[10px] uppercase font-bold text-slate-500 px-3 tracking-wider">
+                  Main Navigation
                 </span>
+                <Link
+                  href="/"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className={`flex items-center gap-3 text-xs font-semibold px-3 py-2.5 rounded-lg ${
+                    pathname === '/' ? 'bg-blue-600/15 text-blue-400 font-bold' : 'text-slate-200 hover:bg-white/[0.04]'
+                  }`}
+                >
+                  <Home className="h-4 w-4 text-slate-400" />
+                  <span>Home</span>
+                </Link>
+
+                <Link
+                  href="/schemes"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className={`flex items-center gap-3 text-xs font-semibold px-3 py-2.5 rounded-lg ${
+                    pathname === '/schemes' ? 'bg-blue-600/15 text-blue-400 font-bold' : 'text-slate-200 hover:bg-white/[0.04]'
+                  }`}
+                >
+                  <Layers className="h-4 w-4 text-slate-400" />
+                  <span>All Government Schemes</span>
+                </Link>
+
+                <Link
+                  href="/compare"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className={`flex items-center justify-between text-xs font-semibold px-3 py-2.5 rounded-lg ${
+                    pathname === '/compare' ? 'bg-blue-600/15 text-blue-400 font-bold' : 'text-slate-200 hover:bg-white/[0.04]'
+                  }`}
+                >
+                  <div className="flex items-center gap-3">
+                    <Scale className="h-4 w-4 text-slate-400" />
+                    <span>Compare Schemes</span>
+                  </div>
+                  {compareCount > 0 && (
+                    <span className="px-2 py-0.5 rounded-full text-[9px] font-bold bg-blue-600 text-white">
+                      {compareCount}
+                    </span>
+                  )}
+                </Link>
+
+                <Link
+                  href="/chat"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className={`flex items-center gap-3 text-xs font-semibold px-3 py-2.5 rounded-lg ${
+                    pathname === '/chat' ? 'bg-blue-600/15 text-blue-400 font-bold' : 'text-slate-200 hover:bg-white/[0.04]'
+                  }`}
+                >
+                  <Bot className="h-4 w-4 text-blue-400" />
+                  <span>Advisor AI</span>
+                </Link>
+
+                <Link
+                  href="/dashboard"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className={`flex items-center gap-3 text-xs font-semibold px-3 py-2.5 rounded-lg ${
+                    pathname === '/dashboard' ? 'bg-blue-600/15 text-blue-400 font-bold' : 'text-slate-200 hover:bg-white/[0.04]'
+                  }`}
+                >
+                  <LayoutDashboard className="h-4 w-4 text-slate-400" />
+                  <span>Citizen Dashboard</span>
+                </Link>
               </div>
+
+              {/* Sector Hubs Mobile Links */}
+              <div className="space-y-1 pt-2 border-t border-white/[0.06]">
+                <span className="text-[10px] uppercase font-bold text-slate-500 px-3 tracking-wider">
+                  Sector Welfare Portals
+                </span>
+                <div className="grid grid-cols-2 gap-1.5 pt-1">
+                  <Link
+                    href="/hubs/farmer"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="flex items-center gap-2 p-2 rounded-lg bg-white/[0.03] text-xs font-medium text-slate-300 hover:text-white"
+                  >
+                    <Sprout className="h-3.5 w-3.5 text-emerald-400" />
+                    <span>Farmers</span>
+                  </Link>
+                  <Link
+                    href="/hubs/student"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="flex items-center gap-2 p-2 rounded-lg bg-white/[0.03] text-xs font-medium text-slate-300 hover:text-white"
+                  >
+                    <GraduationCap className="h-3.5 w-3.5 text-blue-400" />
+                    <span>Students</span>
+                  </Link>
+                  <Link
+                    href="/hubs/women"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="flex items-center gap-2 p-2 rounded-lg bg-white/[0.03] text-xs font-medium text-slate-300 hover:text-white"
+                  >
+                    <HeartHandshake className="h-3.5 w-3.5 text-pink-400" />
+                    <span>Women</span>
+                  </Link>
+                  <Link
+                    href="/hubs/startup"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="flex items-center gap-2 p-2 rounded-lg bg-white/[0.03] text-xs font-medium text-slate-300 hover:text-white"
+                  >
+                    <Rocket className="h-3.5 w-3.5 text-amber-400" />
+                    <span>Startups</span>
+                  </Link>
+                </div>
+              </div>
+
+              {/* Utilities & Status */}
+              <div className="pt-2 border-t border-white/[0.06] space-y-2">
+                <Link
+                  href="/admin"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex items-center gap-2.5 text-xs font-medium px-3 py-2 rounded-lg text-slate-400 hover:text-white"
+                >
+                  <Settings className="h-3.5 w-3.5" />
+                  <span>Admin Staging Portal</span>
+                </Link>
+
+                <div className="px-3 py-2 flex items-center justify-between text-[11px] text-slate-500 bg-white/[0.02] rounded-lg">
+                  <span>API Engine Status</span>
+                  <span className={`font-semibold ${backendOnline ? 'text-emerald-400' : 'text-rose-400'}`}>
+                    {backendOnline ? '● Operational' : '○ Offline'}
+                  </span>
+                </div>
+              </div>
+
             </div>
           </div>
         )}

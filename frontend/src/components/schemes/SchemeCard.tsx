@@ -1,24 +1,26 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { EligibleSchemeResult } from '../../types/eligibility';
 import { useApp } from '../../context/AppContext';
-import { api } from '../../lib/api';
 import { formatIndianCurrency } from '../../lib/formatter';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { Modal } from '../common/Modal';
 import { 
   ShieldCheck, 
   ExternalLink, 
-  Sparkles, 
   Bookmark, 
   BookmarkCheck, 
   ArrowRight,
   Building2,
   Coins,
   CheckCircle2,
-  XCircle,
-  Scale
+  Scale,
+  MoreVertical,
+  Share2,
+  Copy,
+  Check,
+  Bot
 } from 'lucide-react';
 
 interface SchemeCardProps {
@@ -27,10 +29,9 @@ interface SchemeCardProps {
 }
 
 export const SchemeCard: React.FC<SchemeCardProps> = ({ scheme, isMatchedView = true }) => {
-  const { language, t } = useApp();
-  const router = useRouter();
+  const { language } = useApp();
 
-  // Initialize bookmark state from localStorage safely without synchronous cascading re-render
+  // Initialize bookmark state from localStorage
   const [isBookmarked, setIsBookmarked] = useState<boolean>(() => {
     if (typeof window !== 'undefined') {
       try {
@@ -55,23 +56,35 @@ export const SchemeCard: React.FC<SchemeCardProps> = ({ scheme, isMatchedView = 
     return false;
   });
 
-  const [aiLoading, setAiLoading] = useState<boolean>(false);
-  const [aiExplanation, setAiExplanation] = useState<string | undefined>(scheme.ai_explanation);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [shareModalOpen, setShareModalOpen] = useState(false);
+  const [copied, setCopied] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const handleStorage = () => {
       try {
         const saved = JSON.parse(localStorage.getItem('govscheme_bookmarks') || '[]');
-        if (Array.isArray(saved)) {
-          setIsBookmarked(saved.includes(scheme.slug));
-        }
+        if (Array.isArray(saved)) setIsBookmarked(saved.includes(scheme.slug));
+        const compares = JSON.parse(localStorage.getItem('govscheme_compare') || '[]');
+        if (Array.isArray(compares)) setIsCompared(compares.includes(scheme.slug));
       } catch {
-        // Ignore JSON parse errors
+        // ignore
       }
     };
     window.addEventListener('storage', handleStorage);
     return () => window.removeEventListener('storage', handleStorage);
   }, [scheme.slug]);
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        setMenuOpen(false);
+      }
+    };
+    if (menuOpen) document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [menuOpen]);
 
   const toggleBookmark = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -103,7 +116,6 @@ export const SchemeCard: React.FC<SchemeCardProps> = ({ scheme, isMatchedView = 
         setIsCompared(false);
       } else {
         if (compareList.length >= 3) {
-          // Keep max 3 for side-by-side comparison
           updated = [...compareList.slice(1), scheme.slug];
         } else {
           updated = [...compareList, scheme.slug];
@@ -116,258 +128,234 @@ export const SchemeCard: React.FC<SchemeCardProps> = ({ scheme, isMatchedView = 
     }
   };
 
-  const handleExplain = async (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    if (aiExplanation) return;
-    setAiLoading(true);
-    try {
-      const chatData = await api.sendChatMessage({
-        message: `Briefly explain why an eligible citizen should consider: "${scheme.name}". Benefits: ${scheme.benefits_amount || 'Financial and welfare assistance'}. Category: ${scheme.category_name || 'General'}. Max 2 clear sentences.`,
-        language: (language === 'hi' ? 'hi' : 'en') as 'en' | 'hi',
-      });
-      setAiExplanation(chatData.response);
-    } catch (err) {
-      console.error('AI explanation error:', err);
-      setAiExplanation("AI analysis temporarily offline. Check the official eligibility criteria on the scheme details page.");
-    } finally {
-      setAiLoading(false);
-    }
-  };
-
-  const handleCardClick = () => {
-    // Record into recently viewed in localStorage
+  const handleCopyLink = () => {
     if (typeof window !== 'undefined') {
-      try {
-        const recent = JSON.parse(localStorage.getItem('govscheme_recently_viewed') || '[]');
-        const filtered = recent.filter((r: { slug: string }) => r.slug !== scheme.slug);
-        const updated = [
-          {
-            id: scheme.id,
-            slug: scheme.slug,
-            name: scheme.name,
-            name_hi: scheme.name_hi,
-            category_name: scheme.category_name,
-            level: scheme.level,
-            benefits_amount: scheme.benefits_amount,
-          },
-          ...filtered,
-        ].slice(0, 6);
-        localStorage.setItem('govscheme_recently_viewed', JSON.stringify(updated));
-      } catch (err) {
-        console.warn('Recently viewed storage error:', err);
-      }
+      const url = `${window.location.origin}/schemes/${scheme.slug}`;
+      navigator.clipboard.writeText(url);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
     }
-    router.push(`/schemes/${scheme.slug}`);
-  };
-
-  const handleInnerLinkClick = (e: React.MouseEvent) => {
-    e.stopPropagation();
   };
 
   const displayName = language === 'hi' && scheme.name_hi ? scheme.name_hi : scheme.name;
+  const isCentral = scheme.level === 'Central' || !scheme.level;
 
   return (
-    <article 
-      onClick={handleCardClick}
-      className="gov-card scheme-card gov-card-hover p-5 sm:p-6 relative overflow-hidden group cursor-pointer flex flex-col justify-between border border-white/[0.08] hover:border-purple-500/40"
-      aria-label={`Scheme: ${displayName}`}
-    >
-      {/* Top Subtle Radial Accent */}
-      <div 
-        className="absolute top-0 right-0 w-36 h-36 bg-gradient-to-bl from-purple-600/10 via-purple-600/5 to-transparent rounded-bl-full pointer-events-none transition-opacity duration-300 opacity-60 group-hover:opacity-100" 
-        aria-hidden="true" 
-      />
+    <>
+      <article
+        className="gov-card gov-card-hover rounded-2xl p-5 sm:p-6 flex flex-col justify-between relative group border border-white/[0.08] transition-all bg-[#111827]"
+        aria-labelledby={`scheme-title-${scheme.slug}`}
+      >
+        <div className="space-y-3.5">
+          {/* Card Top Strip: Category Badge + Scheme Level + Contextual Menu */}
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex items-center gap-1.5 flex-wrap">
+              <span className="text-[10px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-md bg-blue-500/10 text-blue-400 border border-blue-500/20">
+                {scheme.category_name || 'General Welfare'}
+              </span>
+              <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md border ${
+                isCentral 
+                  ? 'bg-amber-500/10 text-amber-400 border-amber-500/20' 
+                  : 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
+              }`}>
+                {isCentral ? 'Central Scheme' : `State: ${scheme.state_name || 'State'}`}
+              </span>
+            </div>
 
-      <div className="flex flex-col gap-4">
-        {/* Badges & Actions Row */}
-        <div className="flex items-start justify-between gap-3">
-          <div className="flex flex-wrap items-center gap-1.5 flex-1">
-            {/* Category Pill */}
-            <span className="text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-md bg-purple-500/10 text-purple-300 border border-purple-500/20">
-              {scheme.category_name || 'General Welfare'}
-            </span>
-
-            {/* Government Level Pill */}
-            <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded-md bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">
-              {scheme.level || 'Central'}
-            </span>
-
-            {/* Verified Official Source Badge */}
-            <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-emerald-400 bg-emerald-500/10 px-2 py-1 rounded-md border border-emerald-500/20">
-              <ShieldCheck className="h-3 w-3 shrink-0" aria-hidden="true" />
-              <span>Official</span>
-            </span>
-          </div>
-
-          {/* Action Icons: Bookmark & Compare */}
-          <div className="flex items-center gap-1.5 shrink-0">
-            {/* Compare Toggle */}
-            <button
-              type="button"
-              onClick={toggleCompare}
-              title={isCompared ? "Remove from comparison" : "Add to side-by-side comparison"}
-              aria-label={isCompared ? "Remove from comparison" : "Add to comparison"}
-              className={`p-1.5 rounded-lg border text-xs transition-colors cursor-pointer ${
-                isCompared
-                  ? 'bg-purple-600/25 border-purple-500/50 text-purple-300'
-                  : 'bg-[#0E1017] border-white/[0.08] text-slate-400 hover:text-white hover:border-purple-500/30'
-              }`}
-            >
-              <Scale className="h-3.5 w-3.5" />
-            </button>
-
-            {/* Bookmark button */}
-            <button
-              type="button"
-              onClick={toggleBookmark}
-              title={isBookmarked ? "Remove bookmark" : "Save this scheme"}
-              aria-label={isBookmarked ? "Remove bookmark" : "Save this scheme"}
-              className={`p-1.5 rounded-lg border text-xs transition-colors cursor-pointer ${
-                isBookmarked 
-                  ? 'bg-purple-600/25 border-purple-500/50 text-purple-300' 
-                  : 'bg-[#0E1017] border-white/[0.08] text-slate-400 hover:text-white hover:border-purple-500/30'
-              }`}
-            >
-              {isBookmarked ? (
-                <BookmarkCheck className="h-3.5 w-3.5 text-purple-400" />
-              ) : (
-                <Bookmark className="h-3.5 w-3.5" />
-              )}
-            </button>
-
-            {/* Match Percentage Badge */}
-            {isMatchedView && scheme.match_score !== undefined && (
-              <div 
-                className="inline-flex flex-col items-center px-2 py-1 rounded-lg bg-[#0E1017] border border-emerald-500/30 shadow-xs"
-                title={`${Math.round(scheme.match_score * 100)}% criteria match with your profile`}
+            {/* Contextual Actions (Bookmark & Three-Dot Popover) */}
+            <div className="flex items-center gap-1">
+              <button
+                type="button"
+                onClick={toggleBookmark}
+                className={`p-1.5 rounded-lg border transition-all cursor-pointer ${
+                  isBookmarked
+                    ? 'bg-amber-500/20 text-amber-400 border-amber-500/40'
+                    : 'text-slate-400 hover:text-white border-transparent hover:bg-white/[0.05]'
+                }`}
+                title={isBookmarked ? 'Remove from Saved' : 'Save Scheme'}
+                aria-label={isBookmarked ? 'Remove from Saved' : 'Save Scheme'}
               >
-                <span className="text-xs font-black text-emerald-400 leading-none">
-                  {Math.round(scheme.match_score * 100)}%
-                </span>
-                <span className="text-[7px] uppercase tracking-wider text-slate-400 font-bold mt-0.5">
-                  Match
-                </span>
-              </div>
-            )}
-          </div>
-        </div>
+                {isBookmarked ? <BookmarkCheck className="h-4 w-4" /> : <Bookmark className="h-4 w-4" />}
+              </button>
 
-        {/* Scheme Title & Ministry */}
-        <div className="space-y-1">
-          <h3 className="font-heading text-base sm:text-lg font-bold text-slate-100 leading-snug group-hover:text-purple-300 transition-colors">
-            <Link 
-              href={`/schemes/${scheme.slug}`} 
-              onClick={handleInnerLinkClick}
-              className="focus-visible:outline-none"
+              {/* Three-Dot Menu */}
+              <div className="relative" ref={menuRef}>
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setMenuOpen(!menuOpen);
+                  }}
+                  className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-white/[0.05] transition-colors cursor-pointer"
+                  aria-label="More actions"
+                  aria-expanded={menuOpen}
+                >
+                  <MoreVertical className="h-4 w-4" />
+                </button>
+
+                {menuOpen && (
+                  <div className="absolute right-0 mt-1 w-48 rounded-xl bg-[#0E1422] border border-white/[0.1] shadow-xl p-1 z-30 animate-fade-in text-left">
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        toggleCompare(e);
+                        setMenuOpen(false);
+                      }}
+                      className="w-full flex items-center gap-2 px-2.5 py-1.5 text-xs text-slate-300 hover:text-white hover:bg-white/[0.06] rounded-md transition-colors"
+                    >
+                      <Scale className="h-3.5 w-3.5 text-blue-400" />
+                      <span>{isCompared ? 'Remove from Compare' : 'Add to Compare'}</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setShareModalOpen(true);
+                        setMenuOpen(false);
+                      }}
+                      className="w-full flex items-center gap-2 px-2.5 py-1.5 text-xs text-slate-300 hover:text-white hover:bg-white/[0.06] rounded-md transition-colors"
+                    >
+                      <Share2 className="h-3.5 w-3.5 text-amber-400" />
+                      <span>Share Scheme</span>
+                    </button>
+                    <Link
+                      href={`/chat?q=${encodeURIComponent(`Explain eligibility requirements and application steps for ${scheme.name}`)}`}
+                      className="w-full flex items-center gap-2 px-2.5 py-1.5 text-xs text-slate-300 hover:text-white hover:bg-white/[0.06] rounded-md transition-colors"
+                      onClick={() => setMenuOpen(false)}
+                    >
+                      <Bot className="h-3.5 w-3.5 text-emerald-400" />
+                      <span>Ask AI Advisor</span>
+                    </Link>
+                    {(scheme.application_url || scheme.portal_url) && (
+                      <a
+                        href={scheme.application_url || scheme.portal_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="w-full flex items-center gap-2 px-2.5 py-1.5 text-xs text-slate-300 hover:text-white hover:bg-white/[0.06] rounded-md transition-colors"
+                        onClick={() => setMenuOpen(false)}
+                      >
+                        <ExternalLink className="h-3.5 w-3.5 text-slate-400" />
+                        <span>Official Portal</span>
+                      </a>
+                    )}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Scheme Title */}
+          <Link href={`/schemes/${scheme.slug}`} className="block group/title">
+            <h3
+              id={`scheme-title-${scheme.slug}`}
+              className="font-heading text-base sm:text-lg font-bold text-slate-100 group-hover/title:text-blue-400 transition-colors line-clamp-2 leading-snug"
             >
               {displayName}
-            </Link>
-          </h3>
+            </h3>
+          </Link>
 
-          {scheme.ministry && (
-            <p className="text-xs text-slate-400 flex items-center gap-1.5 line-clamp-1">
-              <Building2 className="h-3 w-3 text-purple-400/80 shrink-0" aria-hidden="true" />
-              <span>{scheme.ministry}</span>
-            </p>
+          {/* Ministry / Department */}
+          {scheme.ministry_name && (
+            <div className="flex items-center gap-1.5 text-xs text-slate-400">
+              <Building2 className="h-3.5 w-3.5 shrink-0 text-slate-500" />
+              <span className="truncate">{scheme.ministry_name}</span>
+            </div>
+          )}
+
+          {/* Benefit Highlight Card */}
+          <div className="p-3 rounded-xl bg-[#0E1422] border border-white/[0.06] flex items-center justify-between gap-3">
+            <div className="flex items-center gap-2">
+              <div className="h-8 w-8 rounded-lg bg-emerald-500/10 text-emerald-400 flex items-center justify-center shrink-0">
+                <Coins className="h-4 w-4" />
+              </div>
+              <div>
+                <span className="text-[10px] uppercase font-bold text-slate-500 tracking-wider block">Estimated Benefit</span>
+                <span className="text-xs sm:text-sm font-bold text-emerald-400 font-heading">
+                  {scheme.benefits_amount ? formatIndianCurrency(scheme.benefits_amount) : 'Financial & Social Aid'}
+                </span>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-1 text-[10px] font-semibold text-slate-400">
+              <ShieldCheck className="h-3.5 w-3.5 text-emerald-400" />
+              <span>Official</span>
+            </div>
+          </div>
+
+          {/* Matched View Evaluation Highlights */}
+          {isMatchedView && scheme.rules_evaluation && scheme.rules_evaluation.length > 0 && (
+            <div className="space-y-1 pt-1">
+              {scheme.rules_evaluation.slice(0, 2).map((rule, idx) => (
+                <div key={idx} className="flex items-center gap-1.5 text-[11px] text-slate-300">
+                  <CheckCircle2 className="h-3 w-3 text-emerald-400 shrink-0" />
+                  <span className="truncate">{rule.replace(/^[✓✔]\s*/, '')}</span>
+                </div>
+              ))}
+            </div>
           )}
         </div>
 
-        {/* Key Benefit Allocation Card */}
-        {scheme.benefits_amount && (
-          <div className="flex items-center gap-2.5 bg-[#0E1017] border border-white/[0.06] p-2.5 rounded-xl">
-            <div className="h-7 w-7 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 shrink-0">
-              <Coins className="h-3.5 w-3.5" aria-hidden="true" />
-            </div>
-            <div className="flex flex-col">
-              <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">
-                {t('benefits')}
-              </span>
-              <span className="text-xs sm:text-sm font-bold text-slate-100 line-clamp-1">
-                {/^\d+$/.test(scheme.benefits_amount.trim()) 
-                  ? formatIndianCurrency(scheme.benefits_amount.trim()) 
-                  : scheme.benefits_amount}
-              </span>
-            </div>
-          </div>
-        )}
+        {/* Card Footer Actions */}
+        <div className="pt-4 mt-4 border-t border-white/[0.06] flex items-center justify-between gap-2">
+          {/* Quick Compare Checkbox */}
+          <button
+            type="button"
+            onClick={toggleCompare}
+            className={`flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1.5 rounded-lg border transition-all cursor-pointer ${
+              isCompared
+                ? 'bg-blue-600/20 text-blue-300 border-blue-500/40'
+                : 'text-slate-400 hover:text-slate-200 border-white/[0.06] hover:bg-white/[0.04]'
+            }`}
+          >
+            <Scale className="h-3.5 w-3.5" />
+            <span className="hidden sm:inline">{isCompared ? 'Compared' : 'Compare'}</span>
+          </button>
 
-        {/* Inline AI Explanation Card */}
-        {isMatchedView && aiExplanation && (
-          <div className="p-3 rounded-xl bg-purple-950/20 border border-purple-500/25 text-xs text-slate-200 leading-relaxed animate-fade-in">
-            <div className="flex items-center gap-1.5 font-bold text-purple-300 mb-1 text-[11px]">
-              <Sparkles className="h-3 w-3 text-purple-400" />
-              <span>Citizen Advisor Insight:</span>
-            </div>
-            <p className="text-xs text-slate-300 italic">
-              &ldquo;{aiExplanation}&rdquo;
-            </p>
-          </div>
-        )}
-
-        {/* Rule Evaluation Match Indicators */}
-        {isMatchedView && scheme.rules_evaluation && scheme.rules_evaluation.length > 0 && (
-          <div className="space-y-1.5 border-t border-white/[0.06] pt-3">
-            <span className="text-[9px] uppercase tracking-wider font-extrabold text-slate-400 block">
-              Profile Validation Status:
-            </span>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
-              {scheme.rules_evaluation.slice(0, 4).map((rule, rIdx) => {
-                const passed = rule.startsWith('✓');
-                return (
-                  <div key={rIdx} className="flex items-center gap-1.5 text-xs text-slate-300">
-                    {passed ? (
-                      <CheckCircle2 className="h-3.5 w-3.5 text-emerald-400 shrink-0" />
-                    ) : (
-                      <XCircle className="h-3.5 w-3.5 text-rose-400 shrink-0" />
-                    )}
-                    <span className="truncate text-[11px]">{rule.replace(/[✓✗]\s*/, '')}</span>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        )}
-      </div>
-
-      {/* Action Footer Bar */}
-      <div className="flex items-center justify-between border-t border-white/[0.06] pt-3 mt-4 shrink-0 gap-2">
-        <span className="text-xs text-purple-400 font-semibold group-hover:translate-x-1 transition-transform flex items-center gap-1">
-          <span>View Guidelines</span>
-          <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
-        </span>
-
-        <div className="flex items-center gap-2">
-          {/* AI Explain Button */}
-          {isMatchedView && !aiExplanation && (
-            <button
-              type="button"
-              onClick={handleExplain}
-              disabled={aiLoading}
-              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold border border-purple-500/30 bg-purple-500/10 text-purple-300 hover:bg-purple-500/20 transition-all cursor-pointer"
-            >
-              <Sparkles className="h-3 w-3 text-purple-400" />
-              <span>{aiLoading ? 'Analyzing...' : t('explainWhy')}</span>
-            </button>
-          )}
-
-          {/* Official Apply Now Link */}
-          {scheme.application_url && (
-            <a
-              href={scheme.application_url}
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={handleInnerLinkClick}
-              className="inline-flex items-center gap-1 px-3 py-1.5 bg-purple-600 hover:bg-purple-500 text-white rounded-lg text-xs font-bold transition-all shadow-xs cursor-pointer focus-visible:outline-none"
-              title="Opens official government portal (.gov.in)"
-            >
-              <span>{t('applyNow')}</span>
-              <ExternalLink className="h-3 w-3 shrink-0" aria-hidden="true" />
-            </a>
-          )}
+          {/* Primary View Action */}
+          <Link
+            href={`/schemes/${scheme.slug}`}
+            className="flex items-center gap-1 px-3.5 py-1.5 rounded-lg text-xs font-bold bg-white/[0.06] hover:bg-blue-600 text-slate-200 hover:text-white border border-white/[0.08] hover:border-blue-500 transition-all cursor-pointer"
+          >
+            <span>View Scheme</span>
+            <ArrowRight className="h-3 w-3" />
+          </Link>
         </div>
-      </div>
-    </article>
+      </article>
+
+      {/* Share Modal Dialog */}
+      <Modal
+        isOpen={shareModalOpen}
+        onClose={() => setShareModalOpen(false)}
+        title="Share Government Scheme"
+        description="Share official scheme details with fellow citizens via direct link."
+      >
+        <div className="space-y-4">
+          <div className="p-3 rounded-xl bg-[#080C15] border border-white/[0.08]">
+            <div className="text-xs font-bold text-slate-200 line-clamp-1">{scheme.name}</div>
+            <div className="text-[11px] text-slate-400 mt-0.5">{scheme.ministry_name || 'Government of India'}</div>
+          </div>
+
+          <div className="space-y-2">
+            <span className="text-[11px] text-slate-400 font-medium">Scheme Page Link</span>
+            <div className="flex items-center gap-2">
+              <input
+                type="text"
+                readOnly
+                value={typeof window !== 'undefined' ? `${window.location.origin}/schemes/${scheme.slug}` : ''}
+                className="w-full text-xs px-3 py-2 rounded-lg bg-[#080C15] border border-white/[0.1] text-slate-300"
+              />
+              <button
+                type="button"
+                onClick={handleCopyLink}
+                className="px-3.5 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold flex items-center gap-1.5 shrink-0 transition-colors cursor-pointer"
+              >
+                {copied ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
+                <span>{copied ? 'Copied' : 'Copy'}</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </Modal>
+    </>
   );
 };
 

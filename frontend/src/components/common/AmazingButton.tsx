@@ -6,7 +6,7 @@ import { Loader2 } from 'lucide-react';
 
 export interface AmazingButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   children: React.ReactNode;
-  variant?: 'primary' | 'gradient' | 'secondary' | 'ghost' | 'outline';
+  variant?: 'primary' | 'saffron' | 'gradient' | 'secondary' | 'ghost' | 'outline' | 'emerald';
   size?: 'sm' | 'md' | 'lg';
   href?: string;
   icon?: React.ReactNode;
@@ -25,34 +25,38 @@ export const AmazingButton: React.FC<AmazingButtonProps> = ({
   iconPosition = 'right',
   loading = false,
   className = '',
-  glow = true,
+  glow = false,
   disabled,
   onClick,
   type = 'button',
   ...props
 }) => {
   const sizeClasses = {
-    sm: 'px-3.5 py-1.5 text-xs rounded-xl gap-1.5',
-    md: 'px-5 py-2.5 text-sm rounded-xl gap-2',
-    lg: 'px-7 py-3.5 text-base rounded-2xl gap-2.5',
+    sm: 'px-3.5 py-1.5 text-xs rounded-lg gap-1.5',
+    md: 'px-5 py-2.5 text-xs sm:text-sm rounded-xl gap-2',
+    lg: 'px-6 py-3 text-sm sm:text-base rounded-xl gap-2.5',
   };
 
   const variantClasses = {
     primary:
-      'relative group overflow-hidden bg-gradient-to-b from-[#1E1B4B] to-[#0F0E26] text-white border border-[#8B5CF6]/40 hover:border-[#A855F7] shadow-lg shadow-[#8B5CF6]/15 hover:shadow-[#8B5CF6]/30',
+      'bg-blue-600 hover:bg-blue-500 text-white font-semibold shadow-sm hover:shadow-md border border-blue-400/20 active:bg-blue-700',
+    saffron:
+      'bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold shadow-sm hover:shadow-md border border-amber-300/30 active:bg-amber-600',
     gradient:
-      'relative group overflow-hidden bg-gradient-to-r from-[#8B5CF6] via-[#7C3AED] to-[#6D28D9] text-white font-bold shadow-lg shadow-[#8B5CF6]/25 hover:shadow-[#8B5CF6]/45 border border-white/20',
+      'bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-semibold shadow-sm hover:shadow-md border border-white/10',
+    emerald:
+      'bg-emerald-600 hover:bg-emerald-500 text-white font-semibold shadow-sm hover:shadow-md border border-emerald-400/20 active:bg-emerald-700',
     secondary:
-      'bg-[#0E1017] hover:bg-[#161926] text-slate-100 hover:text-white border border-white/[0.08] hover:border-purple-500/40 shadow-xs',
+      'bg-[#0E1422] hover:bg-[#162035] text-slate-200 hover:text-white border border-white/[0.08] hover:border-blue-500/30 shadow-xs',
     ghost:
-      'bg-transparent hover:bg-purple-600/15 text-purple-300 hover:text-purple-200',
+      'bg-transparent hover:bg-white/[0.06] text-slate-300 hover:text-white',
     outline:
-      'bg-transparent border border-purple-500/40 hover:border-purple-400 text-purple-300 hover:text-white hover:bg-purple-600/15',
+      'bg-transparent border border-blue-500/30 hover:border-blue-400 text-blue-400 hover:text-white hover:bg-blue-600/10',
   };
 
   const baseClasses = `
-    inline-flex items-center justify-center font-bold transition-all duration-300
-    active:scale-[0.98] select-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#8B5CF6]/50 focus:ring-offset-2 focus:ring-offset-[#090A0F]
+    inline-flex items-center justify-center font-heading transition-all duration-200
+    active:scale-[0.98] select-none cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/50 focus-visible:ring-offset-2 focus-visible:ring-offset-[#080C15]
     disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none disabled:active:scale-100
     ${sizeClasses[size]}
     ${variantClasses[variant]}
@@ -61,21 +65,6 @@ export const AmazingButton: React.FC<AmazingButtonProps> = ({
 
   const content = (
     <>
-      {/* Background Sheen & Hover Glow */}
-      {(variant === 'primary' || variant === 'gradient') && (
-        <span
-          className="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/15 to-transparent -translate-x-full group-hover:animate-shimmer pointer-events-none"
-          aria-hidden="true"
-        />
-      )}
-      {glow && (variant === 'primary' || variant === 'gradient') && (
-        <span
-          className="absolute -inset-0.5 bg-gradient-to-r from-[#8B5CF6] to-[#EC4899] rounded-xl opacity-0 group-hover:opacity-30 blur-sm transition-opacity duration-300 -z-10"
-          aria-hidden="true"
-        />
-      )}
-
-      {/* Content layout with loading spinner and icon */}
       {loading ? (
         <Loader2 className="h-4 w-4 animate-spin shrink-0" />
       ) : (
@@ -109,3 +98,5 @@ export const AmazingButton: React.FC<AmazingButtonProps> = ({
     </button>
   );
 };
+
+export default AmazingButton;
