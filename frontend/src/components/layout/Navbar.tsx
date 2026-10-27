@@ -1,15 +1,13 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { api } from '../../lib/api';
 import { Logo } from '../common/Logo';
-import { AmazingButton } from '../common/AmazingButton';
 import { LanguagePicker } from './LanguagePicker';
 import { DropdownMenu, DropdownItem } from '../common/DropdownMenu';
 import { 
-  Home, 
   Layers, 
   Bot, 
   Grid, 
@@ -19,20 +17,24 @@ import {
   Settings,
   Scale,
   Sparkles,
-  ShieldCheck,
   GraduationCap,
   Sprout,
   HeartHandshake,
   Rocket,
-  MoreVertical,
-  Code
+  Code,
+  FileCheck2,
+  RefreshCw,
+  ChevronDown,
+  ChevronRight
 } from 'lucide-react';
 
 export const Navbar: React.FC = () => {
   const pathname = usePathname();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [mobileSectionOpen, setMobileSectionOpen] = useState<'schemes' | 'services' | 'resources' | null>(null);
   const [backendOnline, setBackendOnline] = useState<boolean | null>(null);
   const [compareCount, setCompareCount] = useState<number>(0);
+  const mobileRef = useRef<HTMLDivElement>(null);
 
   // Check backend health engine on mount
   useEffect(() => {
@@ -49,7 +51,7 @@ export const Navbar: React.FC = () => {
     };
   }, []);
 
-  // Check compare count from localStorage
+  // Sync compare items count from localStorage
   useEffect(() => {
     const updateCompareCount = () => {
       if (typeof window !== 'undefined') {
@@ -70,7 +72,22 @@ export const Navbar: React.FC = () => {
     };
   }, []);
 
-  // Dropdown Items for "Explore Schemes"
+  // Close mobile drawer on route change or escape key
+  useEffect(() => {
+    setMobileMenuOpen(false);
+  }, [pathname]);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setMobileMenuOpen(false);
+    };
+    if (mobileMenuOpen) {
+      document.addEventListener('keydown', handleKeyDown);
+    }
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [mobileMenuOpen]);
+
+  // Dropdown Items: 1. Explore Schemes
   const exploreItems: DropdownItem[] = [
     {
       label: 'All Government Schemes',
@@ -79,224 +96,206 @@ export const Navbar: React.FC = () => {
       icon: <Layers className="h-4 w-4" />,
     },
     {
-      label: 'Sector Hubs Overview',
-      description: 'Dedicated portals for farmers, students, women & startups',
+      label: 'Side-by-Side Comparison',
+      description: 'Compare benefits, eligibility criteria & required documents',
+      href: '/compare',
+      icon: <Scale className="h-4 w-4" />,
+      badge: compareCount > 0 ? `${compareCount} saved` : undefined,
+    },
+    {
+      label: 'Sector Hubs Directory',
+      description: 'Browse specialized schemes grouped by beneficiary profile',
       href: '/hubs',
       icon: <Grid className="h-4 w-4" />,
     },
-    {
-      label: 'Side-by-Side Comparison',
-      description: 'Compare benefits, eligibility & documents for up to 3 schemes',
-      href: '/compare',
-      icon: <Scale className="h-4 w-4" />,
-      badge: compareCount > 0 ? `${compareCount}` : undefined,
-    },
     { divider: true, label: '' },
     {
-      label: 'Farmer Welfare (Kisan Hub)',
+      label: 'Farmer Welfare (Kisan)',
       description: 'PM-KISAN, crop insurance, fertilizer subsidies',
       href: '/hubs/farmer',
       icon: <Sprout className="h-4 w-4 text-[#176B52]" />,
     },
     {
-      label: 'Student Scholarships Hub',
-      description: 'National Scholarship Portal, fee waivers, fellowships',
+      label: 'Student Scholarships',
+      description: 'Fee waivers, merit scholarships & fellowships',
       href: '/hubs/student',
       icon: <GraduationCap className="h-4 w-4 text-[#176B52]" />,
     },
     {
-      label: 'Women & Child Welfare Hub',
-      description: 'Maternity assistance, SHG loans, Sukanya Samriddhi',
+      label: 'Women & Child Welfare',
+      description: 'Maternity assistance, SHG loans & Sukanya Samriddhi',
       href: '/hubs/women',
       icon: <HeartHandshake className="h-4 w-4 text-[#E8A126]" />,
     },
     {
-      label: 'Startup & MSME Credit Hub',
-      description: 'Mudra business loans, Startup India seed funding',
+      label: 'Startup & MSME Credit',
+      description: 'Mudra business loans, Startup India seed grants',
       href: '/hubs/startup',
       icon: <Rocket className="h-4 w-4 text-[#176B52]" />,
     },
   ];
 
-  // Dropdown Items for "Citizen Tools"
-  const citizenToolsItems: DropdownItem[] = [
+  // Dropdown Items: 2. Citizen Services
+  const citizenServicesItems: DropdownItem[] = [
     {
       label: 'Eligibility Quick-Scan',
-      description: 'Evaluate demographic profile against all scheme matrices',
+      description: 'Instant demographic matching across all scheme matrices',
       href: '/eligibility',
       icon: <Sparkles className="h-4 w-4 text-[#E8A126]" />,
-      badge: 'Recommended',
+      badge: '60 Seconds',
     },
     {
       label: 'Citizen Advisor AI',
-      description: 'Chat with our scheme intelligence model for guidelines',
+      description: 'Interactive conversation model for scheme guidance',
       href: '/chat',
       icon: <Bot className="h-4 w-4 text-[#176B52]" />,
     },
     {
-      label: 'Citizen Workspace / Dashboard',
-      description: 'Review saved bookmarks, recent searches & match history',
+      label: 'Citizen Workspace & Dashboard',
+      description: 'View bookmarks, matching history & application checklist',
       href: '/dashboard',
       icon: <LayoutDashboard className="h-4 w-4 text-[#176B52]" />,
     },
+    {
+      label: 'Scheme Evaluation Results',
+      description: 'View scored benefits and official application links',
+      href: '/results',
+      icon: <FileCheck2 className="h-4 w-4 text-[#176B52]" />,
+    },
   ];
 
-  // More Options Menu
-  const moreItems: DropdownItem[] = [
+  // Dropdown Items: 3. Resources
+  const resourcesItems: DropdownItem[] = [
     {
-      label: 'Admin Staging Portal',
-      description: 'Manage crawler synchronization and scheme database',
+      label: 'Scheme Updates & Scrapers',
+      description: 'Live crawler status, sync logs & freshness metrics',
+      href: '/admin/updates',
+      icon: <RefreshCw className="h-4 w-4 text-[#176B52]" />,
+    },
+    {
+      label: 'Administration Staging Portal',
+      description: 'Manage scheme records, categories & crawler tasks',
       href: '/admin',
       icon: <Settings className="h-4 w-4 text-[#687368]" />,
     },
     {
-      label: 'Developer & Architecture',
-      description: 'System specifications, APIs, and data provenance',
+      label: 'Developer APIs & Architecture',
+      description: 'System specifications, REST endpoints & data models',
       href: '/about-developer',
       icon: <Code className="h-4 w-4 text-[#687368]" />,
     },
   ];
 
+  // Check active states for top-level dropdowns
+  const isSchemesActive = pathname.startsWith('/schemes') || pathname.startsWith('/compare') || pathname.startsWith('/hubs');
+  const isServicesActive = pathname.startsWith('/eligibility') || pathname.startsWith('/chat') || pathname.startsWith('/dashboard') || pathname.startsWith('/results');
+  const isResourcesActive = pathname.startsWith('/admin') || pathname.startsWith('/about-developer');
+
   return (
     <header className="sticky top-0 z-50 w-full bg-white/95 backdrop-blur-md border-b border-[#E5E9E3]">
-      {/* Official Government Utility Announcement Strip */}
-      <div className="hidden md:flex items-center justify-between px-4 sm:px-6 lg:px-8 py-1.5 bg-[#FAF5E9] border-b border-[#F3E7CA] text-xs text-[#687368]">
-        <div className="flex items-center gap-2">
-          <span className="inline-flex items-center gap-1.5 font-semibold text-[#176B52]">
-            <ShieldCheck className="h-3.5 w-3.5" />
-            <span>GovSchemeAI Directory</span>
-          </span>
-          <span className="text-[#C5CEC4]">•</span>
-          <span>Verified Central & State Government Welfare Schemes</span>
-        </div>
-        <div className="flex items-center gap-4 text-[#687368]">
-          <Link href="/eligibility" className="hover:text-[#176B52] font-medium flex items-center gap-1 transition-colors">
-            <Sparkles className="h-3 w-3 text-[#E8A126]" />
-            <span>Find Eligible Benefits</span>
-          </Link>
-          <span className="text-[#C5CEC4]">•</span>
-          <span className="text-[#687368]">100% Free Public Resource</span>
-        </div>
-      </div>
-
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 items-center justify-between gap-4">
           
-          {/* Brand Logo */}
+          {/* 1. Left: Brand Logo */}
           <div className="flex items-center shrink-0">
             <Link href="/" className="group flex items-center focus-visible:outline-none">
               <Logo variant="with-subtitle" size="md" />
             </Link>
           </div>
 
-          {/* Desktop Smart Grouped Navigation */}
-          <nav className="hidden lg:flex items-center gap-1.5" aria-label="Main Navigation">
+          {/* 2. Center: Exactly 4 Clean Organized Navigation Items */}
+          <nav className="hidden lg:flex items-center gap-1 xl:gap-2" aria-label="Main Navigation">
+            {/* Nav Item 1: Home */}
             <Link
               href="/"
-              className={`flex items-center gap-1.5 text-xs font-semibold px-3 py-2 rounded-xl transition-all duration-150 ${
+              className={`px-3.5 py-2 rounded-xl text-xs font-semibold transition-all duration-150 ${
                 pathname === '/'
                   ? 'bg-[#E7F3EC] text-[#176B52]'
                   : 'text-[#202820] hover:text-[#176B52] hover:bg-[#F7F8F5]'
               }`}
             >
-              <Home className="h-3.5 w-3.5 text-[#687368]" />
-              <span>Home</span>
+              Home
             </Link>
 
-            {/* Explore Schemes Dropdown */}
+            {/* Nav Item 2: Explore Schemes ▾ */}
             <DropdownMenu
               label="Explore Schemes"
-              icon={<Layers className="h-3.5 w-3.5" />}
               items={exploreItems}
               badge={compareCount > 0 ? compareCount : undefined}
+              isActive={isSchemesActive}
             />
 
-            {/* Citizen Tools Dropdown */}
+            {/* Nav Item 3: Citizen Services ▾ */}
             <DropdownMenu
-              label="Citizen Tools"
-              icon={<Sparkles className="h-3.5 w-3.5 text-[#E8A126]" />}
-              items={citizenToolsItems}
+              label="Citizen Services"
+              items={citizenServicesItems}
+              isActive={isServicesActive}
             />
 
-            {/* Direct Advisor AI Link */}
-            <Link
-              href="/chat"
-              className={`flex items-center gap-1.5 text-xs font-semibold px-3 py-2 rounded-xl transition-all duration-150 ${
-                pathname === '/chat'
-                  ? 'bg-[#E7F3EC] text-[#176B52]'
-                  : 'text-[#202820] hover:text-[#176B52] hover:bg-[#F7F8F5]'
-              }`}
-            >
-              <Bot className="h-3.5 w-3.5 text-[#176B52]" />
-              <span>Advisor AI</span>
-            </Link>
-
-            {/* Citizen Dashboard Link */}
-            <Link
-              href="/dashboard"
-              className={`flex items-center gap-1.5 text-xs font-semibold px-3 py-2 rounded-xl transition-all duration-150 ${
-                pathname === '/dashboard'
-                  ? 'bg-[#E7F3EC] text-[#176B52]'
-                  : 'text-[#202820] hover:text-[#176B52] hover:bg-[#F7F8F5]'
-              }`}
-            >
-              <LayoutDashboard className="h-3.5 w-3.5 text-[#687368]" />
-              <span>Dashboard</span>
-            </Link>
+            {/* Nav Item 4: Resources ▾ */}
+            <DropdownMenu
+              label="Resources"
+              items={resourcesItems}
+              isActive={isResourcesActive}
+            />
           </nav>
 
-          {/* Right Controls */}
-          <div className="flex items-center gap-2 sm:gap-3">
-            {/* Backend Engine Health Indicator */}
+          {/* 3. Right: Status Indicator, Language Picker & Primary Forest-Green CTA */}
+          <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+            {/* Compact Status Indicator */}
             <div
-              className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[10px] font-semibold uppercase tracking-wider bg-[#F7F8F5] border border-[#E5E9E3]"
-              title={backendOnline === null ? 'Checking API status...' : backendOnline ? 'API Engine Active' : 'API Engine Offline'}
+              className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-medium bg-[#F7F8F5] border border-[#E5E9E3] text-[#202820]"
+              title={
+                backendOnline === null
+                  ? 'Verifying service health...'
+                  : backendOnline
+                  ? 'Backend Service Operational'
+                  : 'Service Connectivity Issue'
+              }
             >
-              <div
-                className={`h-2 w-2 rounded-full ${
-                  backendOnline === null
-                    ? 'bg-slate-400 animate-pulse'
-                    : backendOnline
-                    ? 'bg-[#176B52]'
-                    : 'bg-rose-500'
-                }`}
-              />
-              <span className={backendOnline ? 'text-[#176B52]' : backendOnline === false ? 'text-rose-600' : 'text-[#687368]'}>
-                {backendOnline === null ? 'Engine' : backendOnline ? 'Online' : 'Offline'}
+              <span className="relative flex h-2 w-2">
+                <span
+                  className={`absolute inline-flex h-full w-full rounded-full opacity-75 ${
+                    backendOnline === null
+                      ? 'bg-amber-400 animate-ping'
+                      : backendOnline
+                      ? 'bg-[#176B52] animate-ping'
+                      : 'bg-rose-500'
+                  }`}
+                />
+                <span
+                  className={`relative inline-flex rounded-full h-2 w-2 ${
+                    backendOnline === null
+                      ? 'bg-amber-500'
+                      : backendOnline
+                      ? 'bg-[#176B52]'
+                      : 'bg-rose-600'
+                  }`}
+                />
+              </span>
+              <span className="hidden md:inline text-[#687368]">
+                {backendOnline === null ? 'Checking' : backendOnline ? 'Online' : 'Offline'}
               </span>
             </div>
-
-            {/* Primary Action Button: Forest Green High-Visibility CTA */}
-            <AmazingButton
-              href="/eligibility"
-              variant="primary"
-              size="sm"
-              icon={<Sparkles className="h-3.5 w-3.5" />}
-              iconPosition="left"
-              className="hidden md:inline-flex text-xs py-2 px-4 shadow-xs"
-            >
-              Check Eligibility
-            </AmazingButton>
 
             {/* Language Picker */}
             <LanguagePicker />
 
-            {/* More Contextual Actions (Desktop) */}
-            <div className="hidden lg:block">
-              <DropdownMenu
-                label=""
-                icon={<MoreVertical className="h-4 w-4 text-[#687368]" />}
-                items={moreItems}
-                align="right"
-              />
-            </div>
+            {/* Prominent Forest-Green "Check Eligibility" Action Button */}
+            <Link
+              href="/eligibility"
+              className="hidden md:inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-semibold bg-[#176B52] hover:bg-[#124C3D] text-white shadow-xs transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#176B52]/40"
+            >
+              <Sparkles className="h-3.5 w-3.5 text-[#FAF5E9]" />
+              <span>Check Eligibility</span>
+            </Link>
 
-            {/* Mobile Menu Button */}
+            {/* Mobile Menu Toggle Button */}
             <button
               type="button"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="lg:hidden flex items-center justify-center h-9 w-9 rounded-xl border border-[#E5E9E3] bg-white text-[#202820] hover:bg-[#F7F8F5] transition-all cursor-pointer"
-              aria-label="Toggle Navigation Menu"
+              className="lg:hidden flex items-center justify-center h-9 w-9 rounded-xl border border-[#E5E9E3] bg-white text-[#202820] hover:bg-[#F7F8F5] transition-colors cursor-pointer"
+              aria-label="Toggle navigation menu"
               aria-expanded={mobileMenuOpen}
             >
               {mobileMenuOpen ? <X className="h-4 w-4 text-[#202820]" /> : <Menu className="h-4 w-4 text-[#202820]" />}
@@ -304,149 +303,151 @@ export const Navbar: React.FC = () => {
           </div>
         </div>
 
-        {/* Mobile Navigation Drawer */}
+        {/* 4. Responsive Mobile Navigation Menu */}
         {mobileMenuOpen && (
-          <div className="lg:hidden border-t border-[#E5E9E3] py-4 bg-white shadow-xl animate-fade-in max-h-[85vh] overflow-y-auto">
-            <div className="space-y-4 px-2">
+          <div 
+            ref={mobileRef}
+            className="lg:hidden border-t border-[#E5E9E3] py-4 bg-white animate-fade-in max-h-[calc(100vh-4.5rem)] overflow-y-auto"
+          >
+            <div className="space-y-4 px-2 pb-6">
               
-              {/* Primary Mobile CTA */}
+              {/* Prominent Mobile CTA */}
               <Link
                 href="/eligibility"
                 onClick={() => setMobileMenuOpen(false)}
-                className="flex items-center justify-center gap-2 text-xs font-semibold px-4 py-3 rounded-xl bg-[#176B52] hover:bg-[#124C3D] text-white shadow-xs"
+                className="flex items-center justify-center gap-2 text-xs font-semibold px-4 py-3 rounded-xl bg-[#176B52] hover:bg-[#124C3D] text-white shadow-xs transition-colors"
               >
-                <Sparkles className="h-4 w-4" />
+                <Sparkles className="h-4 w-4 text-[#FAF5E9]" />
                 <span>Check My Scheme Eligibility</span>
               </Link>
 
-              {/* Core Links */}
-              <div className="space-y-1">
-                <span className="text-[10px] uppercase font-bold text-[#8A968A] px-3 tracking-wider">
-                  Main Navigation
-                </span>
-                <Link
-                  href="/"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className={`flex items-center gap-3 text-xs font-semibold px-3 py-2.5 rounded-xl ${
-                    pathname === '/' ? 'bg-[#E7F3EC] text-[#176B52]' : 'text-[#202820] hover:bg-[#F7F8F5]'
-                  }`}
-                >
-                  <Home className="h-4 w-4 text-[#687368]" />
-                  <span>Home</span>
-                </Link>
+              {/* 1. Home */}
+              <Link
+                href="/"
+                onClick={() => setMobileMenuOpen(false)}
+                className={`flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-colors ${
+                  pathname === '/'
+                    ? 'bg-[#E7F3EC] text-[#176B52]'
+                    : 'text-[#202820] hover:bg-[#F7F8F5]'
+                }`}
+              >
+                <span>Home</span>
+                <ChevronRight className="h-3.5 w-3.5 text-[#687368]" />
+              </Link>
 
-                <Link
-                  href="/schemes"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className={`flex items-center gap-3 text-xs font-semibold px-3 py-2.5 rounded-xl ${
-                    pathname === '/schemes' ? 'bg-[#E7F3EC] text-[#176B52]' : 'text-[#202820] hover:bg-[#F7F8F5]'
-                  }`}
+              {/* 2. Explore Schemes Accordion */}
+              <div className="border border-[#E5E9E3] rounded-2xl overflow-hidden bg-[#FAFBF9]">
+                <button
+                  type="button"
+                  onClick={() => setMobileSectionOpen(mobileSectionOpen === 'schemes' ? null : 'schemes')}
+                  className="w-full flex items-center justify-between px-3.5 py-2.5 text-xs font-semibold text-[#202820] hover:bg-white transition-colors cursor-pointer"
                 >
-                  <Layers className="h-4 w-4 text-[#687368]" />
-                  <span>All Government Schemes</span>
-                </Link>
-
-                <Link
-                  href="/compare"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className={`flex items-center justify-between text-xs font-semibold px-3 py-2.5 rounded-xl ${
-                    pathname === '/compare' ? 'bg-[#E7F3EC] text-[#176B52]' : 'text-[#202820] hover:bg-[#F7F8F5]'
-                  }`}
-                >
-                  <div className="flex items-center gap-3">
-                    <Scale className="h-4 w-4 text-[#687368]" />
-                    <span>Compare Schemes</span>
+                  <div className="flex items-center gap-2">
+                    <span>Explore Schemes</span>
+                    {compareCount > 0 && (
+                      <span className="px-1.5 py-0.2 rounded-full text-[10px] font-bold bg-[#176B52] text-white">
+                        {compareCount}
+                      </span>
+                    )}
                   </div>
-                  {compareCount > 0 && (
-                    <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#176B52] text-white">
-                      {compareCount}
+                  <ChevronDown className={`h-4 w-4 text-[#687368] transition-transform duration-200 ${mobileSectionOpen === 'schemes' ? 'rotate-180' : ''}`} />
+                </button>
+                {mobileSectionOpen === 'schemes' && (
+                  <div className="p-2 space-y-1 bg-white border-t border-[#E5E9E3]">
+                    {exploreItems.map((item, i) => {
+                      if (item.divider) return <div key={i} className="my-1 border-t border-[#E5E9E3]" />;
+                      return (
+                        <Link
+                          key={i}
+                          href={item.href || '#'}
+                          onClick={() => setMobileMenuOpen(false)}
+                          className="flex items-start gap-2.5 px-3 py-2 rounded-xl text-xs hover:bg-[#F7F8F5] transition-colors"
+                        >
+                          {item.icon && <span className="shrink-0 mt-0.5">{item.icon}</span>}
+                          <div className="min-w-0">
+                            <div className="font-semibold text-[#202820]">{item.label}</div>
+                            {item.description && <div className="text-[11px] text-[#687368] truncate">{item.description}</div>}
+                          </div>
+                        </Link>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+
+              {/* 3. Citizen Services Accordion */}
+              <div className="border border-[#E5E9E3] rounded-2xl overflow-hidden bg-[#FAFBF9]">
+                <button
+                  type="button"
+                  onClick={() => setMobileSectionOpen(mobileSectionOpen === 'services' ? null : 'services')}
+                  className="w-full flex items-center justify-between px-3.5 py-2.5 text-xs font-semibold text-[#202820] hover:bg-white transition-colors cursor-pointer"
+                >
+                  <div className="flex items-center gap-2">
+                    <span>Citizen Services</span>
+                    <span className="px-1.5 py-0.2 rounded-full text-[10px] font-semibold bg-[#E7F3EC] text-[#176B52]">
+                      Tools
                     </span>
-                  )}
-                </Link>
-
-                <Link
-                  href="/chat"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className={`flex items-center gap-3 text-xs font-semibold px-3 py-2.5 rounded-xl ${
-                    pathname === '/chat' ? 'bg-[#E7F3EC] text-[#176B52]' : 'text-[#202820] hover:bg-[#F7F8F5]'
-                  }`}
-                >
-                  <Bot className="h-4 w-4 text-[#176B52]" />
-                  <span>Advisor AI</span>
-                </Link>
-
-                <Link
-                  href="/dashboard"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className={`flex items-center gap-3 text-xs font-semibold px-3 py-2.5 rounded-xl ${
-                    pathname === '/dashboard' ? 'bg-[#E7F3EC] text-[#176B52]' : 'text-[#202820] hover:bg-[#F7F8F5]'
-                  }`}
-                >
-                  <LayoutDashboard className="h-4 w-4 text-[#687368]" />
-                  <span>Citizen Dashboard</span>
-                </Link>
+                  </div>
+                  <ChevronDown className={`h-4 w-4 text-[#687368] transition-transform duration-200 ${mobileSectionOpen === 'services' ? 'rotate-180' : ''}`} />
+                </button>
+                {mobileSectionOpen === 'services' && (
+                  <div className="p-2 space-y-1 bg-white border-t border-[#E5E9E3]">
+                    {citizenServicesItems.map((item, i) => (
+                      <Link
+                        key={i}
+                        href={item.href || '#'}
+                        onClick={() => setMobileMenuOpen(false)}
+                        className="flex items-start gap-2.5 px-3 py-2 rounded-xl text-xs hover:bg-[#F7F8F5] transition-colors"
+                      >
+                        {item.icon && <span className="shrink-0 mt-0.5">{item.icon}</span>}
+                        <div className="min-w-0">
+                          <div className="font-semibold text-[#202820]">{item.label}</div>
+                          {item.description && <div className="text-[11px] text-[#687368] truncate">{item.description}</div>}
+                        </div>
+                      </Link>
+                    ))}
+                  </div>
+                )}
               </div>
 
-              {/* Sector Hubs Mobile Links */}
-              <div className="space-y-1 pt-2 border-t border-[#E5E9E3]">
-                <span className="text-[10px] uppercase font-bold text-[#8A968A] px-3 tracking-wider">
-                  Sector Welfare Portals
-                </span>
-                <div className="grid grid-cols-2 gap-1.5 pt-1">
-                  <Link
-                    href="/hubs/farmer"
-                    onClick={() => setMobileMenuOpen(false)}
-                    className="flex items-center gap-2 p-2.5 rounded-xl bg-[#F7F8F5] text-xs font-medium text-[#202820] hover:bg-[#E7F3EC]"
-                  >
-                    <Sprout className="h-3.5 w-3.5 text-[#176B52]" />
-                    <span>Farmers</span>
-                  </Link>
-                  <Link
-                    href="/hubs/student"
-                    onClick={() => setMobileMenuOpen(false)}
-                    className="flex items-center gap-2 p-2.5 rounded-xl bg-[#F7F8F5] text-xs font-medium text-[#202820] hover:bg-[#E7F3EC]"
-                  >
-                    <GraduationCap className="h-3.5 w-3.5 text-[#176B52]" />
-                    <span>Students</span>
-                  </Link>
-                  <Link
-                    href="/hubs/women"
-                    onClick={() => setMobileMenuOpen(false)}
-                    className="flex items-center gap-2 p-2.5 rounded-xl bg-[#F7F8F5] text-xs font-medium text-[#202820] hover:bg-[#E7F3EC]"
-                  >
-                    <HeartHandshake className="h-3.5 w-3.5 text-[#E8A126]" />
-                    <span>Women</span>
-                  </Link>
-                  <Link
-                    href="/hubs/startup"
-                    onClick={() => setMobileMenuOpen(false)}
-                    className="flex items-center gap-2 p-2.5 rounded-xl bg-[#F7F8F5] text-xs font-medium text-[#202820] hover:bg-[#E7F3EC]"
-                  >
-                    <Rocket className="h-3.5 w-3.5 text-[#176B52]" />
-                    <span>Startups</span>
-                  </Link>
+              {/* 4. Resources Accordion */}
+              <div className="border border-[#E5E9E3] rounded-2xl overflow-hidden bg-[#FAFBF9]">
+                <button
+                  type="button"
+                  onClick={() => setMobileSectionOpen(mobileSectionOpen === 'resources' ? null : 'resources')}
+                  className="w-full flex items-center justify-between px-3.5 py-2.5 text-xs font-semibold text-[#202820] hover:bg-white transition-colors cursor-pointer"
+                >
+                  <span>Resources & System</span>
+                  <ChevronDown className={`h-4 w-4 text-[#687368] transition-transform duration-200 ${mobileSectionOpen === 'resources' ? 'rotate-180' : ''}`} />
+                </button>
+                {mobileSectionOpen === 'resources' && (
+                  <div className="p-2 space-y-1 bg-white border-t border-[#E5E9E3]">
+                    {resourcesItems.map((item, i) => (
+                      <Link
+                        key={i}
+                        href={item.href || '#'}
+                        onClick={() => setMobileMenuOpen(false)}
+                        className="flex items-start gap-2.5 px-3 py-2 rounded-xl text-xs hover:bg-[#F7F8F5] transition-colors"
+                      >
+                        {item.icon && <span className="shrink-0 mt-0.5">{item.icon}</span>}
+                        <div className="min-w-0">
+                          <div className="font-semibold text-[#202820]">{item.label}</div>
+                          {item.description && <div className="text-[11px] text-[#687368] truncate">{item.description}</div>}
+                        </div>
+                      </Link>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Mobile Footer Status & Info */}
+              <div className="pt-2 border-t border-[#E5E9E3] flex items-center justify-between text-xs text-[#687368] px-2">
+                <div className="flex items-center gap-1.5">
+                  <span className={`inline-block h-2 w-2 rounded-full ${backendOnline ? 'bg-[#176B52]' : 'bg-slate-400'}`} />
+                  <span>API Engine: {backendOnline ? 'Online' : 'Connecting'}</span>
                 </div>
+                <span>GovSchemeAI 2026</span>
               </div>
-
-              {/* Utilities & Status */}
-              <div className="pt-2 border-t border-[#E5E9E3] space-y-2">
-                <Link
-                  href="/admin"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="flex items-center gap-2.5 text-xs font-medium px-3 py-2 rounded-xl text-[#687368] hover:text-[#202820]"
-                >
-                  <Settings className="h-3.5 w-3.5" />
-                  <span>Admin Staging Portal</span>
-                </Link>
-
-                <div className="px-3 py-2 flex items-center justify-between text-xs text-[#687368] bg-[#F7F8F5] rounded-xl border border-[#E5E9E3]">
-                  <span>API Engine Status</span>
-                  <span className={`font-semibold ${backendOnline ? 'text-[#176B52]' : 'text-rose-600'}`}>
-                    {backendOnline ? '● Operational' : '○ Offline'}
-                  </span>
-                </div>
-              </div>
-
             </div>
           </div>
         )}
