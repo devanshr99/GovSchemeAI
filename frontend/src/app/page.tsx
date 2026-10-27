@@ -5,7 +5,6 @@ import { EligibilityForm } from '../components/eligibility/EligibilityForm';
 import { SchemeCard } from '../components/schemes/SchemeCard';
 import { AmazingButton } from '../components/common/AmazingButton';
 import { CompareFloatingBar } from '../components/common/CompareFloatingBar';
-import { NetworkBackground } from '../components/common/NetworkBackground';
 import { useApp } from '../context/AppContext';
 import {
   ShieldCheck, 
@@ -167,132 +166,125 @@ export default function Home() {
   };
 
   return (
-    <div className="relative min-h-screen flex flex-col justify-start py-8 sm:py-12 px-4 sm:px-6 lg:px-8 space-y-16 sm:space-y-24 bg-[#F7F8F5]">
+    <div className="relative min-h-screen flex flex-col justify-start py-8 sm:py-12 px-4 sm:px-6 lg:px-8 space-y-16 sm:space-y-24">
       
       {/* Compare Floating Tray */}
       <CompareFloatingBar />
 
-      {/* HERO SECTION CONTAINER WITH EXACT REFERENCE NETWORK ANIMATION */}
-      <section className="relative mx-auto max-w-7xl w-full rounded-3xl border border-[#CDEAEB] shadow-sm bg-[#DFF3F5] overflow-hidden">
-        {/* Exact Reference Pale-Cyan Network Animation Canvas */}
-        <NetworkBackground className="absolute inset-0 w-full h-full pointer-events-none" />
-
-        {/* Foreground Content with High-Legibility Contrast & Full Interactivity */}
-        <div className="relative z-10 flex flex-col lg:flex-row gap-12 lg:gap-16 items-center justify-between px-6 sm:px-10 lg:px-12 py-8 sm:py-12 lg:py-14">
+      {/* HERO SECTION */}
+      <section className="mx-auto max-w-7xl w-full flex flex-col lg:flex-row gap-12 lg:gap-16 items-center justify-between relative z-10 pt-2 sm:pt-4">
+        
+        {/* Left Hero Content */}
+        <div className="flex-1 space-y-6 text-left animate-fade-in w-full">
           
-          {/* Left Hero Content */}
-          <div className="flex-1 space-y-6 text-left animate-fade-in w-full">
+          <div className="space-y-4">
+            {/* Trust Pill */}
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-[#176B52]/20 bg-[#E7F3EC] text-xs font-semibold text-[#176B52]">
+              <ShieldCheck className="h-4 w-4" />
+              <span className="tracking-wide text-xs font-medium">
+                Official Directory • 130+ Verified Public Welfare Programs
+              </span>
+            </div>
+
+            {/* Headline */}
+            <h1 className="font-heading text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight leading-[1.12] text-[#202820]">
+              Government Benefits, <br className="hidden sm:inline" />
+              <span className="text-[#176B52]">Made Easier to Access.</span>
+            </h1>
+
+            {/* Subtitle */}
+            <p className="text-sm sm:text-base text-[#687368] max-w-xl leading-relaxed">
+              Discover public welfare programs tailored to your family. Check eligibility in under 60 seconds with transparent criteria and direct official application portals.
+            </p>
+          </div>
+
+          {/* Quick Search Bar */}
+          <form onSubmit={handleHeroSearchSubmit} className="max-w-xl relative">
+            <div className="relative flex items-center">
+              <Search className="absolute left-4 h-4 w-4 text-[#8A968A] pointer-events-none" />
+              <input
+                type="text"
+                value={heroSearch}
+                onChange={(e) => setHeroSearch(e.target.value)}
+                placeholder="Search by scheme name, ministry, or benefit..."
+                className="w-full pl-11 pr-28 py-3.5 rounded-2xl text-xs sm:text-sm bg-white border border-[#E5E9E3] text-[#202820] placeholder-[#8A968A] focus:border-[#176B52] focus:outline-none shadow-xs transition-all"
+              />
+              <button
+                type="submit"
+                className="absolute right-2 px-4 py-2 bg-[#176B52] hover:bg-[#124C3D] text-white rounded-xl text-xs font-semibold transition-all shadow-xs cursor-pointer"
+              >
+                Search
+              </button>
+            </div>
             
-            <div className="space-y-4">
-              {/* Trust Pill */}
-              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-[#176B52]/25 bg-white/80 backdrop-blur-xs text-xs font-semibold text-[#176B52] shadow-2xs">
-                <ShieldCheck className="h-4 w-4" />
-                <span className="tracking-wide text-xs font-medium">
-                  Official Directory • 130+ Verified Public Welfare Programs
-                </span>
-              </div>
-
-              {/* Headline */}
-              <h1 className="font-heading text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight leading-[1.12] text-[#1A2E28]">
-                Government Benefits, <br className="hidden sm:inline" />
-                <span className="text-[#176B52]">Made Easier to Access.</span>
-              </h1>
-
-              {/* Subtitle */}
-              <p className="text-sm sm:text-base text-[#3E524A] max-w-xl leading-relaxed">
-                Discover public welfare programs tailored to your family. Check eligibility in under 60 seconds with transparent criteria and direct official application portals.
-              </p>
-            </div>
-
-            {/* Quick Search Bar */}
-            <form onSubmit={handleHeroSearchSubmit} className="max-w-xl relative">
-              <div className="relative flex items-center">
-                <Search className="absolute left-4 h-4 w-4 text-[#738A84] pointer-events-none" />
-                <input
-                  type="text"
-                  value={heroSearch}
-                  onChange={(e) => setHeroSearch(e.target.value)}
-                  placeholder="Search by scheme name, ministry, or benefit..."
-                  className="w-full pl-11 pr-28 py-3.5 rounded-2xl text-xs sm:text-sm bg-white/95 backdrop-blur-xs border border-[#C6E4E7] text-[#202820] placeholder-[#738A84] focus:border-[#176B52] focus:bg-white focus:outline-none shadow-xs transition-all"
-                />
+            {/* Popular Search Pills */}
+            <div className="flex flex-wrap items-center gap-1.5 pt-3">
+              <span className="text-xs font-medium text-[#687368]">Popular:</span>
+              {popularSearches.map((term, idx) => (
                 <button
-                  type="submit"
-                  className="absolute right-2 px-4 py-2 bg-[#176B52] hover:bg-[#124C3D] text-white rounded-xl text-xs font-semibold transition-all shadow-xs cursor-pointer"
+                  key={idx}
+                  type="button"
+                  onClick={() => router.push(`/schemes?search=${encodeURIComponent(term)}`)}
+                  className="text-xs px-2.5 py-1 rounded-full bg-white border border-[#E5E9E3] text-[#4F594F] hover:text-[#176B52] hover:border-[#176B52]/40 transition-all cursor-pointer"
                 >
-                  Search
+                  {term}
                 </button>
-              </div>
-              
-              {/* Popular Search Pills */}
-              <div className="flex flex-wrap items-center gap-1.5 pt-3">
-                <span className="text-xs font-medium text-[#4F635C]">Popular:</span>
-                {popularSearches.map((term, idx) => (
-                  <button
-                    key={idx}
-                    type="button"
-                    onClick={() => router.push(`/schemes?search=${encodeURIComponent(term)}`)}
-                    className="text-xs px-2.5 py-1 rounded-full bg-white/90 backdrop-blur-xs border border-[#CBE7EA] text-[#334640] hover:text-[#176B52] hover:border-[#176B52]/50 transition-all cursor-pointer shadow-2xs"
-                  >
-                    {term}
-                  </button>
-                ))}
-              </div>
-            </form>
-
-            {/* Action CTAs */}
-            <div className="flex flex-wrap items-center gap-3 pt-1">
-              <AmazingButton
-                href="#eligibility-form"
-                variant="primary"
-                size="lg"
-                icon={<Sparkles className="h-4 w-4 text-[#E8A126]" />}
-                iconPosition="left"
-              >
-                Check My Eligibility
-              </AmazingButton>
-              <AmazingButton
-                href="/schemes"
-                variant="secondary"
-                size="lg"
-                icon={<Layers className="h-4 w-4 text-[#687368]" />}
-                iconPosition="left"
-              >
-                Explore All Schemes
-              </AmazingButton>
+              ))}
             </div>
+          </form>
 
-            {/* Live Verified Platform Metrics */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-3 max-w-2xl">
-              <div className="bg-white/90 backdrop-blur-xs p-3.5 rounded-2xl border border-[#CBE7EA] shadow-xs">
-                <div className="font-heading text-xl sm:text-2xl font-bold text-[#1A2E28]">
-                  {totalSchemes !== null ? totalSchemes : '130+'}
-                </div>
-                <div className="text-xs text-[#526B63] mt-0.5">Active Schemes</div>
-              </div>
-
-              <div className="bg-white/90 backdrop-blur-xs p-3.5 rounded-2xl border border-[#CBE7EA] shadow-xs">
-                <div className="font-heading text-xl sm:text-2xl font-bold text-[#176B52]">36</div>
-                <div className="text-xs text-[#526B63] mt-0.5">States & UTs</div>
-              </div>
-
-              <div className="bg-white/90 backdrop-blur-xs p-3.5 rounded-2xl border border-[#CBE7EA] shadow-xs">
-                <div className="font-heading text-xl sm:text-2xl font-bold text-[#D08B15]">50+</div>
-                <div className="text-xs text-[#526B63] mt-0.5">Departments</div>
-              </div>
-
-              <div className="bg-white/90 backdrop-blur-xs p-3.5 rounded-2xl border border-[#CBE7EA] shadow-xs">
-                <div className="font-heading text-xl sm:text-2xl font-bold text-[#176B52]">100%</div>
-                <div className="text-xs text-[#526B63] mt-0.5">Direct Sources</div>
-              </div>
-            </div>
-
+          {/* Action CTAs */}
+          <div className="flex flex-wrap items-center gap-3 pt-1">
+            <AmazingButton
+              href="#eligibility-form"
+              variant="primary"
+              size="lg"
+              icon={<Sparkles className="h-4 w-4 text-[#E8A126]" />}
+              iconPosition="left"
+            >
+              Check My Eligibility
+            </AmazingButton>
+            <AmazingButton
+              href="/schemes"
+              variant="secondary"
+              size="lg"
+              icon={<Layers className="h-4 w-4 text-[#687368]" />}
+              iconPosition="left"
+            >
+              Explore All Schemes
+            </AmazingButton>
           </div>
 
-          {/* Right Hero Panel: Citizen Eligibility Quick-Scan Form */}
-          <div id="eligibility-form" className="w-full lg:max-w-md animate-slide-up shrink-0 shadow-sm rounded-3xl">
-            <EligibilityForm />
+          {/* Live Verified Platform Metrics */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-3 max-w-2xl">
+            <div className="bg-white p-3.5 rounded-2xl border border-[#E5E9E3] shadow-xs">
+              <div className="font-heading text-xl sm:text-2xl font-bold text-[#202820]">
+                {totalSchemes !== null ? totalSchemes : '130+'}
+              </div>
+              <div className="text-xs text-[#687368] mt-0.5">Active Schemes</div>
+            </div>
+
+            <div className="bg-white p-3.5 rounded-2xl border border-[#E5E9E3] shadow-xs">
+              <div className="font-heading text-xl sm:text-2xl font-bold text-[#176B52]">36</div>
+              <div className="text-xs text-[#687368] mt-0.5">States & UTs</div>
+            </div>
+
+            <div className="bg-white p-3.5 rounded-2xl border border-[#E5E9E3] shadow-xs">
+              <div className="font-heading text-xl sm:text-2xl font-bold text-[#E8A126]">50+</div>
+              <div className="text-xs text-[#687368] mt-0.5">Departments</div>
+            </div>
+
+            <div className="bg-white p-3.5 rounded-2xl border border-[#E5E9E3] shadow-xs">
+              <div className="font-heading text-xl sm:text-2xl font-bold text-[#176B52]">100%</div>
+              <div className="text-xs text-[#687368] mt-0.5">Direct Sources</div>
+            </div>
           </div>
 
+        </div>
+
+        {/* Right Hero Panel: Citizen Eligibility Quick-Scan Form */}
+        <div id="eligibility-form" className="w-full lg:max-w-md animate-slide-up shrink-0">
+          <EligibilityForm />
         </div>
       </section>
 

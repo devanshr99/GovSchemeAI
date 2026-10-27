@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { AppProvider } from '../context/AppContext';
 import { Navbar } from '../components/layout/Navbar';
 import { Footer } from '../components/layout/Footer';
+import { NetworkBackground } from '../components/common/NetworkBackground';
 import './globals.css';
 
 export const metadata: Metadata = {
@@ -32,6 +33,9 @@ export default function RootLayout({
       </head>
       <body className="min-h-full flex flex-col antialiased bg-[#F7F8F5] text-[#202820] selection:bg-[#E7F3EC] selection:text-[#176B52] relative overflow-x-hidden">
         <AppProvider>
+          {/* Global Floating Animated Network Background */}
+          <NetworkBackground />
+
           {/* Foreground Application Content */}
           <div className="relative z-10 flex min-h-screen flex-col justify-between">
             <Navbar />
