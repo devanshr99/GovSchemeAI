@@ -39,7 +39,12 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     return null;
   });
 
-  const [results, setResultsState] = useState<EligibilityResponse | null>(null);
+  const [results, setResultsState] = useState<EligibilityResponse | null>(() => {
+    if (typeof window !== 'undefined') {
+      return api.getResultsFromStorage();
+    }
+    return null;
+  });
   const [loading, setLoading] = useState<boolean>(false);
   const [announcement, setAnnouncement] = useState<string>('');
 
@@ -79,6 +84,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       api.saveProfileToStorage(prof);
     } else {
       api.clearProfileFromStorage();
+      api.clearResultsFromStorage();
       setResultsState(null);
       announce(language === 'hi' ? 'प्रोफ़ाइल साफ़ कर दी गई है' : 'Profile reset successfully');
     }
@@ -86,6 +92,11 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const setResults = (res: EligibilityResponse | null) => {
     setResultsState(res);
+    if (res) {
+      api.saveResultsToStorage(res);
+    } else {
+      api.clearResultsFromStorage();
+    }
   };
 
   const t = (key: keyof typeof translations.en): string => {

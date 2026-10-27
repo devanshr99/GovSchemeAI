@@ -99,7 +99,7 @@ class WorkerManagerService:
 
                 if not job:
                     # Queue is empty, sleep and poll again
-                    await asyncio.sleep(1.0)
+                    await asyncio.sleep(3.0)
                     continue
 
                 # Transition worker status to active

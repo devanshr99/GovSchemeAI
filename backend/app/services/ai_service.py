@@ -225,15 +225,73 @@ class OpenAIProvider(AIProvider):
 
 
 class FallbackProvider(AIProvider):
-    """No-LLM fallback. Returns a template-based response."""
+    """Fallback provider when external LLM APIs are unavailable, rate limited, or out of credits.
+    Synthesizes facts directly from verified database schemes and context without hallucination.
+    """
 
     async def generate(
         self, prompt: str, system_prompt: str = "", max_tokens: int = 1024
     ) -> str:
+        # Extract structured scheme facts from RAG context
+        schemes_found = []
+        current_scheme = {}
+        for line in prompt.splitlines():
+            line_str = line.strip()
+            if line_str.startswith("Scheme Name:") or line_str.startswith("**Scheme**:") or line_str.startswith("Scheme:"):
+                if current_scheme.get("name"):
+                    schemes_found.append(current_scheme)
+                name = line_str.split(":", 1)[1].strip()
+                current_scheme = {"name": name, "benefits": "", "criteria": []}
+            elif line_str.startswith("Benefits:") or line_str.startswith("**Benefits**:") or line_str.startswith("- Benefits:"):
+                if current_scheme:
+                    current_scheme["benefits"] = line_str.split(":", 1)[1].strip()
+            elif line_str.startswith("Eligibility Criteria:") or line_str.startswith("**Eligibility Criteria**:") or line_str.startswith("- Criteria:"):
+                if current_scheme:
+                    current_scheme["criteria"].append(line_str.split(":", 1)[1].strip())
+            elif line_str.startswith("Application URL:") or line_str.startswith("Official Link:") or line_str.startswith("Application URL"):
+                if current_scheme:
+                    current_scheme["url"] = line_str.split(":", 1)[1].strip()
+
+        if current_scheme.get("name"):
+            schemes_found.append(current_scheme)
+
+        is_hindi = "Hindi" in system_prompt or "हिंदी" in prompt
+
+        if schemes_found:
+            if is_hindi:
+                lines = ["सरकारी डेटाबेस से सत्यापित योजनाओं की जानकारी:"]
+                for s in schemes_found[:3]:
+                    lines.append(f"\n📋 **{s['name']}**")
+                    if s.get("benefits"):
+                        lines.append(f"• **लाभ**: {s['benefits']}")
+                    if s.get("criteria"):
+                        lines.append(f"• **पात्रता**: {', '.join(s['criteria'][:2])}")
+                    if s.get("url"):
+                        lines.append(f"• **आधिकारिक पोर्टल**: {s['url']}")
+                lines.append("\n💡 अधिक जानकारी और ऑनलाइन आवेदन के लिए कृपया आधिकारिक सरकारी पोर्टल पर जाएं।")
+                return "\n".join(lines)
+            else:
+                lines = ["Here are the verified scheme details retrieved from official government records:"]
+                for s in schemes_found[:3]:
+                    lines.append(f"\n📋 **{s['name']}**")
+                    if s.get("benefits"):
+                        lines.append(f"• **Benefits**: {s['benefits']}")
+                    if s.get("criteria"):
+                        lines.append(f"• **Eligibility Criteria**: {', '.join(s['criteria'][:2])}")
+                    if s.get("url"):
+                        lines.append(f"• **Official Link**: {s['url']}")
+                lines.append("\n💡 Please visit the official government portals or your nearest Common Service Centre (CSC) to apply.")
+                return "\n".join(lines)
+
+        if is_hindi:
+            return (
+                "सरकारी योजना सलाहकार सेवा सक्रिय है। कृपया विशिष्ट योजना का नाम (जैसे PM-KISAN, आयुष्मान भारत) या अपनी आवश्यकता बताएं। "
+                "विस्तृत जानकारी के लिए आप 'Explore Schemes' टैब भी देख सकते हैं।"
+            )
         return (
-            "AI explanation is currently unavailable. "
-            "Please check the scheme details and eligibility criteria listed above. "
-            "For assistance, contact the helpline number provided."
+            "GovSchemeAI Knowledge Base: The assistant is connected to verified government records. "
+            "Please ask about a specific welfare scheme (e.g. PM-KISAN, Ayushman Bharat, PMAY) or criteria to retrieve full details. "
+            "You can also browse all verified schemes in the Scheme Directory."
         )
 
     async def generate_stream(
@@ -241,7 +299,15 @@ class FallbackProvider(AIProvider):
     ):
         text = await self.generate(prompt, system_prompt, max_tokens)
         if text:
-            yield text
+            words = text.split(" ")
+            chunk = []
+            for w in words:
+                chunk.append(w)
+                if len(chunk) >= 4:
+                    yield " ".join(chunk) + " "
+                    chunk = []
+            if chunk:
+                yield " ".join(chunk)
 
     async def check_availability(self) -> bool:
         return True

@@ -25,7 +25,7 @@ _is_sqlite = "sqlite" in db_url
 
 # Build engine with optimized pool configuration
 _engine_kwargs = {
-    "echo": settings.debug,
+    "echo": False,
 }
 
 if _is_sqlite:

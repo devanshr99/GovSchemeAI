@@ -30,7 +30,7 @@ class SchemeStatusUpdate(BaseModel):
 async def list_schemes(
     page: int = Query(1, ge=1),
     page_size: int = Query(20, ge=1, le=1000),
-    level: Optional[str] = Query(None, pattern="^(central|state|district)$"),
+    level: Optional[str] = Query(None, pattern="^(?i)(central|state|district)$"),
     state: Optional[str] = Query(None, min_length=2, max_length=5),
     category: Optional[str] = None,
     type: Optional[str] = None,
@@ -39,11 +39,12 @@ async def list_schemes(
     db: AsyncSession = Depends(get_db),
 ):
     """Browse all schemes with pagination, filtering, and search."""
+    normalized_level = level.lower() if level else None
     return await scheme_service.list_schemes(
         db,
         page=page,
         page_size=page_size,
-        level=level,
+        level=normalized_level,
         state_code=state,
         category_slug=category,
         scheme_type=type,

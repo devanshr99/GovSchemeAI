@@ -243,6 +243,41 @@ export const api = {
     }
   },
 
+  // Results Storage helpers
+  saveResultsToStorage: (results: EligibilityResponse): void => {
+    if (typeof window !== 'undefined') {
+      try {
+        localStorage.setItem('govscheme_results', JSON.stringify(results));
+      } catch (e) {
+        console.warn('Failed to persist eligibility results:', e);
+      }
+    }
+  },
+
+  getResultsFromStorage: (): EligibilityResponse | null => {
+    if (typeof window !== 'undefined') {
+      let stored = localStorage.getItem('govscheme_results');
+      if (!stored) {
+        stored = localStorage.getItem('yojana_results');
+      }
+      if (stored) {
+        try {
+          return JSON.parse(stored) as EligibilityResponse;
+        } catch {
+          return null;
+        }
+      }
+    }
+    return null;
+  },
+
+  clearResultsFromStorage: (): void => {
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('govscheme_results');
+      localStorage.removeItem('yojana_results');
+    }
+  },
+
   // Update Scheduler / Staging API actions
   getUpdateHealth: (): Promise<{ enabled: boolean; running: boolean; next_run: string | null; cron: string }> => {
     return fetchJson('/api/admin/updates/health');
